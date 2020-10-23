@@ -20,8 +20,17 @@ class ApiWrapper {
    * Projects
    */
   async getAllProjects() {
+    const { currentUser } = await firebase.auth();
+    const currentUserUid = currentUser.uid;
+    console.log('currentUserUid', currentUserUid, currentUser.email, currentUser.displayName);
+
     return new Promise((resolve, reject) => {
       db.collection('projects')
+        // Temporary solution to match users with projects.
+        // TODO: figure out how to enforce these in firestore.
+        // There seems to be a known bug in fireestore using `get` and `exists` in firestore rules?
+        // TODO: also figure out how to extened/modify this, to support multiple users on the same project? eg array instead of string. Also in project create
+        .where('user', '==', currentUser.email)
         .get()
         .then(querySnapshot => {
           let list = [];
@@ -43,13 +52,15 @@ class ApiWrapper {
   }
 
   async getProject(id) {
+    const { currentUser } = await firebase.auth();
+
     return new Promise((resolve, reject) => {
       const docRef = db.collection('projects').doc(id);
 
       docRef
         .get()
         .then(doc => {
-          if (doc.exists) {
+          if (doc.exists && doc.data().user === currentUser.email) {
             const tmpData = doc.data();
             const tmpResult = { project: tmpData };
             // TODO: also need to get transcript associated with project
@@ -57,21 +68,25 @@ class ApiWrapper {
             // TODO: also need to get paper-edits for project
             resolve(tmpResult);
           } else {
-            console.log('No such document!');
-            reject('No such document!');
+            console.log('No such document! getProject');
+            reject('No such document! getProject');
           }
         })
         .catch(error => {
-          console.log('Error getting document:', error);
-          reject('No such document!');
+          console.log('Error getting document getProject:', error);
+          reject('No such document! getProject');
         });
     });
   }
 
   async createProject(data) {
+    const { currentUser } = await firebase.auth();
+    const currentUserUid = currentUser.uid;
+    console.log('currentUserUid', currentUserUid, currentUser.email, currentUser.displayName);
     return new Promise((resolve, reject) => {
       db.collection('projects')
         .add({
+          user: currentUser.email,
           title: data.title,
           description: data.description,
           status: 'in-progress',
@@ -110,7 +125,7 @@ class ApiWrapper {
         })
         .catch(error => {
           console.error('Error getting document:', error);
-          reject('No such document!');
+          reject('No such document updateProject!');
         });
     });
   }
@@ -359,13 +374,13 @@ class ApiWrapper {
             resolve(tmpResult);
           } else {
             // doc.data() will be undefined in this case
-            console.log('No such document!');
-            reject('No such document!');
+            console.log('No such document! getTranscript');
+            reject('No such document! getTranscript');
           }
         })
         .catch(function(error) {
-          console.log('Error getting document:', error);
-          reject('No such document!');
+          console.log('Error getting document: getTranscript', error);
+          reject('No such document! getTranscript error');
         });
     });
   }
@@ -393,7 +408,7 @@ class ApiWrapper {
         })
         .catch(error => {
           console.log('Error getting document:', error);
-          reject('No such document!');
+          reject('No such document updateTranscript!');
         });
     });
   }
@@ -529,8 +544,8 @@ class ApiWrapper {
           resolve({ ok: true, status: 'ok', annotation: tmpData });
         })
         .catch(error => {
-          console.log('Error getting document:', error);
-          reject('No such document!');
+          console.log('Error getting document updateAnnotation:', error);
+          reject('No such document! updateAnnotation');
         });
     });
   }
@@ -586,13 +601,13 @@ class ApiWrapper {
             resolve({ ok: true, status: 'ok', labels: tmpData });
           } else {
             resolve({ ok: true, status: 'ok', labels: [] });
-            // console.log('No such document!');
-            // reject('No such document!');
+            // console.log('No such document getAllLabels!');
+            // reject('No such document getAllLabels!');
           }
         })
         .catch(function(error) {
-          console.log('Error getting document:', error);
-          reject('No such document!');
+          console.log('Error getting document getAllLabels:', error);
+          reject('No such document! getAllLabels');
         });
     });
   }
@@ -618,13 +633,13 @@ class ApiWrapper {
 
             resolve({ ok: true, status: 'ok', label });
           } else {
-            console.log('No such document!');
-            reject('No such document!');
+            console.log('No such document! getLabel');
+            reject('No such document! getLabel');
           }
         })
         .catch(function(error) {
-          console.log('Error getting document:', error);
-          reject('No such document!');
+          console.log('Error getting document getLabel:', error);
+          reject('No such document! getLabel');
         });
     });
   }
@@ -681,8 +696,8 @@ class ApiWrapper {
           resolve(resp);
         })
         .catch(error => {
-          console.log('Error getting document:', error);
-          reject('No such document!');
+          console.log('Error getting document updateLabel:', error);
+          reject('No such document updateLabel!');
         });
     });
   }
@@ -720,7 +735,6 @@ class ApiWrapper {
         .collection('projects')
         .doc(projectId)
         .collection('paperedits');
-      // const query = transcriptRef.where('projectId', '==', projectId);
 
       transcriptRef
         .get()
@@ -783,13 +797,13 @@ class ApiWrapper {
             };
             resolve(tmpResult);
           } else {
-            console.log('No such document!');
-            reject('No such document!');
+            console.log('No such document! getPaperEdit');
+            reject('No such document! getPaperEdit');
           }
         })
         .catch(function(error) {
-          console.log('Error getting document:', error);
-          reject('No such document!');
+          console.log('Error getting document getPaperEdit: ', error);
+          reject('No such document! getPaperEdit');
         });
     });
   }
@@ -849,7 +863,7 @@ class ApiWrapper {
         })
         .catch(error => {
           console.log('Error getting document:', error);
-          reject('No such document!');
+          reject('No such document! updatePaperEdit');
         });
     });
   }
@@ -953,6 +967,7 @@ class ApiWrapper {
     const projectResult = await this.getProject(projectId);
     // Get labels
     const labelsResults = await this.getAllLabels(projectId);
+    console.log('labelsResults', labelsResults);
     // package results
     const results = {
       programmeScript: paperEditResult.programmeScript,
