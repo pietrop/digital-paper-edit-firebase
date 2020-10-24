@@ -30,17 +30,22 @@ class ApiWrapper {
         // TODO: figure out how to enforce these in firestore.
         // There seems to be a known bug in fireestore using `get` and `exists` in firestore rules?
         // TODO: also figure out how to extened/modify this, to support multiple users on the same project? eg array instead of string. Also in project create
-        .where('user', '==', currentUser.email)
+        // .where('user', '==', currentUser.email)
         .get()
         .then(querySnapshot => {
           let list = [];
           querySnapshot.forEach(doc => {
             const data = doc.data();
-            const tmpData = {
-              id: doc.id,
-              ...data,
-            };
-            list.push(tmpData);
+            // temporary way to only show the user their projects
+            // TODO: it be better to make this more secure, using where compound query.
+            // as well as using firestore queries for this
+            if (data.roles[currentUser.email]) {
+              const tmpData = {
+                id: doc.id,
+                ...data,
+              };
+              list.push(tmpData);
+            }
           });
           resolve(list);
           return list;
@@ -56,11 +61,12 @@ class ApiWrapper {
 
     return new Promise((resolve, reject) => {
       const docRef = db.collection('projects').doc(id);
-
       docRef
         .get()
         .then(doc => {
-          if (doc.exists && doc.data().user === currentUser.email) {
+          // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/in
+          if (doc.exists) {
+            // && currentUser.email in doc.data().roles
             const tmpData = doc.data();
             const tmpResult = { project: tmpData };
             // TODO: also need to get transcript associated with project
@@ -68,25 +74,26 @@ class ApiWrapper {
             // TODO: also need to get paper-edits for project
             resolve(tmpResult);
           } else {
-            console.log('No such document! getProject');
-            reject('No such document! getProject');
+            console.log('No such document! getProject 1');
+            reject('No such document! getProject 2');
           }
         })
         .catch(error => {
-          console.log('Error getting document getProject:', error);
-          reject('No such document! getProject');
+          console.log('Error getting document getProject: 3', error);
+          reject('No such document! getProject 4');
         });
     });
   }
 
   async createProject(data) {
     const { currentUser } = await firebase.auth();
-    const currentUserUid = currentUser.uid;
-    console.log('currentUserUid', currentUserUid, currentUser.email, currentUser.displayName);
+    const currentUserEmail = currentUser.email;
+    const roles = {};
+    roles[currentUserEmail] = 'owner';
     return new Promise((resolve, reject) => {
       db.collection('projects')
         .add({
-          user: currentUser.email,
+          roles,
           title: data.title,
           description: data.description,
           status: 'in-progress',
