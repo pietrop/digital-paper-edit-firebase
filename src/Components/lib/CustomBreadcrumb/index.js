@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
-// import { LinkContainer } from 'react-router-bootstrap';
 
 class CustomBreadcrumb extends Component {
   render() {
     const breadcrumbs = this.props.items.map((item, index) => {
       if (item.link) {
         return (
-          // <LinkContainer key={ index } to={ item.link }>
-          <Breadcrumb.Item key={index}>{item.name}</Breadcrumb.Item>
-          // </LinkContainer>
+          <Breadcrumb.Item key={index} href={`#${item.link}`}>
+            {' '}
+            {item.name}
+          </Breadcrumb.Item>
         );
       } else {
         return (

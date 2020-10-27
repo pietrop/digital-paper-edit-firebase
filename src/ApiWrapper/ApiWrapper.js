@@ -1,8 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import querystring from 'querystring';
 import corsFetch from './cors_wrapper.js';
-import firebase, { db } from '../Firebase.js';
+import firebase, { db, analytics } from '../Firebase.js';
+
 import { type } from 'os';
+// const analytics = firebase.analytics();
 
 const DEFAULT_LABEL = {
   //TODO: is _id needed, or is it just needed for electron database?
@@ -16,6 +18,13 @@ const DEFAULT_LABEL = {
 };
 
 class ApiWrapper {
+  // constructor  () {
+  //     const { currentUser } = await firebase.auth();
+  //   const currentUserUid = currentUser.uid;
+  // firebase.analytics().setUserProperties({ favorite_food: 'apples' });
+  // analytics.logEvent('goal_completion', { name: 'lever_puzzle'});
+  // }
+
   /**
    * Projects
    */
@@ -23,7 +32,7 @@ class ApiWrapper {
     const { currentUser } = await firebase.auth();
     const currentUserUid = currentUser.uid;
     console.log('currentUserUid', currentUserUid, currentUser.email, currentUser.displayName);
-
+    analytics.logEvent('getAllProjects', 'd');
     return new Promise((resolve, reject) => {
       db.collection('projects')
         // Temporary solution to match users with projects.
@@ -36,7 +45,7 @@ class ApiWrapper {
           let list = [];
           querySnapshot.forEach(doc => {
             const data = doc.data();
-            // temporary way to only show the user their projects
+            // Temporary way to only show the user their projects
             // TODO: it be better to make this more secure, using where compound query.
             // as well as using firestore queries for this
             if (data.roles[currentUser.email]) {
@@ -58,7 +67,7 @@ class ApiWrapper {
 
   async getProject(id) {
     const { currentUser } = await firebase.auth();
-
+    firebase.analytics().logEvent('getProject', { projectId: id });
     return new Promise((resolve, reject) => {
       const docRef = db.collection('projects').doc(id);
       docRef

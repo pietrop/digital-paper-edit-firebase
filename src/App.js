@@ -1,4 +1,3 @@
-// import React, { Component, Suspense, lazy } from 'react';
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Switch, Route, HashRouter } from 'react-router-dom';
 import 'bootstrap-css-only/css/bootstrap.css';
@@ -11,7 +10,7 @@ import Row from 'react-bootstrap/Row';
 import Alert from 'react-bootstrap/Alert';
 import Skeleton from '@material-ui/lab/Skeleton';
 import CustomNavbar from './CustomNavbar';
-import firebase, { db } from './Firebase.js';
+import firebase from './Firebase.js';
 
 const Projects = lazy(() => import('./Components/Projects/index.js'));
 const Project = lazy(() => import('./Components/Projects/Project.js'));
@@ -47,7 +46,7 @@ function App(props) {
 
   useEffect(() => {});
 
-  const handleUserChange = (isUserSignedIn) => {
+  const handleUserChange = isUserSignedIn => {
     setUser(isUserSignedIn);
   };
   // eslint-disable-next-line class-methods-use-this
@@ -76,13 +75,12 @@ function App(props) {
 
   return (
     <>
-      {envWarning}
+      <HashRouter>
+        {envWarning}
+        {offlineWarning}
+        <CustomNavbar firebase={firebase} handleUserChange={handleUserChange} />
 
-      {offlineWarning}
-
-      <CustomNavbar firebase={firebase} handleUserChange={handleUserChange} />
-      {user ? (
-        <HashRouter>
+        {user ? (
           <Suspense
             fallback={
               <Container>
@@ -106,19 +104,18 @@ function App(props) {
               <Route component={NoMatch} />
             </Switch>
           </Suspense>
-        </HashRouter>
-      ) : (
-        <Container>
-          <br />
-          {/* <CustomNotice variant={'info'} title={'Login'} description={'You need to login'} /> */}
-          <p className="text-center">
-            <i>You need to login</i>
-          </p>
-        </Container>
-      )}
+        ) : (
+          <Container>
+            <br />
+
+            <p className="text-center">
+              <i>You need to login</i>
+            </p>
+          </Container>
+        )}
+      </HashRouter>
     </>
   );
-  // }
 }
 
 export default App;
