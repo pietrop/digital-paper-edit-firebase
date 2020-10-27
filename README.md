@@ -194,6 +194,8 @@ See [docs](./docs) folder
 
 We are using [this template for ADR](https://gist.github.com/iaincollins/92923cc2c309c2751aea6f1b34b31d95)
 
+<!-- firebase docs on gitbook link  -->
+
 ## Build
 
 ```sh
@@ -243,4 +245,4 @@ See [LICENCE](./LICENCE.md)
 
 ## Legal Disclaimer
 
-_Despite using React and Firebase, the BBC is not promoting any Facebook products or other commercial interest._
+_Despite using React and Firebase, this project is not promoting any Facebook or Google's products or other commercial interest._

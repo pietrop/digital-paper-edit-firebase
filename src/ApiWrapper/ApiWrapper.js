@@ -3,7 +3,7 @@ import querystring from 'querystring';
 import corsFetch from './cors_wrapper.js';
 import firebase, { db, analytics, storage } from '../Firebase.js';
 
-import { type } from 'os';
+// import { type } from 'os';
 // const analytics = firebase.analytics();
 
 const DEFAULT_LABEL = {
@@ -109,7 +109,7 @@ class ApiWrapper {
           created: firebase.firestore.FieldValue.serverTimestamp(),
           updated: firebase.firestore.FieldValue.serverTimestamp(),
         })
-        .then(docRef => {
+        .then(async docRef => {
           console.log('Document written with ID: ', docRef.id);
           const response = {};
           response.status = 'ok';
@@ -118,6 +118,9 @@ class ApiWrapper {
             title: data.title,
             description: data.description,
           };
+
+          // create default label for project
+          await this.createLabel(docRef.id, DEFAULT_LABEL);
 
           resolve(response);
         })
@@ -148,46 +151,6 @@ class ApiWrapper {
 
   async deleteProject(id) {
     return new Promise((resolve, reject) => {
-      // Delete transcripts
-      const transcriptRef = db
-        .collection('projects')
-        .doc(id)
-        .collection('transcripts');
-
-      transcriptRef
-        .get()
-        .then(querySnapshot => {
-          const transcripts = querySnapshot.forEach(doc => {
-            doc.ref.delete();
-          });
-          // TODO: does it need to resolve?
-        })
-        .catch(error => {
-          console.log('Error getting documents: ', error);
-          // TODO: does it need to reject?
-          reject(error);
-        });
-
-      // Delete paper edits
-      const paperEditsRef = db
-        .collection('projects')
-        .doc(id)
-        .collection('paperedits');
-
-      paperEditsRef
-        .get()
-        .then(querySnapshot => {
-          const paperedits = querySnapshot.forEach(doc => {
-            // Add the individual transcript firebase id to the data
-            doc.ref.delete();
-          });
-          // TODO: does it need to resolve?
-        })
-        .catch(function(error) {
-          console.log('Error getting documents: ', error);
-          // TODO: does it need to reject?
-        });
-
       // Delete projects
       db.collection('projects')
         .doc(id)
@@ -253,7 +216,10 @@ class ApiWrapper {
     const clipName = formData.get('file').name;
 
     const selectedFile = formData.get('file');
-    const storageRefName = `${uuidv4()}-${clipName}`;
+
+    const storageRefFileName = `${uuidv4()}-${clipName}`;
+    //add folder path, eg /{projectId}/...
+    const storageRefName = `${projectId}/${storageRefFileName}`;
     const storageRef = firebase.storage().ref();
     const fileRef = storageRef.child(storageRefName);
     // TODO: could add metadata - firebase.storage.child(path).put(file, metadata);  ?
@@ -341,6 +307,7 @@ class ApiWrapper {
                   ...newTranscript,
                   id: docRef.id,
                 };
+
                 resolve(response);
               })
               .catch(function(error) {
@@ -627,8 +594,7 @@ class ApiWrapper {
                 ...doc.data(),
               };
             });
-            // Default Label is not saved in DB, as it's not customizable
-            tmpData.unshift(DEFAULT_LABEL);
+
             resolve({ ok: true, status: 'ok', labels: tmpData });
           } else {
             resolve({ ok: true, status: 'ok', labels: [] });

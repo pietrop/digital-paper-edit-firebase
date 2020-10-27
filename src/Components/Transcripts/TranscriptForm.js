@@ -208,7 +208,7 @@ class TranscriptForm extends Component {
           </Form.Group>
 
           <Modal.Footer>
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" disabled={this.state.uploading}>
               Save
             </Button>
           </Modal.Footer>

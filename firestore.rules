@@ -18,16 +18,19 @@ service cloud.firestore {
 			}
       
     	function readWriteAccess(database,pId) {
-    	return get(/databases/$(database)/documents/projects/$(pId)).data.roles[request.auth.token.email] == 'owner';
+    	 return get(/databases/$(database)/documents/projects/$(pId)).data.roles[request.auth.token.email] == 'owner';
     	}
       
       match /projects/{pId}/{document=**} {
 					allow read, write: if isValidEmail() && readWriteAccess(database,pId);
 			}
+      
       		
 			// This is here to match /project root collection, coz without { doesn't seem to work
       match /{document=**}{
-      			 allow list: if isValidEmail();  
-      }	
+            // TODO: see if this needs to be made more secure 
+      			 allow read, write: if isValidEmail();  
+      }
+      
   }
 }
