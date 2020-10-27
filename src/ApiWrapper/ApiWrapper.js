@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import querystring from 'querystring';
 import corsFetch from './cors_wrapper.js';
-import firebase, { db, analytics } from '../Firebase.js';
+import firebase, { db, analytics, storage } from '../Firebase.js';
 
 import { type } from 'os';
 // const analytics = firebase.analytics();
@@ -371,23 +371,38 @@ class ApiWrapper {
         .then(doc => {
           if (doc.exists) {
             const tmpData = doc.data();
-            const tmpResult = {
-              id: doc.id,
-              projectTitle: projectData.title,
-              transcriptTitle: tmpData.title,
-              // TODO: integrate with transcript json data
-              transcript: { paragraphs: tmpData.paragraphs, words: tmpData.words },
-              // TODO: integrate with cloud storage url data
-              // TODO: change this for url of video / audio preview (mp4 or wav)
-              url: tmpData.downloadURL,
-              // TODO: add clipName
-              clipName: tmpData.clipName,
-              status: tmpData.status,
-            };
-            // TODO: also need to get transcript associated with project
-            // TODO: first do the create transcript within a project ApiWrapper
-            // TODO: also need to get paper-edits for project
-            resolve(tmpResult);
+            // In casee the url of the media expires, getting a new getDownloadURL from ref in cloud storage
+            const pathReference = storage.ref(tmpData.storageRefName);
+            // TODO: or could get it from the audio that is sent to STT
+            // to ensure HTML5 compatibility, if non HTML5 audio/video is being uploaded as source file
+            // const pathReference = storage.ref(tmpData.audioUrl);
+            pathReference
+              .getDownloadURL()
+              .then(function(url) {
+                const tmpResult = {
+                  id: doc.id,
+                  projectTitle: projectData.title,
+                  transcriptTitle: tmpData.title,
+                  // TODO: integrate with transcript json data
+                  transcript: { paragraphs: tmpData.paragraphs, words: tmpData.words },
+                  // TODO: integrate with cloud storage url data
+                  // TODO: change this for url of video / audio preview (mp4 or wav)
+                  // url: tmpData.downloadURL,
+                  url,
+                  // TODO: add clipName
+                  clipName: tmpData.clipName,
+                  status: tmpData.status,
+                };
+                // TODO: also need to get transcript associated with project
+                // TODO: first do the create transcript within a project ApiWrapper
+                // TODO: also need to get paper-edits for project
+                resolve(tmpResult);
+              })
+              .catch(function(error) {
+                // Handle any errors
+                console.log('No such document! getTranscript');
+                reject('No such document! getTranscript');
+              });
           } else {
             // doc.data() will be undefined in this case
             console.log('No such document! getTranscript');
