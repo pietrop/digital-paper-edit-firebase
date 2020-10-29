@@ -655,16 +655,16 @@ class ApiWrapper {
         .doc(projectId)
         .collection('labels')
         .add(newLabel)
-        .then(docRef => {
+        .then(async docRef => {
           const labelId = docRef.id;
           newLabel.id = labelId;
           //TODO: is _id needed, or is it just needed for electron database?
           newLabel._id = labelId;
           // TODO: get labels
-          this.updateLabel(projectId, labelId, newLabel);
+          await this.updateLabel(projectId, labelId, newLabel);
           // TODO: Is this call to get all labels needed, is it actually used by the client,
           // or can we just return  { ok: true, status: 'ok' }
-          const resp = this.getAllLabels(projectId);
+          const resp = await this.getAllLabels(projectId);
           resolve(resp);
         })
         .catch(function(error) {
