@@ -595,7 +595,7 @@ class ApiWrapper {
               };
             });
             // reversing the labels collection so that the default label in db is always at position 0 of the array.
-            resolve({ ok: true, status: 'ok', labels: tmpData.reverse() });
+            resolve({ ok: true, status: 'ok', labels: tmpData });
           } else {
             resolve({ ok: true, status: 'ok', labels: [] });
             // console.log('No such document getAllLabels!');
