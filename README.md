@@ -30,6 +30,8 @@ Setup a firebase project on [Google Cloud Firebase Dashboard](https://firebase.g
 
 Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details
 
+`Project settings` → `Your apps` → `Firebase SDK snippet`→ `CDN`
+
 ```env
 # App name used in browser title and navbar
 REACT_APP_NAME=""
@@ -44,11 +46,26 @@ REACT_APP_MEASUREMENT_ID=
 REACT_APP_API_KEY=
 ```
 
-#### Firebase API key
+#### Firebase API key for cloud function
 
 To get the value for `REACT_APP_API_KEY`. Go to the firebase dashboard, ans you can find it under:
 
 `Project settings` → `Your Project` → `Web API Key`
+
+set env in cloud function
+
+```console
+cd functions
+```
+
+set the Firebase web API key as env var for cloud functions, to be able to use to call the GCP STT operation end point, outside of the STT SDK to check progress of a transcription.
+
+```console
+firebase functions:config:set webapi.key="THE FIREBASE WEB API KEY"
+
+```
+
+[more info here](https://stackoverflow.com/questions/34442739/how-does-one-set-private-environment-variables-on-firebase-hosting)
 
 ### Firebase tools
 
