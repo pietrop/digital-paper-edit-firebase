@@ -28,8 +28,8 @@ Setup a firebase project on [Google Cloud Firebase Dashboard](https://firebase.g
 
 #### `.env`
 
-Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details.
-From [firebase dashboard](https://console.firebase.google.com/u/0/)
+Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details.  
+Then from the [firebase dashboard](https://console.firebase.google.com/u/0/)
 
 `Project settings` → `Your apps` → `Firebase SDK snippet`→ `CDN`
 
