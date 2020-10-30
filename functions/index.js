@@ -1,62 +1,183 @@
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+const createTranscriptHandler = require('./createTranscript/index.js');
+const firestoreCheckSTTHandler = require('./firestoreCheckSTT/index.js');
+
+// firebase-admin module allows us to use the Firebase platform on a server with admin access, for instance to write to the Cloud Firestore or send FCM notifications.
 admin.initializeApp();
+const db = admin.firestore();
 
-const inventoryChecker = require("./inventoryChecker");
-const audioStripper = require("./audioStripper");
-const awsUploader = require("./awsUploader");
-const sttChecker = require("./sttChecker");
-
-// Was run as a migration task
-// const compressData = require("./compressData")
-
-const config = functions.config();
-
-const bucketName = config.storage.bucket;
-const bucketTrigger = functions.storage.bucket(bucketName).object();
-const bucket = admin.storage().bucket(bucketName);
-
-exports.dpeOnFinalizeBucketObjUpdateFirestore = bucketTrigger.onFinalize((obj) =>
-  inventoryChecker.finalizeHandler(admin, obj)
-);
-
-exports.dpeOnDeleteBucketObjUpdateFirestore = bucketTrigger.onDelete((obj) =>
-  inventoryChecker.deleteHandler(admin, obj)
-);
-
-const maxRuntimeOpts = {
+const AUDIO_EXTENSION = 'ogg';
+const SAMPLE_RATE_HERTZ = 16000; // or 48000
+const MAX_RUNTIME_OPTS = {
   timeoutSeconds: 540, // 9 minutes
-  memory: "2GB",
+  memory: '2GB',
 };
+// TODO: Google cloud function triggers Goolge Cloud task
+//  Goolge Cloud task calls cloud function that calls STT SDK
+// this function returns null.
+// timeout 1min to 9min https://cloud.google.com/functions/docs/concepts/exec#timeout
+// https://firebase.google.com/docs/functions/firestore-events
+exports.createTranscript = functions
+  .runWith(MAX_RUNTIME_OPTS)
+  .firestore.document('projects/{projectId}/transcripts/{transcriptId}')
+  .onCreate(async (change, context) => {
+    return await createTranscriptHandler.createHandler(change, context, admin, AUDIO_EXTENSION, SAMPLE_RATE_HERTZ);
+  });
 
-exports.dpeOnCreateAudioFirestoreUploadToAWS = functions
-  .runWith(maxRuntimeOpts)
-  .firestore.document("apps/digital-paper-edit/users/{userId}/audio/{itemId}")
-  .onCreate((snap, context) =>
-    awsUploader.createHandler(snap, bucket, config.aws, context)
-  );
+// function to retrieve STT data from GCP STT operation
+// does this    ?
+exports.firestoreCheckSTT = functions.runWith(MAX_RUNTIME_OPTS).https.onRequest(async (req, res) => {
+  return await firestoreCheckSTTHandler.createHandler(req, res, admin, functions);
+});
 
-exports.dpeOnCreateFirestoreUploadStripAndUploadAudio = functions
-  .runWith(maxRuntimeOpts)
-  .firestore.document("apps/digital-paper-edit/users/{userId}/uploads/{itemId}")
-  .onCreate((snap, context) =>
-    audioStripper.createHandler(snap, bucket, context)
-  );
+exports.onDeleteTranscriptCleanUp = functions
+  .runWith(MAX_RUNTIME_OPTS)
+  .firestore.document('projects/{projectId}/transcripts/{transcriptId}')
+  .onDelete(async (snap, context) => {
+    const projectId = context.params.projectId;
+    const transcriptId = context.params.transcriptId;
+    // delete annotations for project being deleted
+    const annotationsRef = db
+      .collection('projects')
+      .doc(projectId)
+      .collection('transcripts')
+      .doc(transcriptId)
+      .collection('annotations');
 
-const runSchedule = config.aws.api.transcriber.schedule || "every 60 minutes";
+    await annotationsRef
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.forEach(doc => {
+          doc.ref.delete();
+        });
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
+        // TODO: does it need to reject?
+        reject(error);
+      });
 
-exports.dpeCronSTTJobChecker = functions
-  .runWith(maxRuntimeOpts)
-  .pubsub.schedule(runSchedule)
-  .onRun((context) =>
-    sttChecker.createHandler(admin, config.aws.api.transcriber, context)
-  );
+    // delete meida associated with project in cloud storage
+    function deleteMedia(storageRefPath, bucket) {
+      const file = bucket.file(storageRefPath);
+      return file.delete();
+    }
+    const defaultStorage = admin.storage();
+    const deletedValue = snap.data();
+    const storageRefPath = deletedValue.storageRefName;
+    const bucket = defaultStorage.bucket();
+    await deleteMedia(storageRefPath, bucket);
+    const storageRefPathAudioPreview = deletedValue.audioUrl;
+    await deleteMedia(storageRefPathAudioPreview, bucket);
+    return null;
+  });
 
-// For migration of DB
+exports.onDeleteProjectCleanUp = functions
+  .runWith(MAX_RUNTIME_OPTS)
+  .firestore.document('projects/{projectId}')
+  .onDelete(async (snap, context) => {
+    const projectId = context.params.projectId;
+    // Delete labels
+    const labelsRef = db
+      .collection('projects')
+      .doc(projectId)
+      .collection('labels');
 
-//  exports.compressToGrouped = functions
-//  .runWith(maxRuntimeOpts)
-//  .pubsub.schedule("every 24 hours")
-//  .onRun(() =>
-//    compressData.createHandler(admin)
-//  );
+    await labelsRef
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.forEach(doc => {
+          // Add the individual transcript firebase id to the data
+          doc.ref.delete();
+        });
+        // TODO: does it need to resolve?
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
+        // TODO: does it need to reject?
+      });
+
+    // Delete paper edits
+    const paperEditsRef = db
+      .collection('projects')
+      .doc(projectId)
+      .collection('paperedits');
+
+    await paperEditsRef
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.forEach(doc => {
+          // Add the individual transcript firebase id to the data
+          doc.ref.delete();
+        });
+        // TODO: does it need to resolve?
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
+        // TODO: does it need to reject?
+      });
+    // delete Annoations
+    // const transcriptRef = db
+    //   .collection('projects')
+    //   .doc(projectId)
+    //   .collection('transcripts');
+    // transcriptRef
+    //   .get()
+    //   .then(querySnapshot => {
+    //     const transcripts = querySnapshot.forEach(doc => {
+    //       // // deleete annoations
+    //       // try {
+    //       //   const annotationsRef = db
+    //       //     .collection('projects')
+    //       //     .doc(projectId)
+    //       //     .collection('transcripts')
+    //       //     .doc(doc.ref.id)
+    //       //     .collection('annotations');
+
+    //       //   annotationsRef
+    //       //     .get()
+    //       //     .then(querySnapshot => {
+    //       //       const annotations = querySnapshot.forEach(doc => {
+    //       //         doc.ref.delete();
+    //       //       });
+    //       //     })
+    //       //     .catch(error => {
+    //       //       console.log('Error getting documents: ', error);
+    //       //       // TODO: does it need to reject?
+    //       //       reject(error);
+    //       //     });
+    //       // } catch (e) {
+    //       //   console.error('could not delete annotations');
+    //       // }
+    //       // delete transcripts
+    //       doc.ref.delete();
+    //     });
+    //     // TODO: does it need to resolve?
+    //   })
+    //   .catch(error => {
+    //     console.log('Error getting documents: ', error);
+    //     // TODO: does it need to reject?
+    //     reject(error);
+    //   });
+
+    // Delete transcripts
+    const transcriptRef = db
+      .collection('projects')
+      .doc(projectId)
+      .collection('transcripts');
+
+    await transcriptRef
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.forEach(doc => {
+          doc.ref.delete();
+        });
+        // TODO: does it need to resolve?
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
+        // TODO: does it need to reject?
+        reject(error);
+      });
+  });

@@ -1,161 +1,133 @@
 # Digital Paper Edit - Firebase
 
-An application to make it faster, easier and more accessible to edit audio and video interviews using automatically generated transcriptions form STT service.
+<!-- _One liner + link to confluence page_
+_Screenshot of UI - optional_ -->
+
+An application to make it faster, easier and more accessible to edit audio and video interviews using automatically generated transcriptions from STT service.
 
 See [intro](./docs/intro.md) for more info on the project. And [user journey](./docs/user-journey/user-journey.md) for a high level overview of the user journey.
 
-## Development
+This is a web app version of [autoedit.io](https://www.autoedit.io) desktop app. If you are not a developer and are looking for a ready to use version check out the desktop app.
 
-### Fork: API and Client
+If you are a developer, and are not just working on this repo but are also working across the other repositories for this project, you can check out [the docs notes guides 'Visual Code Workspace Setup'](./docs/guides/visual-code-workspace-setup.md), for ease of development.
 
-A fork of the [client](https://github.com/bbc/digital-paper-edit-client) and [API](https://github.com/bbc/digital-paper-edit-api) is still being developed in the open, in **separate forks: [client](https://github.com/pietrop/digital-paper-edit-client) and [API](https://github.com/pietrop/digital-paper-edit-api)**, thanks to @pietrop.
+This project uses [Github project boards to track progress](https://github.com/pietrop/digital-paper-edit-firebase/projects)
 
-We don't want the opensource collaboration to stop, so we will be pulling in changes from the forks. If there's a valuable feature that we haven't yet implemented from the fork, please open an issue in **[this repo](https://github.com/bbc/digital-paper-edit-firebase)** or get in touch with us!
-
-#### Collaborating across forks
-
-We will look at the changes in the [fork](https://github.com/pietrop/digital-paper-edit-client) and manually add them to our [firebase version](https://github.com/bbc/digital-paper-edit-firebase).
-
-When manually adding changes to the changes from a fork - there are challenges of pulling in dependencies, such as:
-
-```javascript
-[
-  ("@bbc/aes31-adl-composer": "^1.0.1"),
-  ("@bbc/digital-paper-edit-storybook": "^1.3.2"),
-  ("@bbc/fcpx-xml-composer": "^1.0.0"),
-  ("@bbc/react-transcript-editor": "^1.4.0"),
-];
-```
-
-These dependencies (non-exhaustive) they might've been forked also. In this case, this is a matter of updating the BBC's version with the newest changes from the dependency's forks and making sure everything works together.
-
-For understanding the approach see [this PR](https://github.com/bbc/digital-paper-edit-client/pull/94).
-
-### Current project board
-
-- [~~BBC News Labs - Digital Paper Edit - Sprint Board~~](https://github.com/orgs/bbc/projects/47)
-- [BBC News Labs - Digital Paper Edit 2WOT - Sprint Board](https://github.com/orgs/bbc/projects/54)
-
-The project is divided into [concurrent milestones as described here](https://github.com/bbc/digital-paper-edit-client/milestones) with UX being an overarching milestone that cuts across these different parts.
-See [UX Approach](./docs/guides/ux-approach.md) in docs guides for more information on the UX development process.
-
-## Project Architecture
-
-This is a simplified version of the [`bbc/digital-paper-edit-client`](https://github.com/bbc/digital-paper-edit-client) application, using Firebase.
-There are many moving parts in this project, but Firebase is self-contained. If you want to see all the projects you can also look at them as a list [here](https://github.com/topics/digital-paper-edit). Most React Components are developed, maintained and imported from [`bbc/digital-paper-edit-storybook`](https://github.com/bbc/digital-paper-edit-storybook). There is a [Storybook demo website](https://bbc.github.io/digital-paper-edit-storybook/) in the repo that you access to view the components.If you want to develop with a local version of the React Components, see [here](https://github.com/bbc/digital-paper-edit-firebase/blob/master/docs/guides/npm-link.md).
-
-See docs in ADR for an understanding of the architectural decisions made. If you'd like some information on Firebase, please read [Firebase ADR](./docs/ADR/2019-11-05-firebase.md) and the [Modular Architecture ADR for more info on the implementation](./docs/ADR/2019-05-09-modular-architecture.md)
-
-![Firebase architecture diagram](./docs/img/firebase-arch.png)
-
-## Versioning
-
-The projects use [npm semantic versioning](https://docs.npmjs.com/about-semantic-versioning)
+You can also checkout the [autoEdit 3 (Digital Paper Edit) project board](https://github.com/users/pietrop/projects/1), that tracks issues and tickets across repositories.
 
 ## Setup
 
-This project uses `npm`.
+<!-- _stack - optional_
+_How to build and run the code/app_ -->
 
-## Configuration
+### Configuration
 
-[`.env`](./.env) contains environment variables setting up against the `dev` environment. You can copy over the `.env.example` to start.
-`REACT_APP_NAME` is used in browser title and navbar component.
+#### `.env`
 
-```bash
-REACT_APP_NAME="digital-paper-edit"
+setup a firebase project on[Google Cloud Firebase Dashboard](https://firebase.google.com/). See [firebase docs](https://firebase.google.com/docs/web/setup), or [these notes](https://textav.gitbook.io/firebase-react-notes/react-+-firebase/firebase-create-react-app-setup) for more info.
+
+Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details
+
+```env
+# App name used in browser title and navbar
+REACT_APP_NAME=""
 REACT_APP_NODE_ENV="development"
-REACT_APP_PROTOTYPE_BY="BBC News Labs"
-REACT_APP_PROTOTYPE_BY_LINK="http://bbcnewslabs.co.uk"
+REACT_APP_AUTH_DOMAIN=
+REACT_APP_DATABASE_URL=
+REACT_APP_PROJECT_ID=digital-paper-edit
+REACT_APP_STORAGE_BUCKET=
+REACT_APP_MESSAGING_SENDER_ID=
+REACT_APP_APP_ID=
+REACT_APP_MEASUREMENT_ID=
+REACT_APP_API_KEY=
 ```
 
-### Firebase specific configuration
+#### Firebase API key
 
-[This doc from Firebase is handy to understand the variables](https://firebase.google.com/docs/web/setup)
+To get the value for `REACT_APP_API_KEY`. Go to the firebase dashboard, ans you can find it under:
 
-```js
-let firebaseConfig = {
-  apiKey: "api-key",
-  authDomain: "project-id.firebaseapp.com",
-  databaseURL: "https://project-id.firebaseio.com",
-  projectId: "project-id",
-  storageBucket: "project-id.appspot.com",
-  messagingSenderId: "sender-id",
-  appId: "app-id",
-  measurementId: "G-measurement-id",
-};
+`Project settings` → `Your Project` → `Web API Key`
+
+### Firebase tools
+
+Install firebase tools on your local system, if you don't already have them
+
+```console
+npm install -g firebase-tools
 ```
 
-If you do change this and you want Travis to run deployment, you will need to encrypt it using Travis CLI's `encrypt-file` feature and recommit `.env.enc`.
+### Create a Google Task/Queue
 
-#### CORS
+[Create a Google Queue ](https://cloud.google.com/tasks/docs/creating-queues#creating_a_queue) (`firestore-stt`) to use Google Task within this project. This is for using [GCP STT](https://cloud.google.com/speech-to-text) with firebase cloud functions. See architecture diagram for more info.
 
-The `cors.json` file in root has been used to update the setting for GCP Storage to get the media file for playback.
-
-```
-gsutil cors set cors.json gs://dev-digital-paper-edit
+```console
+gcloud tasks queues create `firestore-stt`
 ```
 
-## Local Development
+if you don't have [`gcloud`](https://cloud.google.com/sdk/gcloud) you can either set it up, or use the [gcp cloud shell](https://cloud.google.com/shell), in [cloud console](https://cloud.google.com/cloud-console) for the project.
 
-You must setup the Firebase credentials in order to develop the project - as mentioned in above [section](#Firebase-specific-configuration). If you are BBC staff, please sign into the corporate GCP account. Firebase can be free, but some parts of the app may not work.
-In root of the project (`cd digital-paper-edit-firebase`):
+### setting up CORS for this project
 
-```sh
-npm run start
+Checkout [`cors.json`](./cors.json)
+
+```json
+[
+  {
+    "maxAgeSeconds": 3600,
+    "method": ["GET"],
+    "origin": ["*"]
+  }
+]
 ```
 
-which maps to `"run-p --race dev:firebase dev:react",`
+[install gsutil](https://cloud.google.com/storage/docs/gsutil_install)
 
-This will start two servers: proxy (`3000`) and Firebase server (`4000`). You should have an entry point app running in port `3000`. **Note that this is accessing real data, rather than a dummy one.** We are trying to resolve this in [#31](https://github.com/bbc/digital-paper-edit-firebase/issues/31)
+In termianl use the [`cors.json`](./cors.json) file to set the project's CORS as follow
 
-```js
-{
-    "dev:firebase": "firebase serve -p 4000",
-    "dev:react": "cross-env REACT_APP_NODE_ENV=development react-scripts start",
-}
+```console
+gsutil cors set cors.json gs://<gcp-firebase-project-name>.appspot.com
 ```
 
-### Local version of React Components (DPE-Storybook)
+_replace `<gcp-firebase-project-name>` with the name of your firebase project_
 
-If you want to develop with a local version of the React Components, see [here](https://github.com/bbc/digital-paper-edit-firebase/blob/master/docs/guides/npm-link.md).
+See links below for more info on setting CORS on a Firebase project
 
-## Production and Deployment
+- [Cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/cross-origin#Configuring-CORS-on-a-Bucket)
+- [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors#json-api)
+- [Firebase Storage and Access-Control-Allow-Origin](https://stackoverflow.com/questions/37760695/firebase-storage-and-access-control-allow-origin)
 
-See Configuration step above and configure `firebase.json`, `.firebaserc` to change the sitename and environment. The deployment will be done via [`Travis CI`](https://travis-ci.org/github/bbc/digital-paper-edit-firebase)
+<!-- ```
+gsutil cors set cors.json gs://dj-con-innovation-dpe-web-poc.appspot.com
+``` -->
 
-To deploy to development environment:
+### Firebase login
 
-```sh
-npm run deploy:dev:hosting
+```console
+firebase login
 ```
 
-To deploy to production environment:
+## Usage - development
 
-```sh
-npm run deploy:prod:hosting
+```console
+npm start
 ```
 
-Both steps will remove the build folder, rebuild and deploy, using `firebase cli tools`. You must ensure that Firebase is installed globally (`npm i -g firebase-tools`).
-
-Read more about [Firebase](https://firebase.google.com/) and initialising [here](https://firebase.google.com/docs/cli).
+Runs firebase dev enviroment, and the react client. Checkout [http://localhost:3000](http://localhost:3000)
 
 ## System Architecture
 
-React is setup using [Create React App](https://facebook.github.io/create-react-app/docs/getting-started).
+This is a modified version of the [`pietrop/digital-paper-edit-client`](https://github.com/pietrop/digital-paper-edit-client) application, using Firebase.
 
-> You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
->
-> To learn React, check out the [React documentation](https://reactjs.org/).
+_The plan is to, after adding core functionalities to the web app to be on par with the desktop app, to further refactor it to follow a [modular architecture approach (more details in this talk)](https://textav.gitbook.io/textav-event-2018/projects/autoedit-panel-for-adobe-cep-pietro), that encourages reusability at component level_
 
-## Development env
+![Firebase Arc](./docs/img/dpe-firebase.png)
 
-- [ ] npm > `6.11.3`
-- [ ] node v 10 - [lts/dubnium](https://scotch.io/tutorials/whats-new-in-node-10-dubnium)
-- [ ] see [`.eslintrc`](./.eslintrc) in the various packages for linting rules
+GCP STT Firebase cloud functions + cloud task setup, in mode details
+![Firebase Arc](./docs/img/dpe-firebase-stt.png)
 
-Node version is set in node version manager [`.nvmrc`](https://github.com/creationix/nvm#nvmrc)
+<!-- _High level overview of system architecture_ -->
 
-### Functions
+<!-- ### Google Cloud Functions
 
 Use node v8 in Functions directory.
 
@@ -163,61 +135,64 @@ Developing is a lot easier if you have your **local emulator** set up.
 
 1. Follow the instructions [here](https://firebase.google.com/docs/functions/local-2. emulator#set_up_admin_credentials_optional) to get the admin credentials.
 2. You need to save this as `gcp-credentials.json` and keep it in your `digital-paper-edit-firebase/functions` folder.
-3. Run `./start_firebase_shell` in functions folder.
+3. Run `./start_firebase_shell` in functions folder. -->
+
    <!-- TODO: Setup eslint in express server -->
 
-## Documentation
+<!-- ## Development env -->
+<!-- _How to run the development environment_
+_Coding style convention ref optional, eg which linter to use_
+_Linting, github pre-push hook - optional_ -->
 
-See [docs](./docs) folder
+## Docs
 
-- [`docs/features-list`](./docs/features-list.md) overview of main features of the app.
+See [docs](./docs) folder.
+
 - [`docs/user-journey/user-journey.md`](./docs/user-journey/user-journey.md) overview of main features of the app.
 - [`docs/notes/`](./docs/notes/) contains unsorted dev notes on various aspects of the project (think of it as drafts).
 - [`docs/guides/`](./docs/guides/) contains good to know/how to on various aspects of the project.
-  - [`guides/admin-view`](./docs/guides/admin-view.md) contains instructions on the Admin View
-  - [`guides/create-new-users`](./docs/guides/create-new-users.md) contains instructions for adding new users to DPE
+
+### ADR
+
 - [`docs/adr/`](./docs/adr/) contains [Architecture Decision Record](https://github.com/joelparkerhenderson/architecture_decision_record).
 
 > An architectural decision record (ADR) is a document that captures an important architectural decision made along with its context and consequences.
 
 We are using [this template for ADR](https://gist.github.com/iaincollins/92923cc2c309c2751aea6f1b34b31d95)
 
+## Development env
+
+- [ ] npm > `6.13.4`
+- [ ] node v 10 - [lts/dubnium](https://scotch.io/tutorials/whats-new-in-node-10-dubnium)
+- [ ] see [`.eslintrc`](./.eslintrc) in the various packages for linting rules
+
+Node version is set in node version manager [`.nvmrc`](https://github.com/creationix/nvm#nvmrc)
+
 ## Build
 
-```sh
+<!-- _How to run build_ -->
+
+To build the client side react app run
+
+```console
 npm run build
 ```
 
-Build of react client side will be in `build`
-
-> Builds the app for production to the `build` folder.<br />
-> It correctly bundles React in production mode and optimizes the build for the best performance.
->
-> The build is minified and the filenames include the hashes.<br />
-> Your app is ready to be deployed!
-
 ## Tests
 
-Test coverage using [`jest`](https://jestjs.io/), to run tests
+<!-- _How to carry out tests_ -->
 
-```sh
-npm run test
+_NA_
+
+## Deployment
+
+<!-- _How to deploy the code/app into test/staging/production_ -->
+
+To deploy the project onto firebase (cloud functions, and firebase hosting) run (this also builds the react app)
+
+```console
+npm run deploy:all
 ```
-
-During development you can use
-
-```sh
-npm run test:watch
-```
-
-> Launches the test runner in the interactive watch mode.<br/ >
-> See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-<!-- See README for individual packages for more details -->
-
-<!-- ## Travis CI
-
-On commit this repo uses the [.travis.yml](./.travis.yml) config tu run the automated test on [travis CI](https://travis-ci.org/bbc/react-transcript-editor). -->
 
 ## Contributing
 
@@ -231,4 +206,4 @@ See [LICENCE](./LICENCE.md)
 
 ## Legal Disclaimer
 
-_Despite using React and Firebase, the BBC is not promoting any Facebook products or other commercial interest._
+_Despite using React and Firebase, this project is not promoting any Facebook or Google's products or other commercial interest._
