@@ -1,19 +1,16 @@
 # Aannotations client side representation - Draft
 
-
-
 For implementing the selection and highlights and notes on to the document,
 
 the idea is that you could have selection object that allows you to get started and time
 
 of what the user selected, then the user clicks on highlight button.
 
-When the user clicks on the highlight button, they can select the tag of the color, or the label that they want to apply to the selection. When they go back to the actual selection, under the hood, we are taking the start and end time of the range that is then saved with a selection. 
+When the user clicks on the highlight button, they can select the tag of the color, or the label that they want to apply to the selection. When they go back to the actual selection, under the hood, we are taking the start and end time of the range that is then saved with a selection.
 
 So then the paragraph knows if it needs to display a selection. Now, the paragraph is past the selection data from the transcript and then it knows what it needs to display, the words with backgrounds are no
 
 ---
-
 
 So once the
 
@@ -167,10 +164,7 @@ so the older they will information just series selection. And then the other thi
 
 I think this is fine for now I need to look at it again and make it
 
-
-
 ---
-
 
 Take this annotation, referencing a label
 
@@ -187,8 +181,9 @@ Take this annotation, referencing a label
 ]
 ```
 
-and wrap words contained by it 
+and wrap words contained by it
 edge case tje label contains parts of the paragraph
+
 - includes starts but not end - start before the paragraph
 - includes end but not the paragraph - ends after the paragraph
 - includes all of the paragraph, starts paragraph before and ends paragraph after
@@ -235,28 +230,32 @@ edge case tje label contains parts of the paragraph
 ```
 
 `find` returns first one it finds
+
 ```
 d = p.find((w)=> { return w.start < 703.36})
 ```
 
 `filter` returns all of them
+
 ```
 d = p.filter((w)=> { return w.start > 703.36});
 d.length !== 0;
 ```
 
 returns all words before - including
+
 ```
 p.filter((w)=> { return w.start <= 703.36});
 ```
 
 returns all words after - excluding
+
 ```
 p.filter((w)=> { return w.start > 703.36});
 ```
 
+eg
 
-eg 
 ```
 p.filter((w)=> { return w.start <= 703.36})
 p.filter((w)=> { return w.start > 703.36})
