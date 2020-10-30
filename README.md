@@ -5,6 +5,8 @@ _Screenshot of UI - optional_ -->
 
 **Note**: _Thsi fork of [`@bbc/digital-paper-edit-firebase`](https://github.com/bbc/digital-paper-edit-firebase) removes BBC specific dependecies and enables other developer to deploy their own web app instance on firebase using GCP services._
 
+---
+
 An application to make it faster, easier and more accessible to edit audio and video interviews using automatically generated transcriptions from STT(Speech To Text) services.
 
 See [intro](./docs/intro.md) for more info on the project. And [user journey](./docs/user-journey/user-journey.md) for a high level overview of the user journey.
