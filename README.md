@@ -28,7 +28,8 @@ Setup a firebase project on [Google Cloud Firebase Dashboard](https://firebase.g
 
 #### `.env`
 
-Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details
+Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details.
+From [firebase dashboard](https://console.firebase.google.com/u/0/)
 
 `Project settings` → `Your apps` → `Firebase SDK snippet`→ `CDN`
 
@@ -48,7 +49,7 @@ REACT_APP_API_KEY=
 
 #### Firebase API key for cloud function
 
-To get the value for `REACT_APP_API_KEY`. Go to the firebase dashboard, ans you can find it under:
+To get the value for `REACT_APP_API_KEY`. Go to the [firebase dashboard](https://console.firebase.google.com/u/0/), ans you can find it under:
 
 `Project settings` → `Your Project` → `Web API Key`
 
