@@ -3,7 +3,7 @@
 <!-- _One liner + link to confluence page_
 _Screenshot of UI - optional_ -->
 
-An application to make it faster, easier and more accessible to edit audio and video interviews using automatically generated transcriptions from STT service.
+An application to make it faster, easier and more accessible to edit audio and video interviews using automatically generated transcriptions from STT(Speech To Text) services.
 
 See [intro](./docs/intro.md) for more info on the project. And [user journey](./docs/user-journey/user-journey.md) for a high level overview of the user journey.
 
