@@ -20,11 +20,13 @@ You can also checkout the [autoEdit 3 (Digital Paper Edit) project board](https:
 <!-- _stack - optional_
 _How to build and run the code/app_ -->
 
+### Firebase project
+
+Setup a firebase project on [Google Cloud Firebase Dashboard](https://firebase.google.com/). See [firebase docs](https://firebase.google.com/docs/web/setup), or [these notes](https://textav.gitbook.io/firebase-react-notes/react-+-firebase/firebase-create-react-app-setup) for more info.
+
 ### Configuration
 
 #### `.env`
-
-setup a firebase project on[Google Cloud Firebase Dashboard](https://firebase.google.com/). See [firebase docs](https://firebase.google.com/docs/web/setup), or [these notes](https://textav.gitbook.io/firebase-react-notes/react-+-firebase/firebase-create-react-app-setup) for more info.
 
 Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details
 
@@ -56,7 +58,7 @@ Install firebase tools on your local system, if you don't already have them
 npm install -g firebase-tools
 ```
 
-### Create a Google Task/Queue
+### Create a Google Queue
 
 [Create a Google Queue ](https://cloud.google.com/tasks/docs/creating-queues#creating_a_queue) (`firestore-stt`) to use Google Task within this project. This is for using [GCP STT](https://cloud.google.com/speech-to-text) with firebase cloud functions. See architecture diagram for more info.
 
@@ -66,7 +68,7 @@ gcloud tasks queues create `firestore-stt`
 
 if you don't have [`gcloud`](https://cloud.google.com/sdk/gcloud) you can either set it up, or use the [gcp cloud shell](https://cloud.google.com/shell), in [cloud console](https://cloud.google.com/cloud-console) for the project.
 
-### setting up CORS for this project
+### Setting up CORS for this project
 
 Checkout [`cors.json`](./cors.json)
 
@@ -82,13 +84,13 @@ Checkout [`cors.json`](./cors.json)
 
 [install gsutil](https://cloud.google.com/storage/docs/gsutil_install)
 
-In termianl use the [`cors.json`](./cors.json) file to set the project's CORS as follow
+In terminal use the [`cors.json`](./cors.json) file to set the project's CORS as follow
 
 ```console
 gsutil cors set cors.json gs://<gcp-firebase-project-name>.appspot.com
 ```
 
-_replace `<gcp-firebase-project-name>` with the name of your firebase project_
+_replace `<gcp-firebase-project-name>` with the name of your firebase project, adjust [`.firebaserc`](/.firebaserc), [`firebase.json`](./firebase.json) and [`./functions/.firebaserc`](./functions/.firebaserc)accordingly as well_
 
 See links below for more info on setting CORS on a Firebase project
 
@@ -193,6 +195,8 @@ To deploy the project onto firebase (cloud functions, and firebase hosting) run 
 ```console
 npm run deploy:all
 ```
+
+_note that firestore storage rules are applied from [`storage.rules`](./storage.rules) so any firestore rules you change in the firebase dashboard will be overritten from that file when you deploy the app._
 
 ## Contributing
 

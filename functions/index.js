@@ -117,49 +117,6 @@ exports.onDeleteProjectCleanUp = functions
         console.log('Error getting documents: ', error);
         // TODO: does it need to reject?
       });
-    // delete Annoations
-    // const transcriptRef = db
-    //   .collection('projects')
-    //   .doc(projectId)
-    //   .collection('transcripts');
-    // transcriptRef
-    //   .get()
-    //   .then(querySnapshot => {
-    //     const transcripts = querySnapshot.forEach(doc => {
-    //       // // deleete annoations
-    //       // try {
-    //       //   const annotationsRef = db
-    //       //     .collection('projects')
-    //       //     .doc(projectId)
-    //       //     .collection('transcripts')
-    //       //     .doc(doc.ref.id)
-    //       //     .collection('annotations');
-
-    //       //   annotationsRef
-    //       //     .get()
-    //       //     .then(querySnapshot => {
-    //       //       const annotations = querySnapshot.forEach(doc => {
-    //       //         doc.ref.delete();
-    //       //       });
-    //       //     })
-    //       //     .catch(error => {
-    //       //       console.log('Error getting documents: ', error);
-    //       //       // TODO: does it need to reject?
-    //       //       reject(error);
-    //       //     });
-    //       // } catch (e) {
-    //       //   console.error('could not delete annotations');
-    //       // }
-    //       // delete transcripts
-    //       doc.ref.delete();
-    //     });
-    //     // TODO: does it need to resolve?
-    //   })
-    //   .catch(error => {
-    //     console.log('Error getting documents: ', error);
-    //     // TODO: does it need to reject?
-    //     reject(error);
-    //   });
 
     // Delete transcripts
     const transcriptRef = db

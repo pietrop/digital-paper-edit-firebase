@@ -1,5 +1,7 @@
 # NoSQL Schema (Firestore) for Security Rules
 
+_applies to `@bbc` version only_
+
 - Status: accepted
 - Deciders: Eimi
 - Date: 2019-12-02
@@ -58,10 +60,7 @@ A security rule like below will be able to test authentication and membership of
 
 ```js
 function isOnProject() {
-  return (
-    request.auth.uid in
-    get(/databases/$(database) / documents / projects / $(pid)).data.users
-  );
+  return request.auth.uid in get(/databases/$(database) / documents / projects / $(pid)).data.users;
 }
 ```
 

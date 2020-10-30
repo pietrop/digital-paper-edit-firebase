@@ -72,7 +72,6 @@
     "eject": "react-scripts eject",
     "clean:cache": "npm cache clean --force",
     "deploy:all": "rimraf build && npm run build && firebase deploy",
-    "deploy:ghpages": "rimraf build && cross-env REACT_APP_NODE_ENV=demo npm run build && gh-pages -d build",
     "deploy:hosting": "rimraf build && npm run build && firebase deploy -P --only hosting:dj-con-Innovation-dpe-web-poc",
     "deploy:staging:hosting": "rimraf build && npm run build && firebase deploy -P staging --only hosting:dj-con-Innovation-dpe-web-poc",
     "deploy:dev:hosting": "rimraf build && npm run build && firebase deploy -P dev --only hosting:dj-con-Innovation-dpe-web-poc",

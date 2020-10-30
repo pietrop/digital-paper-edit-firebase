@@ -1,7 +1,10 @@
 # React-express file upload
-Some notes on how form upload between react client and express server works
 
-## React 
+Some notes on how form upload between react client and express server works.
+
+_not relevant for Firebase setup_
+
+## React
 
 On the client side in react using [`react-strap` form](https://react-bootstrap.github.io/components/forms/#forms-validation-native)
 
@@ -27,44 +30,39 @@ On the client side in react using [`react-strap` form](https://react-bootstrap.g
 ```
 
 or without `react-bootstrap`
+
 ```js
-<input
-    type="file"
-    label="Upload"
-    accept="audio/*,video/*"
-    onChange={ this.handleFileUpload }
-/>
+<input type="file" label="Upload" accept="audio/*,video/*" onChange={this.handleFileUpload} />
 ```
 
 `accept` filters out non vide or audio files from selection options.
 
 `handleFileUpload` function is a listener on the on change event for the `input` element
 
-### file upload event handler 
+### file upload event handler
 
 ```js
-  handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const file = files[0];
-    const formData = new FormData();
-    formData.append('file', file);
+handleFileUpload = e => {
+  const files = Array.from(e.target.files);
+  const file = files[0];
+  const formData = new FormData();
+  formData.append('file', file);
 
-    this.setState({ 
-        mediaFileSelected: true, 
-        // adding form data to state because we are not ready to upload yet
-        formData: formData 
-    });
+  this.setState({
+    mediaFileSelected: true,
+    // adding form data to state because we are not ready to upload yet
+    formData: formData,
+  });
 
-    // optimization trick, if there is no title defined in the form
-    // using file name as one to remove friction in filling in the form
-    if (this.state.title === '') {
-      this.setState({ title: file.name });
-    }
+  // optimization trick, if there is no title defined in the form
+  // using file name as one to remove friction in filling in the form
+  if (this.state.title === '') {
+    this.setState({ title: file.name });
   }
+};
 ```
 
-
-### submitting the form 
+### submitting the form
 
 ```js
 ...
@@ -74,7 +72,6 @@ or without `react-bootstrap`
     onSubmit={e => this.handleSubmit(e)}
 >
 ```
-
 
 ```js
   handleSubmit(event) {
@@ -94,36 +91,40 @@ or without `react-bootstrap`
 ```
 
 sending the request using fetch
+
 ```js
-  sendRequest = () => {
-    this.setState({ uploading: true });
+sendRequest = () => {
+  this.setState({ uploading: true });
 
-    const formData = this.state.formData;
-    // adding other info to the form
-    // to save transcript server side 
-    formData.append('title', this.state.title);
-    formData.append('description', this.state.description);
+  const formData = this.state.formData;
+  // adding other info to the form
+  // to save transcript server side
+  formData.append('title', this.state.title);
+  formData.append('description', this.state.description);
 
-    // Move to API.js
-    fetch(`http://localhost:5000/api/projects/${ this.state.projectId }/transcripts`, {
-      method: 'POST',
-      body: this.state.formData
+  // Move to API.js
+  fetch(`http://localhost:5000/api/projects/${this.state.projectId}/transcripts`, {
+    method: 'POST',
+    body: this.state.formData,
+  })
+    .then(res => res.json())
+    .then(response => {
+      this.setState({
+        uploading: false,
+        uploadCompleted: true,
+        redirect: true,
+        newTranscriptId: response.transcriptId,
+      });
     })
-      .then(res => res.json())
-      .then(response => {
-        this.setState({
-          uploading: false,
-          uploadCompleted: true,
-          redirect: true,
-          newTranscriptId: response.transcriptId
-        });
-      })
-      .catch((e) => {console.error('error submitting:::', e);});
-  }
-  ```
+    .catch(e => {
+      console.error('error submitting:::', e);
+    });
+};
+```
 
 ### Redirecting
-Redirecting to another page 
+
+Redirecting to another page
 
 ```js
 <Container>
@@ -144,11 +145,10 @@ import { Redirect } from 'react-router-dom';
   }
 ```
 
-## Progress bar 
-To display progress bar for upload in React, I've used [progressBarFetch](https://www.npmjs.com/package/react-fetch-progressbar), readme instructions pretty straightforward. 
+## Progress bar
+To display progress bar for upload in React, I've used [progressBarFetch](https://www.npmjs.com/package/react-fetch-progressbar), readme instructions pretty straightforward.
 
 XHR request have a straight forward way to listen to form upload progress, fetch doesn't seem to have one, hence this workaround
-
 
 ## Express
 on the server using [`formidable`](https://www.npmjs.com/package/formidable)
@@ -174,12 +174,12 @@ app.post(`/api/projects/:projectId/transcripts`, (req,res) => {
     // form.hash = false;
 
      // Workaround for `form.keepFilenames` not working
-    // Issue, is if file with same name already in `form.uploadDir` 
+    // Issue, is if file with same name already in `form.uploadDir`
     // then it returns error
     // https://stackoverflow.com/questions/8359902/how-to-rename-files-parsed-by-formidable
     form.on('fileBegin', function(name, file){
         // rename the incoming file to the file's name
-        // TODO: escape file names? 
+        // TODO: escape file names?
         // Or let formidable rename with has, and save in db, with name of original as well?
         file.path = path.join(form.uploadDir, file.name);
     })
@@ -196,7 +196,7 @@ app.post(`/api/projects/:projectId/transcripts`, (req,res) => {
     form.parse(req, function(err, fields, file) {
         console.log('fields::',fields);
         sampleTranscripts.transcripts.push({
-            title: fields.title, 
+            title: fields.title,
             description: fields.description,
             id: newTranscriptId
         })
@@ -208,8 +208,8 @@ app.post(`/api/projects/:projectId/transcripts`, (req,res) => {
 ...
 ```
 
-
 ## References
+
 - [Creating a File Upload Component with React](https://malcoded.com/posts/react-file-upload/)
 - [Simple Image Upload with React](https://codeburst.io/react-image-upload-with-kittens-cc96430eaece)
 - [Ridiculously simple Ajax uploads with FormData](https://thoughtbot.com/blog/ridiculously-simple-ajax-uploads-with-formdata)
