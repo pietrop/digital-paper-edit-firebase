@@ -13,13 +13,13 @@ See [intro](./docs/intro.md) for more info on the project. And [user journey](./
 
 This is a web app version of [autoedit.io](https://www.autoedit.io) desktop app. If you are not a developer and are looking for a ready to use version check out the desktop app.
 
-If you are a developer, and are not just working on this repo but are also working across the other repositories for this project, you can check out [the docs notes guides 'Visual Code Workspace Setup'](./docs/guides/visual-code-workspace-setup.md), for ease of development.
-
 This project uses [Github project boards to track progress](https://github.com/pietrop/digital-paper-edit-firebase/projects)
 
 You can also checkout the [autoEdit 3 (Digital Paper Edit) project board](https://github.com/users/pietrop/projects/1), that tracks issues and tickets across repositories.
 
 ## Setup
+
+If you are a developer, and are not just working on this repo but are also working across the other repositories for this project, you can check out [the docs notes guides 'Visual Code Workspace Setup'](./docs/guides/visual-code-workspace-setup.md), for ease of development.
 
 <!-- _stack - optional_
 _How to build and run the code/app_ -->
@@ -28,13 +28,22 @@ _How to build and run the code/app_ -->
 
 Setup a firebase project on [Google Cloud Firebase Dashboard](https://firebase.google.com/). See [firebase docs](https://firebase.google.com/docs/web/setup), or [these notes](https://textav.gitbook.io/firebase-react-notes/react-+-firebase/firebase-create-react-app-setup) for more info.
 
+#### Install dependencies and tools
+
+- Make sure you have [NPM and NodeJS](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed
+- If you don't have [`gcloud`](https://cloud.google.com/sdk/gcloud) you can either set it up, or use the [`gcp cloud shell`](https://cloud.google.com/shell), in [cloud console](https://cloud.google.com/cloud-console) for the project.
+- [install `gsutil`](https://cloud.google.com/storage/docs/gsutil_install)
+- Install `firebase-tools` on your local system, if you don't already have it installed.
+
+```console
+npm install -g firebase-tools
+```
+
 ### Configuration
 
-#### `.env`
+#### configuration file `.env` for the React App
 
-Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details.  
-Then from the [firebase dashboard](https://console.firebase.google.com/u/0/)
-
+Duplicate [`.env.example`](./env.example) into `.env`, and fill in the credentials details from the [firebase dashboard](https://console.firebase.google.com/u/0/):
 `Project settings` → `Your apps` → `Firebase SDK snippet`→ `CDN`
 
 ```env
@@ -51,44 +60,34 @@ REACT_APP_MEASUREMENT_ID=
 REACT_APP_API_KEY=
 ```
 
-#### Firebase API key for cloud function
-
-To get the value for `REACT_APP_API_KEY`. Go to the [firebase dashboard](https://console.firebase.google.com/u/0/), ans you can find it under:
-
+To get the value for `REACT_APP_API_KEY`. Go to the [firebase dashboard](https://console.firebase.google.com/u/0/), and you can find it under:
 `Project settings` → `Your Project` → `Web API Key`
 
-set env in cloud function
+#### Firebase API key for Cloud Function
+
+You need to set the Firebase Web API key (`REACT_APP_API_KEY`) that you set from before as an environment variable for the project's Cloud Functions
+to call our GCP STT (Speech-to-text) API, outside of the STT SDK, to check progress of a transcription.
+
+To configure environment variable for a Cloud Function:
 
 ```console
 cd functions
 ```
-
-set the Firebase web API key as env var for cloud functions, to be able to use to call the GCP STT operation end point, outside of the STT SDK to check progress of a transcription.
 
 ```console
 firebase functions:config:set webapi.key="THE FIREBASE WEB API KEY"
 
 ```
 
-[more info here](https://stackoverflow.com/questions/34442739/how-does-one-set-private-environment-variables-on-firebase-hosting)
-
-### Firebase tools
-
-Install firebase tools on your local system, if you don't already have them
-
-```console
-npm install -g firebase-tools
-```
+[More info here](https://stackoverflow.com/questions/34442739/how-does-one-set-private-environment-variables-on-firebase-hosting)
 
 ### Create a Google Queue
 
-[Create a Google Queue ](https://cloud.google.com/tasks/docs/creating-queues#creating_a_queue) (`firestore-stt`) to use Google Task within this project. This is for using [GCP STT](https://cloud.google.com/speech-to-text) with firebase cloud functions. See architecture diagram for more info.
+[Create a Google Queue](https://cloud.google.com/tasks/docs/creating-queues#creating_a_queue) (`firestore-stt`) to use Google Task within this project. This is for using [GCP STT](https://cloud.google.com/speech-to-text) with firebase cloud functions. See architecture diagram for more info.
 
 ```console
 gcloud tasks queues create `firestore-stt`
 ```
-
-if you don't have [`gcloud`](https://cloud.google.com/sdk/gcloud) you can either set it up, or use the [gcp cloud shell](https://cloud.google.com/shell), in [cloud console](https://cloud.google.com/cloud-console) for the project.
 
 ### Setting up CORS for this project
 
@@ -103,8 +102,6 @@ Checkout [`cors.json`](./cors.json)
   }
 ]
 ```
-
-[install gsutil](https://cloud.google.com/storage/docs/gsutil_install)
 
 In terminal use the [`cors.json`](./cors.json) file to set the project's CORS as follow
 
@@ -136,7 +133,7 @@ firebase login
 npm start
 ```
 
-Runs firebase dev enviroment, and the react client. Checkout [http://localhost:3000](http://localhost:3000)
+Runs firebase dev environment, and the react client. Checkout [http://localhost:3000](http://localhost:3000)
 
 ## System Architecture
 
