@@ -26,7 +26,8 @@ _How to build and run the code/app_ -->
 
 ### Firebase project
 
-Setup a firebase project on [Google Cloud Firebase Dashboard](https://firebase.google.com/). See [firebase docs](https://firebase.google.com/docs/web/setup), or [these notes](https://textav.gitbook.io/firebase-react-notes/react-+-firebase/firebase-create-react-app-setup) for more info.
+Setup a Firebase project on [Google Cloud Firebase Dashboard](https://firebase.google.com/). See [firebase docs](https://firebase.google.com/docs/web/setup), or [these notes](https://textav.gitbook.io/firebase-react-notes/react-+-firebase/firebase-create-react-app-setup) for more info.
+Make sure your `.firebaserc` and `firebase.json` points to your new Firebase project, in place of `dj-con-innovation-dpe-web-poc`.
 
 #### Install dependencies and tools
 
@@ -76,7 +77,12 @@ cd functions
 
 ```console
 firebase functions:config:set webapi.key="THE FIREBASE WEB API KEY"
+```
 
+You can verify that this is correctly setup by running:
+
+```console
+firebase functions:config:get
 ```
 
 [More info here](https://stackoverflow.com/questions/34442739/how-does-one-set-private-environment-variables-on-firebase-hosting)
