@@ -584,6 +584,8 @@ class ApiWrapper {
         .collection('labels');
 
       labelsRef
+        // sorting by created date, to ensure'default' label to be first in list
+        .orderBy('created', 'asc')
         .get()
         .then(querySnapshot => {
           if (querySnapshot.docs.length > 0) {
