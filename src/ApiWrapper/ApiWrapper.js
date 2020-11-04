@@ -298,7 +298,7 @@ class ApiWrapper {
               .doc(projectId)
               .collection('transcripts')
               .add(newTranscript)
-              .then(docRef => {
+              .then(async docRef => {
                 console.log('Document written with ID: ', docRef.id);
                 const response = {};
                 response.status = 'ok';
@@ -309,6 +309,23 @@ class ApiWrapper {
                 };
 
                 resolve(response);
+                // updating metadata with custom fields, to
+                // set with project and transcript it belongs to
+                // This triggers cloud function to create mp4 preview
+                // and update firestore with ref of the mp4 video preview
+                // fileRef
+                //   .updateMetadata({
+                //     customMetadata: {
+                //       projectId: projectId,
+                //       transcriptId: docRef.id,
+                //     },
+                //   })
+                //   .then(resp => {
+                //      resolve(resp);
+                // })
+                // .catch(er => {
+                //   reject(er);
+                // });
               })
               .catch(function(error) {
                 console.error('Error adding document: ', error);
@@ -982,28 +999,50 @@ class ApiWrapper {
   // TODO: may or may not support this for web app?
   async exportVideo(data, fileName) {
     return new Promise((resolve, reject) => {
+      const ffmpegRemixVideo = firebase.functions().httpsCallable('ffmpegRemixVideo');
+      ffmpegRemixVideo({
+        input: data,
+        output: `${fileName}`,
+      })
+        .then(ffmpegRemixData => {
+          // Read result of the Cloud Function.
+          // var sanitizedMessage = result.data.text;
+          resolve(ffmpegRemixData);
+        })
+        .catch(error => {
+          reject(error);
+        });
+
       // In electron prompt for file destination
       // default to desktop on first pass
-      const ffmpegRemixData = {
-        input: data,
-        output: `~/Desktop/${fileName}`,
-        ffmpegPath: '', //add electron ffmpeg bin
-      };
-      resolve(ffmpegRemixData);
+      // const ffmpegRemixData = {
+      //   input: data,
+      //   output: `~/Desktop/${fileName}`,
+      //   ffmpegPath: '', //add electron ffmpeg bin
+      // };
+      // resolve(ffmpegRemixData);
     });
   }
 
   // TODO: may or may not support this for web app?
   async exportAudio(data, fileName, waveForm, waveFormMode, waveFormColor) {
+    const ffmpegRemixAudio = firebase.functions().httpsCallable('ffmpegRemixVideo');
     return new Promise((resolve, reject) => {
-      // In electron prompt for file destination
-      // default to desktop on first pass
-      const ffmpegRemixData = {
+      ffmpegRemixAudio({
         input: data,
-        output: `~/Desktop/${fileName}`,
-        ffmpegPath: '', //add electron ffmpeg bin
-      };
-      resolve(ffmpegRemixData);
+        waveForm,
+        waveFormMode,
+        waveFormColor,
+        output: `${fileName}`,
+      })
+        .then(ffmpegRemixData => {
+          // Read result of the Cloud Function.
+          // var sanitizedMessage = result.data.text;
+          resolve(ffmpegRemixData);
+        })
+        .catch(error => {
+          reject(error);
+        });
     });
   }
 }
