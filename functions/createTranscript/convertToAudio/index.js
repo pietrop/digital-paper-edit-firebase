@@ -2,7 +2,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
-
+const AUDIO_PRREVIEW_PREFIX_NAME = '_preview_audio';
 /**
  * `convertToAudio` - converts video or audio file into audio feel that meets STT specs
  * Uses ffmpeg. ffmpeg binary is installed and available on cloud functions by default.
@@ -19,7 +19,7 @@ exports.convertToAudio = async (admin, storageRef, downloadURLLink, AUDIO_EXTENS
     const fileName = path.basename(storageRef);
     const filePath = storageRef;
     // Exit if the audio is already converted.
-    if (fileName.endsWith(`_output.${AUDIO_EXTENSION}`)) {
+    if (fileName.endsWith(`${AUDIO_PRREVIEW_PREFIX_NAME}.${AUDIO_EXTENSION}`)) {
       console.error('Already a converted audio.');
       // return null;
       reject(new Error());
@@ -27,7 +27,7 @@ exports.convertToAudio = async (admin, storageRef, downloadURLLink, AUDIO_EXTENS
 
     const bucket = admin.storage().bucket();
     // We add a '_output.flac' suffix to target audio file name. That's where we'll upload the converted audio.
-    const targetTempFileName = fileName.replace(/\.[^/.]+$/, '') + `_output.${AUDIO_EXTENSION}`;
+    const targetTempFileName = fileName.replace(/\.[^/.]+$/, '') + `${AUDIO_PRREVIEW_PREFIX_NAME}.${AUDIO_EXTENSION}`;
     const targetTempFilePath = path.join(os.tmpdir(), targetTempFileName);
     const targetStorageFilePath = path.join(path.dirname(filePath), targetTempFileName);
 

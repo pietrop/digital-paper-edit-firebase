@@ -24,6 +24,9 @@ export const functions = firebase.functions();
 // https://firebase.google.com/docs/analytics/get-started
 export const analytics = firebase.analytics();
 export const storage = firebase.storage();
+
 // https://stackoverflow.com/questions/50884534/how-to-test-functions-https-oncall-firebase-cloud-functions-locally
-firebase.functions().useFunctionsEmulator('http://localhost:4001');
+// TODO: add condition that if in dev, then use emulator for functions
+// firebase.functions().useFunctionsEmulator('http://localhost:4001');
+
 export default firebase;

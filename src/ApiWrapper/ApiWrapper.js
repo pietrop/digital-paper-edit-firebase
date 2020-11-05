@@ -356,7 +356,12 @@ class ApiWrapper {
           if (doc.exists) {
             const tmpData = doc.data();
             // In casee the url of the media expires, getting a new getDownloadURL from ref in cloud storage
-            const pathReference = storage.ref(tmpData.storageRefName);
+            let pathReference = storage.ref(tmpData.storageRefName);
+            if (tmpData.videoUrl) {
+              pathReference = storage.ref(tmpData.videoUrl);
+            } else if (tmpData.audioUrl) {
+              pathReference = storage.ref(tmpData.audioUrl);
+            }
             // TODO: or could get it from the audio that is sent to STT
             // to ensure HTML5 compatibility, if non HTML5 audio/video is being uploaded as source file
             // const pathReference = storage.ref(tmpData.audioUrl);
@@ -998,15 +1003,19 @@ class ApiWrapper {
 
   // TODO: may or may not support this for web app?
   async exportVideo(data, fileName) {
-    return new Promise((resolve, reject) => {
+    console.log('exportVideo', data, fileName);
+    return new Promise(async (resolve, reject) => {
       const ffmpegRemixVideo = firebase.functions().httpsCallable('ffmpegRemixVideo');
-      ffmpegRemixVideo({
+      await ffmpegRemixVideo({
         input: data,
         output: `${fileName}`,
       })
         .then(ffmpegRemixData => {
           // Read result of the Cloud Function.
           // var sanitizedMessage = result.data.text;
+          alert('finished exporting');
+          console.log('ffmpegRemixData', ffmpegRemixData);
+          // TODO: prompt download from url,how?
           resolve(ffmpegRemixData);
         })
         .catch(error => {

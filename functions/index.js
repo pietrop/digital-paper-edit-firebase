@@ -6,7 +6,7 @@ const fs = require('fs');
 const createTranscriptHandler = require('./createTranscript/index.js');
 const firestoreCheckSTTHandler = require('./firestoreCheckSTT/index.js');
 const convertToVideo = require('./convert-to-video/index.js');
-
+const remix = require('./ffmpeg-remix/index.js');
 // firebase-admin module allows us to use the Firebase platform on a server with admin access, for instance to write to the Cloud Firestore or send FCM notifications.
 admin.initializeApp();
 const db = admin.firestore();
@@ -41,6 +41,7 @@ exports.onNewTranscriptConvertToMp4Preview = functions
   .runWith(MAX_RUNTIME_OPTS)
   .firestore.document('projects/{projectId}/transcripts/{transcriptId}')
   .onCreate(async (change, context) => {
+    const VIDEO_PRREVIEW_PREFIX_NAME = '_preview_video';
     // functions
     //   .runWith(MAX_RUNTIME_OPTS)
     //   .storage.object()
@@ -63,9 +64,9 @@ exports.onNewTranscriptConvertToMp4Preview = functions
     const filePath = downloadURLLink;
 
     const fileName = path.basename(filePath);
-    const clipName = path.basename(storageRef);
-    // if (fileName.endsWith('_output.ogg')) {
-    const targetTempFileName = fileName.replace(/\.[^/.]+$/, '') + `_output_video.${AUDIO_EXTENSION_VIDEO}`;
+    // const clipName = path.basename(storageRef);
+    // if (fileName.endsWith('_preview.ogg')) {
+    const targetTempFileName = fileName.replace(/\.[^/.]+$/, '') + `${VIDEO_PRREVIEW_PREFIX_NAME}.${AUDIO_EXTENSION_VIDEO}`;
     const targetTempFilePath = path.join(os.tmpdir(), targetTempFileName);
     const targetStorageFilePath = path.join(path.dirname(storageRef), targetTempFileName);
 
@@ -101,7 +102,7 @@ exports.onNewTranscriptConvertToMp4Preview = functions
     change.ref.set(
       {
         videoUrl: targetStorageFilePath,
-        clipName,
+        // clipName,
         path: filePath,
       },
       {
@@ -156,6 +157,8 @@ exports.onDeleteTranscriptCleanUp = functions
     await deleteMedia(storageRefPath, bucket);
     const storageRefPathAudioPreview = deletedValue.audioUrl;
     await deleteMedia(storageRefPathAudioPreview, bucket);
+    const storageRefPathVideoPreview = deletedValue.videoUrl;
+    await deleteMedia(storageRefPathVideoPreview, bucket);
     return null;
   });
 
@@ -227,10 +230,44 @@ exports.onDeleteProjectCleanUp = functions
 
 // https://firebase.google.com/docs/functions/callable#web
 // https://github.com/pietrop/digital-paper-edit-electron/blob/master/src/ElectronWrapper/ffmpeg-remix/index.js
-// exports.ffmpegRemixVideo = functions.https.onCall((data, context) => {
-//   console.log('data', data);
-//   // ...
-// });
+exports.ffmpegRemixVideo = functions.runWith(MAX_RUNTIME_OPTS).https.onCall(async (data, context) => {
+  console.log('data', JSON.stringify(data));
+  const bucket = admin.storage().bucket();
+  const fileName = data.output;
+
+  const localFileNamePath = path.join(os.tmpdir(), data.output);
+  data.output = localFileNamePath;
+  console.log('data.output', data.output);
+  await remix(data, null, null, null, async (err, result) => {
+    if (err) {
+      console.log('err', err);
+      // reject(err);
+      return err;
+    }
+    console.log('result', JSON.stringify(result));
+    console.log('result.path', result.path);
+    console.log('fileName', fileName);
+    // const targetTempFilePath = result.path;
+    // TODO: change this name
+    // const targetStorageFilePath = result.path;
+
+    // TODO: get projectId, to set the folder in destination
+    // when adding to the bucket
+    await bucket.upload(data.output, {
+      destination: fileName,
+      // without resumable false, this seems to fail
+      resumable: false,
+    });
+    // TODO:
+    // fs.unlinkSync(targetTempFilePath);
+    // TODO: save to `_export.mp4` to cloud storage
+    // create downloadUrl
+    // return downloadUrl
+    // resolve(result);
+    return result;
+  });
+  // ...
+});
 
 // exports.ffmpegRemixAudio = functions.https.onCall((data, context) => {
 //   console.log('data', data);

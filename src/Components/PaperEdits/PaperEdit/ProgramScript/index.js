@@ -1079,20 +1079,21 @@ class ProgramScript extends Component {
                         }
                       />
 
+                      <Dropdown.Divider />
+                      <ExportMenuItem
+                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
+                        onClick={this.handleExportVideoPreview}
+                        title="Export mp4 video preview - Experimental feature, at the moment you cannot combine audio and video in the same export."
+                        text={
+                          <>
+                            <FontAwesomeIcon icon={faFileVideo} /> Video (mp4) <FontAwesomeIcon icon={faFlask} />{' '}
+                            <FontAwesomeIcon icon={faInfoCircle} />
+                          </>
+                        }
+                      />
+
                       {whichJsEnv() === 'electron' ? (
                         <>
-                          <Dropdown.Divider />
-                          <ExportMenuItem
-                            tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                            onClick={this.handleExportVideoPreview}
-                            title="Export mp4 video preview - Experimental feature, at the moment you cannot combine audio and video in the same export."
-                            text={
-                              <>
-                                <FontAwesomeIcon icon={faFileVideo} /> Video (mp4) <FontAwesomeIcon icon={faFlask} />{' '}
-                                <FontAwesomeIcon icon={faInfoCircle} />
-                              </>
-                            }
-                          />
                           <ExportMenuItem
                             tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
                             onClick={this.handleExportAudioPreview}
@@ -1118,6 +1119,7 @@ class ProgramScript extends Component {
                           />
                         </>
                       ) : null}
+
                       <Dropdown.Divider />
                       <ExportMenuItem
                         tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}

@@ -1,10 +1,14 @@
 // from https://github.com/pietrop/digital-paper-edit-electron/blob/master/src/ElectronWrapper/ffmpeg-remix/index.js
 const async = require('async');
 const ffmpeg = require('fluent-ffmpeg');
-const tmp = require('tmp');
-const debug = require('debug');
-const d = debug('ffmpeg-remix');
-tmp.setGracefulCleanup();
+const path = require('path');
+const cuid = require('cuid');
+// const tmp = require('tmp');
+const os = require('os');
+// const debug = require('debug');
+// const d = debug('ffmpeg-remix');
+// const d = require('ffmpeg-remix');
+// tmp.setGracefulCleanup();
 
 const ingest = (data, tmpDir, waveForm, waveFormMode, waveFormColor) => {
   console.log('ingest', data, tmpDir, waveForm, waveFormMode, waveFormColor);
@@ -23,11 +27,14 @@ const ingest = (data, tmpDir, waveForm, waveFormMode, waveFormColor) => {
     if (input.end) input.duration = input.end - input.start;
     if (input.duration) ff.duration(input.duration);
 
-    input.path = tmp.fileSync({
-      dir: tmpDir.name,
-      prefix: 'ingest-',
-      postfix: '.ts',
-    }).name;
+    // input.path = tmp.fileSync({
+    //   dir: tmpDir.name,
+    //   prefix: 'ingest-',
+    //   postfix: '.ts',
+    // }).name;
+
+    // TODO: replace with uid
+    input.path = path.join(os.tmpdir(), `ingest-${cuid()}.ts`);
 
     //   ff.audioCodec('copy').videoCodec('copy');
     ff.videoCodec('libx264').audioCodec('aac');
@@ -53,16 +60,16 @@ const ingest = (data, tmpDir, waveForm, waveFormMode, waveFormColor) => {
     ff.output(input.path);
 
     ff.on('start', commandLine => {
-      d(`Spawned: ${commandLine}`);
+      console.log(`Spawned: ${commandLine}`);
     });
 
     ff.on('error', (err, stdout, stderr) => {
-      d(err);
+      console.log(err);
       callback(err, null);
     });
 
     ff.on('end', () => {
-      d(`Created: ${input.path}`);
+      console.log(`Created: ${input.path}`);
       callback(null, input);
     });
 
@@ -89,18 +96,18 @@ const concat = (data, tmpDir, callback) => {
     ff.output(data.output);
 
     ff.on('start', commandLine => {
-      d(`Spawned: ${commandLine}`);
+      console.log(`Spawned: ${commandLine}`);
     });
 
     ff.on('error', (err, stdout, stderr) => {
-      d(err);
-      tmpDir.removeCallback();
+      console.log(err);
+      // tmpDir.removeCallback();
       callback(err);
     });
 
     ff.on('end', () => {
-      d(`Created: ${data.output}`);
-      tmpDir.removeCallback();
+      console.log(`Created: ${data.output}`);
+      // tmpDir.removeCallback();
       callback(null, data);
     });
 
@@ -110,9 +117,11 @@ const concat = (data, tmpDir, callback) => {
 
 module.exports = function(data, waveForm, waveFormMode, waveFormColor, callback) {
   console.log('exports', data, waveForm, waveFormMode, waveFormColor);
-  const tmpDir = tmp.dirSync({
-    unsafeCleanup: true,
-  });
+  // const tmpDir = tmp.dirSync({
+  //   unsafeCleanup: true,
+  // });
+
+  const tmpDir = os.tmpdir();
 
   if (data.limit) {
     async.mapLimit(data.input, data.limit, ingest(data, tmpDir, waveForm, waveFormMode, waveFormColor), concat(data, tmpDir, callback));
