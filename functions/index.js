@@ -42,49 +42,18 @@ exports.onNewTranscriptConvertToMp4Preview = functions
   .firestore.document('projects/{projectId}/transcripts/{transcriptId}')
   .onCreate(async (change, context) => {
     const VIDEO_PRREVIEW_PREFIX_NAME = '_preview_video';
-    // functions
-    //   .runWith(MAX_RUNTIME_OPTS)
-    //   .storage.object()
-    //   .onMetadataUpdate(async object => {
-
-    // const bucket = admin.storage().bucket();
-    // const bucket = object.bucket; // The Storage bucket that contains the file.
-    // const filePath = object.name; // File path in the bucket.
-    // const contentType = object.contentType; // File content type.
-    // const metageneration = object.metageneration; // Number of times metadata has been generated. New objects have a value of 1.
-
     const newValue = change.data();
     // access a particular field as you would any JS property
-    // let storageRef = newValue.storageRefName;
     const storageRef = newValue.storageRefName;
     const downloadURLLink = newValue.downloadURL;
-    // const storage = admin.storage();
-    // const bucket = storage.appInternal.options.storageBucket;
     const bucket = admin.storage().bucket();
     const filePath = downloadURLLink;
-
-    const fileName = path.basename(filePath);
-    // const clipName = path.basename(storageRef);
-    // if (fileName.endsWith('_preview.ogg')) {
+    const fileName = path.basename(storageRef); // clipName
+    console.log('fileName', fileName);
     const targetTempFileName = fileName.replace(/\.[^/.]+$/, '') + `${VIDEO_PRREVIEW_PREFIX_NAME}.${AUDIO_EXTENSION_VIDEO}`;
     const targetTempFilePath = path.join(os.tmpdir(), targetTempFileName);
+    // save exports into dedicated project folder? eg  'exports',
     const targetStorageFilePath = path.join(path.dirname(storageRef), targetTempFileName);
-
-    // var storage = firebase.storage();
-    // const storage = admin.storage();
-    // const storageRef = storage.ref();
-    // const fileRef = storageRef.child(filePath);
-    // const metadata = await fileRef.getMetadata();
-    // Metadata now contains the metadata for 'images/forest.jpg'
-    // const projectId = metadata.customMetadata.projectId;
-    // const transcriptId = metadata.customMetadata.transcriptId;
-
-    // const db = admin.firestore();
-    // const docRef = db
-    //   .collection('projects')
-    //   .doc(projectId)
-    //   .collection('transcripts')
-    //   .doc(transcriptId);
 
     const newFile = await convertToVideo({
       src: filePath,
@@ -102,7 +71,6 @@ exports.onNewTranscriptConvertToMp4Preview = functions
     change.ref.set(
       {
         videoUrl: targetStorageFilePath,
-        // clipName,
         path: filePath,
       },
       {
@@ -113,9 +81,6 @@ exports.onNewTranscriptConvertToMp4Preview = functions
     fs.unlinkSync(targetTempFilePath);
 
     return null;
-    // } else {
-    // return null;
-    // }
   });
 
 exports.onDeleteTranscriptCleanUp = functions
@@ -234,39 +199,55 @@ exports.ffmpegRemixVideo = functions.runWith(MAX_RUNTIME_OPTS).https.onCall(asyn
   console.log('data', JSON.stringify(data));
   const bucket = admin.storage().bucket();
   const fileName = data.output;
+  const projectId = data.projectId;
 
   const localFileNamePath = path.join(os.tmpdir(), data.output);
   data.output = localFileNamePath;
   console.log('data.output', data.output);
-  await remix(data, null, null, null, async (err, result) => {
-    if (err) {
-      console.log('err', err);
-      // reject(err);
-      return err;
-    }
-    console.log('result', JSON.stringify(result));
-    console.log('result.path', result.path);
-    console.log('fileName', fileName);
-    // const targetTempFilePath = result.path;
-    // TODO: change this name
-    // const targetStorageFilePath = result.path;
 
-    // TODO: get projectId, to set the folder in destination
-    // when adding to the bucket
-    await bucket.upload(data.output, {
-      destination: fileName,
-      // without resumable false, this seems to fail
-      resumable: false,
-    });
-    // TODO:
-    // fs.unlinkSync(targetTempFilePath);
-    // TODO: save to `_export.mp4` to cloud storage
-    // create downloadUrl
-    // return downloadUrl
-    // resolve(result);
-    return result;
-  });
-  // ...
+  return new Promise((resolve, reject) =>
+    remix(data, null, null, null, async (err, result) => {
+      if (err) {
+        console.log('err', err);
+        reject(err);
+      }
+      console.log('result', JSON.stringify(result));
+      console.log('result.path', result.path);
+      console.log('fileName', fileName);
+      console.log('projectId', projectId);
+      console.log('remix data.output,', data.output);
+      // TODO: get projectId, to set the folder in destination
+      // when adding to the bucket
+      const destination = `${projectId}/exports/${fileName}`;
+      await bucket.upload(data.output, {
+        // ad paper edit remix expots to dedicate folder
+        // TODO: make cron function that once on a while checks this folder and delets
+        // files older then a certain time
+        destination,
+        // without resumable false, this seems to fail
+        resumable: false,
+      });
+      // clean up video preview mp4 file on the cloud function
+      // const storage = admin.storage().bucket();
+      // const pathReferenceRemix = admin
+      //   .storage()
+      //   .bucket()
+      //   .file(destination);
+      // const storage = admin.storage();
+      // const pathReferenceRemix = storage.ref(destination);
+      // const config = {
+      //   action: 'read',
+      //   expires: '10-17-2025',
+      // };
+      // const urlOfRemix = await pathReferenceRemix.getSignedUrl(config);
+      // // const pathReferenceRemix = storage.ref(destination);
+      // // const urlOfRemix = await pathReferenceRemix.getDownloadURL();
+      // console.log('res url', urlOfRemix);
+      // fs.unlinkSync(data.output);
+      // return resolve(urlOfRemix);
+      return resolve(destination);
+    })
+  );
 });
 
 // exports.ffmpegRemixAudio = functions.https.onCall((data, context) => {

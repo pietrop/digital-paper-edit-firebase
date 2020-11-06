@@ -828,7 +828,7 @@ class ProgramScript extends Component {
       .replace(/:/g, '.')
       .replace(/ /g, '');
     const fileName = `${programmeScriptTitle}_${timeNow}.mp4`;
-    ApiWrapper.exportVideo(sequence, fileName).then(res => {
+    ApiWrapper.exportVideo({ sequence, fileName, projectId: this.props.projectId }).then(res => {
       console.log('exported', res);
     });
   };
@@ -844,7 +844,7 @@ class ProgramScript extends Component {
       .replace(/:/g, '.')
       .replace(/ /g, '');
     const fileName = `${programmeScriptTitle}_${timeNow}.wav`;
-    ApiWrapper.exportAudio(sequence, fileName, false).then(res => {
+    ApiWrapper.exportAudio({ sequence, fileName, waveForm: false }).then(res => {
       console.log('exported', res);
     });
   };
@@ -862,7 +862,7 @@ class ProgramScript extends Component {
     const fileName = `${programmeScriptTitle}_${timeNow}.mp4`;
     const waveForm = true;
     // const waveFormMode = 'cline';
-    ApiWrapper.exportAudio(sequence, fileName, waveForm, waveFormMode, waveFormColor).then(res => {
+    ApiWrapper.exportAudio({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId: this.props.projectId }).then(res => {
       console.log('exported', res);
     });
   };

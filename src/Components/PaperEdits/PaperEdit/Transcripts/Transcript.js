@@ -364,7 +364,7 @@ class Transcript extends Component {
             {highlights}
 
             {this.props.transcript && !this.state.componentMounted && (
-              <Button size="lg" variant="light" onClick={this.handleLoadTranscription} block>
+              <Button size="lg" variant="light" onClick={this.handleLoadTranscription} block disabled={this.props.status === 'done' ? false : true}>
                 Load transcription
               </Button>
             )}

@@ -3,18 +3,11 @@ const async = require('async');
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
 const cuid = require('cuid');
-// const tmp = require('tmp');
 const os = require('os');
-// const debug = require('debug');
-// const d = debug('ffmpeg-remix');
-// const d = require('ffmpeg-remix');
-// tmp.setGracefulCleanup();
+const rimraf = require('rimraf');
 
 const ingest = (data, tmpDir, waveForm, waveFormMode, waveFormColor) => {
   console.log('ingest', data, tmpDir, waveForm, waveFormMode, waveFormColor);
-  // if(data.ffmpegPath){
-  //   ffmpeg.setFfmpegPath(data.ffmpegPath);
-  // }
   return (input, callback) => {
     const ff = ffmpeg(input.source);
 
@@ -27,14 +20,7 @@ const ingest = (data, tmpDir, waveForm, waveFormMode, waveFormColor) => {
     if (input.end) input.duration = input.end - input.start;
     if (input.duration) ff.duration(input.duration);
 
-    // input.path = tmp.fileSync({
-    //   dir: tmpDir.name,
-    //   prefix: 'ingest-',
-    //   postfix: '.ts',
-    // }).name;
-
-    // TODO: replace with uid
-    input.path = path.join(os.tmpdir(), `ingest-${cuid()}.ts`);
+    input.path = path.join(tmpDir, `ingest-${cuid()}.ts`);
 
     //   ff.audioCodec('copy').videoCodec('copy');
     ff.videoCodec('libx264').audioCodec('aac');
@@ -78,9 +64,6 @@ const ingest = (data, tmpDir, waveForm, waveFormMode, waveFormColor) => {
 };
 
 const concat = (data, tmpDir, callback) => {
-  // if(data.ffmpegPath){
-  //   ffmpeg.setFfmpegPath(data.ffmpegPath);
-  // }
   return (err, ingest) => {
     if (err) {
       console.error(err);
@@ -101,13 +84,15 @@ const concat = (data, tmpDir, callback) => {
 
     ff.on('error', (err, stdout, stderr) => {
       console.log(err);
-      // tmpDir.removeCallback();
       callback(err);
     });
 
     ff.on('end', () => {
       console.log(`Created: ${data.output}`);
-      // tmpDir.removeCallback();
+      // Clean up and delete temp files .ts
+      rimraf(`${tmpDir}/*.ts`, function() {
+        console.log('delete .ts files');
+      });
       callback(null, data);
     });
 
@@ -117,12 +102,7 @@ const concat = (data, tmpDir, callback) => {
 
 module.exports = function(data, waveForm, waveFormMode, waveFormColor, callback) {
   console.log('exports', data, waveForm, waveFormMode, waveFormColor);
-  // const tmpDir = tmp.dirSync({
-  //   unsafeCleanup: true,
-  // });
-
   const tmpDir = os.tmpdir();
-
   if (data.limit) {
     async.mapLimit(data.input, data.limit, ingest(data, tmpDir, waveForm, waveFormMode, waveFormColor), concat(data, tmpDir, callback));
   } else {

@@ -27,7 +27,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "gcp-to-dpe": "^2.0.3",
     "node-fetch": "^2.6.1",
-    "tmp": "^0.2.1"
+    "rimraf": "^3.0.2"
   },
   "devDependencies": {
     "eslint": "^5.12.0",

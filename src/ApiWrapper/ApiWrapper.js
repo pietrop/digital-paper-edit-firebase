@@ -1,10 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import querystring from 'querystring';
-import corsFetch from './cors_wrapper.js';
+// import downloadjs from 'downloadjs';
 import firebase, { db, analytics, storage } from '../Firebase.js';
-
-// import { type } from 'os';
-// const analytics = firebase.analytics();
 
 const DEFAULT_LABEL = {
   //TODO: is _id needed, or is it just needed for electron database?
@@ -1002,47 +998,48 @@ class ApiWrapper {
   }
 
   // TODO: may or may not support this for web app?
-  async exportVideo(data, fileName) {
-    console.log('exportVideo', data, fileName);
+  async exportVideo({ sequence, fileName, projectId }) {
+    console.log('exportVideo', sequence, fileName);
     return new Promise(async (resolve, reject) => {
       const ffmpegRemixVideo = firebase.functions().httpsCallable('ffmpegRemixVideo');
       await ffmpegRemixVideo({
-        input: data,
+        input: sequence,
         output: `${fileName}`,
+        projectId,
       })
-        .then(ffmpegRemixData => {
+        .then(async ({ data }) => {
           // Read result of the Cloud Function.
           // var sanitizedMessage = result.data.text;
           alert('finished exporting');
-          console.log('ffmpegRemixData', ffmpegRemixData);
+          console.log('data', data);
+
+          const pathReferenceRemix = storage.ref(data);
+          // https://firebase.google.com/docs/storage/web/download-files#full_example
+          const urlOfRemix = await pathReferenceRemix.getDownloadURL();
+          console.log('res url', urlOfRemix);
+          downloadURI(urlOfRemix, fileName);
+          // downloadjs(urlOfRemix, fileName, 'video/mp4');
+          // window.open(urlOfRemix, '_blank', 'noopener');
           // TODO: prompt download from url,how?
-          resolve(ffmpegRemixData);
+          resolve(data);
         })
         .catch(error => {
           reject(error);
         });
-
-      // In electron prompt for file destination
-      // default to desktop on first pass
-      // const ffmpegRemixData = {
-      //   input: data,
-      //   output: `~/Desktop/${fileName}`,
-      //   ffmpegPath: '', //add electron ffmpeg bin
-      // };
-      // resolve(ffmpegRemixData);
     });
   }
 
   // TODO: may or may not support this for web app?
-  async exportAudio(data, fileName, waveForm, waveFormMode, waveFormColor) {
+  async exportAudio({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId }) {
     const ffmpegRemixAudio = firebase.functions().httpsCallable('ffmpegRemixVideo');
     return new Promise((resolve, reject) => {
       ffmpegRemixAudio({
-        input: data,
+        input: sequence,
         waveForm,
         waveFormMode,
         waveFormColor,
         output: `${fileName}`,
+        projectId,
       })
         .then(ffmpegRemixData => {
           // Read result of the Cloud Function.
@@ -1054,6 +1051,18 @@ class ApiWrapper {
         });
     });
   }
+}
+
+function downloadURI(uri, name) {
+  const link = document.createElement('a');
+  // link.target = '_blank';
+  // link.rel = 'noopener noreferrer';
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  // delete link;
 }
 
 export default ApiWrapper;
