@@ -828,7 +828,14 @@ class ProgramScript extends Component {
       .replace(/:/g, '.')
       .replace(/ /g, '');
     const fileName = `${programmeScriptTitle}_${timeNow}.mp4`;
-    ApiWrapper.exportVideo({ sequence, fileName, projectId: this.props.projectId }).then(res => {
+    ApiWrapper.exportAudioVideo({
+      sequence,
+      fileName,
+      projectId: this.props.projectId,
+      waveForm: false,
+      waveFormMode: false,
+      waveFormColor: false,
+    }).then(res => {
       console.log('exported', res);
     });
   };
@@ -844,7 +851,14 @@ class ProgramScript extends Component {
       .replace(/:/g, '.')
       .replace(/ /g, '');
     const fileName = `${programmeScriptTitle}_${timeNow}.wav`;
-    ApiWrapper.exportAudio({ sequence, fileName, waveForm: false }).then(res => {
+    ApiWrapper.exportAudioVideo({
+      sequence,
+      fileName,
+      waveForm: false,
+      waveFormMode: false,
+      waveFormColor: false,
+      projectId: this.props.projectId,
+    }).then(res => {
       console.log('exported', res);
     });
   };
@@ -862,7 +876,7 @@ class ProgramScript extends Component {
     const fileName = `${programmeScriptTitle}_${timeNow}.mp4`;
     const waveForm = true;
     // const waveFormMode = 'cline';
-    ApiWrapper.exportAudio({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId: this.props.projectId }).then(res => {
+    ApiWrapper.exportAudioVideo({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId: this.props.projectId }).then(res => {
       console.log('exported', res);
     });
   };
