@@ -998,29 +998,27 @@ class ApiWrapper {
   }
 
   // TODO: may or may not support this for web app?
-  async exportVideo({ sequence, fileName, projectId }) {
+  async exportAudioVideo({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId }) {
     console.log('exportVideo', sequence, fileName);
     return new Promise(async (resolve, reject) => {
-      const ffmpegRemixVideo = firebase.functions().httpsCallable('ffmpegRemixVideo');
-      await ffmpegRemixVideo({
+      const ffmpegRemix = firebase.functions().httpsCallable('ffmpegRemix');
+      await ffmpegRemix({
         input: sequence,
+        waveForm,
+        waveFormMode,
+        waveFormColor,
         output: `${fileName}`,
         projectId,
       })
         .then(async ({ data }) => {
-          // Read result of the Cloud Function.
-          // var sanitizedMessage = result.data.text;
+          // Read result of the Cloud Function. it's wrapped in data attribute.
           alert('finished exporting');
           console.log('data', data);
-
           const pathReferenceRemix = storage.ref(data);
           // https://firebase.google.com/docs/storage/web/download-files#full_example
           const urlOfRemix = await pathReferenceRemix.getDownloadURL();
           console.log('res url', urlOfRemix);
           downloadURI(urlOfRemix, fileName);
-          // downloadjs(urlOfRemix, fileName, 'video/mp4');
-          // window.open(urlOfRemix, '_blank', 'noopener');
-          // TODO: prompt download from url,how?
           resolve(data);
         })
         .catch(error => {
@@ -1030,27 +1028,27 @@ class ApiWrapper {
   }
 
   // TODO: may or may not support this for web app?
-  async exportAudio({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId }) {
-    const ffmpegRemixAudio = firebase.functions().httpsCallable('ffmpegRemixVideo');
-    return new Promise((resolve, reject) => {
-      ffmpegRemixAudio({
-        input: sequence,
-        waveForm,
-        waveFormMode,
-        waveFormColor,
-        output: `${fileName}`,
-        projectId,
-      })
-        .then(ffmpegRemixData => {
-          // Read result of the Cloud Function.
-          // var sanitizedMessage = result.data.text;
-          resolve(ffmpegRemixData);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  }
+  // async exportAudio({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId }) {
+  //   const ffmpegRemixAudio = firebase.functions().httpsCallable('ffmpegRemixVideo');
+  //   return new Promise((resolve, reject) => {
+  //     ffmpegRemixAudio({
+  //       input: sequence,
+  //       waveForm,
+  //       waveFormMode,
+  //       waveFormColor,
+  //       output: `${fileName}`,
+  //       projectId,
+  //     })
+  //       .then(ffmpegRemixData => {
+  //         // Read result of the Cloud Function.
+  //         // var sanitizedMessage = result.data.text;
+  //         resolve(ffmpegRemixData);
+  //       })
+  //       .catch(error => {
+  //         reject(error);
+  //       });
+  //   });
+  // }
 }
 
 function downloadURI(uri, name) {

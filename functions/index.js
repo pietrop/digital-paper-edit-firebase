@@ -195,7 +195,7 @@ exports.onDeleteProjectCleanUp = functions
 
 // https://firebase.google.com/docs/functions/callable#web
 // https://github.com/pietrop/digital-paper-edit-electron/blob/master/src/ElectronWrapper/ffmpeg-remix/index.js
-exports.ffmpegRemixVideo = functions.runWith(MAX_RUNTIME_OPTS).https.onCall(async (data, context) => {
+exports.ffmpegRemix = functions.runWith(MAX_RUNTIME_OPTS).https.onCall(async (data, context) => {
   console.log('data', JSON.stringify(data));
   const bucket = admin.storage().bucket();
   const fileName = data.output;
@@ -204,9 +204,9 @@ exports.ffmpegRemixVideo = functions.runWith(MAX_RUNTIME_OPTS).https.onCall(asyn
   const localFileNamePath = path.join(os.tmpdir(), data.output);
   data.output = localFileNamePath;
   console.log('data.output', data.output);
-
+  const { waveForm, waveFormMode, waveFormColor } = data;
   return new Promise((resolve, reject) =>
-    remix(data, null, null, null, async (err, result) => {
+    remix(data, waveForm, waveFormMode, waveFormColor, async (err, result) => {
       if (err) {
         console.log('err', err);
         reject(err);
@@ -227,23 +227,11 @@ exports.ffmpegRemixVideo = functions.runWith(MAX_RUNTIME_OPTS).https.onCall(asyn
         // without resumable false, this seems to fail
         resumable: false,
       });
-      // clean up video preview mp4 file on the cloud function
-      // const storage = admin.storage().bucket();
-      // const pathReferenceRemix = admin
-      //   .storage()
-      //   .bucket()
-      //   .file(destination);
-      // const storage = admin.storage();
-      // const pathReferenceRemix = storage.ref(destination);
-      // const config = {
-      //   action: 'read',
-      //   expires: '10-17-2025',
-      // };
-      // const urlOfRemix = await pathReferenceRemix.getSignedUrl(config);
-      // // const pathReferenceRemix = storage.ref(destination);
-      // // const urlOfRemix = await pathReferenceRemix.getDownloadURL();
-      // console.log('res url', urlOfRemix);
-      // fs.unlinkSync(data.output);
+      // TODO: see if can generate download url or signed url in cloud function
+      // instead of on the client
+
+      // delete remixed file from cloud function to clean up
+      fs.unlinkSync(data.output);
       // return resolve(urlOfRemix);
       return resolve(destination);
     })
