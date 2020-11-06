@@ -1,10 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import querystring from 'querystring';
-import corsFetch from './cors_wrapper.js';
+// import downloadjs from 'downloadjs';
 import firebase, { db, analytics, storage } from '../Firebase.js';
-
-// import { type } from 'os';
-// const analytics = firebase.analytics();
 
 const DEFAULT_LABEL = {
   //TODO: is _id needed, or is it just needed for electron database?
@@ -298,7 +294,7 @@ class ApiWrapper {
               .doc(projectId)
               .collection('transcripts')
               .add(newTranscript)
-              .then(docRef => {
+              .then(async docRef => {
                 console.log('Document written with ID: ', docRef.id);
                 const response = {};
                 response.status = 'ok';
@@ -309,6 +305,23 @@ class ApiWrapper {
                 };
 
                 resolve(response);
+                // updating metadata with custom fields, to
+                // set with project and transcript it belongs to
+                // This triggers cloud function to create mp4 preview
+                // and update firestore with ref of the mp4 video preview
+                // fileRef
+                //   .updateMetadata({
+                //     customMetadata: {
+                //       projectId: projectId,
+                //       transcriptId: docRef.id,
+                //     },
+                //   })
+                //   .then(resp => {
+                //      resolve(resp);
+                // })
+                // .catch(er => {
+                //   reject(er);
+                // });
               })
               .catch(function(error) {
                 console.error('Error adding document: ', error);
@@ -339,7 +352,12 @@ class ApiWrapper {
           if (doc.exists) {
             const tmpData = doc.data();
             // In casee the url of the media expires, getting a new getDownloadURL from ref in cloud storage
-            const pathReference = storage.ref(tmpData.storageRefName);
+            let pathReference = storage.ref(tmpData.storageRefName);
+            if (tmpData.videoUrl) {
+              pathReference = storage.ref(tmpData.videoUrl);
+            } else if (tmpData.audioUrl) {
+              pathReference = storage.ref(tmpData.audioUrl);
+            }
             // TODO: or could get it from the audio that is sent to STT
             // to ensure HTML5 compatibility, if non HTML5 audio/video is being uploaded as source file
             // const pathReference = storage.ref(tmpData.audioUrl);
@@ -980,32 +998,71 @@ class ApiWrapper {
   }
 
   // TODO: may or may not support this for web app?
-  async exportVideo(data, fileName) {
-    return new Promise((resolve, reject) => {
-      // In electron prompt for file destination
-      // default to desktop on first pass
-      const ffmpegRemixData = {
-        input: data,
-        output: `~/Desktop/${fileName}`,
-        ffmpegPath: '', //add electron ffmpeg bin
-      };
-      resolve(ffmpegRemixData);
+  async exportVideo({ sequence, fileName, projectId }) {
+    console.log('exportVideo', sequence, fileName);
+    return new Promise(async (resolve, reject) => {
+      const ffmpegRemixVideo = firebase.functions().httpsCallable('ffmpegRemixVideo');
+      await ffmpegRemixVideo({
+        input: sequence,
+        output: `${fileName}`,
+        projectId,
+      })
+        .then(async ({ data }) => {
+          // Read result of the Cloud Function.
+          // var sanitizedMessage = result.data.text;
+          alert('finished exporting');
+          console.log('data', data);
+
+          const pathReferenceRemix = storage.ref(data);
+          // https://firebase.google.com/docs/storage/web/download-files#full_example
+          const urlOfRemix = await pathReferenceRemix.getDownloadURL();
+          console.log('res url', urlOfRemix);
+          downloadURI(urlOfRemix, fileName);
+          // downloadjs(urlOfRemix, fileName, 'video/mp4');
+          // window.open(urlOfRemix, '_blank', 'noopener');
+          // TODO: prompt download from url,how?
+          resolve(data);
+        })
+        .catch(error => {
+          reject(error);
+        });
     });
   }
 
   // TODO: may or may not support this for web app?
-  async exportAudio(data, fileName, waveForm, waveFormMode, waveFormColor) {
+  async exportAudio({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId }) {
+    const ffmpegRemixAudio = firebase.functions().httpsCallable('ffmpegRemixVideo');
     return new Promise((resolve, reject) => {
-      // In electron prompt for file destination
-      // default to desktop on first pass
-      const ffmpegRemixData = {
-        input: data,
-        output: `~/Desktop/${fileName}`,
-        ffmpegPath: '', //add electron ffmpeg bin
-      };
-      resolve(ffmpegRemixData);
+      ffmpegRemixAudio({
+        input: sequence,
+        waveForm,
+        waveFormMode,
+        waveFormColor,
+        output: `${fileName}`,
+        projectId,
+      })
+        .then(ffmpegRemixData => {
+          // Read result of the Cloud Function.
+          // var sanitizedMessage = result.data.text;
+          resolve(ffmpegRemixData);
+        })
+        .catch(error => {
+          reject(error);
+        });
     });
   }
+}
+
+function downloadURI(uri, name) {
+  const link = document.createElement('a');
+  // link.target = '_blank';
+  // link.rel = 'noopener noreferrer';
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  // delete link;
 }
 
 export default ApiWrapper;

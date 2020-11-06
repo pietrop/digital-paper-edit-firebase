@@ -62,7 +62,8 @@
   "scripts": {
     "start": "run-p --race dev:firebase dev:react",
     "firebase:serve": "firebase serve",
-    "dev:firebase": "firebase serve -p 4000",
+    "dev:firebase": "firebase serve  -p 4000 ",
+    "dev:firebase:emulator": "firebase emulators:start",
     "dev:react": "cross-env REACT_APP_NODE_ENV=development react-scripts start",
     "start:dev": "cross-env REACT_APP_NODE_ENV=development react-scripts start",
     "start-emu": "cross-env REACT_APP_NODE_ENV=development react-scripts start",

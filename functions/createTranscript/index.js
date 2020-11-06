@@ -1,8 +1,10 @@
 const speech = require('@google-cloud/speech');
+const { CloudTasksClient } = require('@google-cloud/tasks');
+const gcpToDpe = require('gcp-to-dpe');
 const { addMinutes } = require('./add-minutes');
 const { getSecondsSinceEpoch } = require('./seconds-since-epoch');
-const { CloudTasksClient } = require('@google-cloud/tasks');
 const { convertToAudio } = require('./convertToAudio');
+const { readMetadataForEDL } = require('./av-metadata-reader/index.js');
 
 exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_RATE_HERTZ) => {
   // Get an object representing the document
@@ -14,6 +16,21 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
   const storage = admin.storage();
   // https://github.com/firebase/firebase-tools/issues/1573#issuecomment-517000981
   const bucket = storage.appInternal.options.storageBucket;
+
+  // Read metadata
+  const metadataRes = await readMetadataForEDL({
+    file: downloadURLLink,
+  });
+
+  change.ref.set(
+    {
+      metadata: metadataRes,
+    },
+    {
+      merge: true,
+    }
+  );
+  // end Read metadata
 
   // Convert video or audio to audio that meets GCP STT Specs
   const audioForSttRef = await convertToAudio(admin, storageRef, downloadURLLink, AUDIO_EXTENSION, SAMPLE_RATE_HERTZ);
@@ -58,6 +75,26 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
     },
   };
 
+  // https://cloud.google.com/speech-to-text/docs/async-recognize
+  // > Asynchronous speech recognition starts a long running audio processing operation.
+  // > Use asynchronous speech recognition to transcribe audio that is longer than 1 minute
+  // if (metadataRes.duration && metadataRes.duration <= 60) {
+  //   const [shortResponse] = await client.recognize(request);
+  //   //  const transcription = response.results.map(result => result.alternatives[0].transcript).join('\n');
+  //   //  console.log('Transcription: ', transcription);
+  //   const transcript = gcpToDpe(shortResponse);
+  //   const { paragraphs, words } = transcript;
+  //   return change.ref.set(
+  //     {
+  //       paragraphs,
+  //       words,
+  //       status: 'done',
+  //     },
+  //     {
+  //       merge: true,
+  //     }
+  //   );
+  // } else {
   // This creates a recognition job that you can wait for now, or get its result later.
   // initialApiResponse.name is the operation name/"id"
   // initialApiResponse.done is the status of the operation
@@ -70,13 +107,14 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
   // TODO: I don't think the first response will have just have the results as is?
   if (sttOperationStatus && initialApiResponse.response && initialApiResponse.response.results) {
     //  const [response] = await operation.promise();
-    const transcript = gcpToDpe(initialApiResponse.response);
+    const transcript = gcpToDpe(initialApiResponse);
     const { paragraphs, words } = transcript;
     return change.ref.set(
       {
         paragraphs,
         words,
         status: 'done',
+        sttEngine: 'GoogleCloud',
       },
       {
         merge: true,
@@ -129,8 +167,12 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
         seconds: secondsSinceEpoch,
       },
     };
-    const [response] = await tasksClient.createTask({ parent: queuePath, task });
+    const [response] = await tasksClient.createTask({
+      parent: queuePath,
+      task,
+    });
     console.log(`Created task ${response.name}`);
     return null;
   }
+  // }
 };

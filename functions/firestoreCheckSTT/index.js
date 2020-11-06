@@ -43,6 +43,7 @@ exports.createHandler = async (req, res, admin, functions) => {
                 paragraphs,
                 words,
                 status: 'done',
+                sttEngine: 'GoogleCloud',
               },
               {
                 merge: true,
