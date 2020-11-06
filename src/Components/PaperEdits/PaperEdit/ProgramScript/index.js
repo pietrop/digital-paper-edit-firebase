@@ -1092,33 +1092,29 @@ class ProgramScript extends Component {
                         }
                       />
 
-                      {whichJsEnv() === 'electron' ? (
-                        <>
-                          <ExportMenuItem
-                            tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                            onClick={this.handleExportAudioPreview}
-                            title="Export wav audio preview - Experimental feature, at the moment you cannot combine audio and video in the same export."
-                            text={
-                              <>
-                                <FontAwesomeIcon icon={faFileAudio} /> Audio (wav) <FontAwesomeIcon icon={faFlask} />
-                                <FontAwesomeIcon icon={faInfoCircle} />
-                              </>
-                            }
-                          />
-                          <Dropdown.Divider />
-                          <ExportWaveForm
-                            TOOLTIP_DEPLAY_IN_MILLISECONDS={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                            handleExportAudioPreviewWithVideoWaveform={this.handleExportAudioPreviewWithVideoWaveform}
-                            title="Export audio preview as video with animated wave form - Experimental feature, at the moment you cannot combine audio and video in the same export."
-                            text={
-                              <>
-                                <FontAwesomeIcon icon={faFileAudio} /> Animated Waveform (mp4) <FontAwesomeIcon icon={faFlask} />
-                                <FontAwesomeIcon icon={faInfoCircle} />
-                              </>
-                            }
-                          />
-                        </>
-                      ) : null}
+                      <ExportMenuItem
+                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
+                        onClick={this.handleExportAudioPreview}
+                        title="Export wav audio preview - Experimental feature, at the moment you cannot combine audio and video in the same export."
+                        text={
+                          <>
+                            <FontAwesomeIcon icon={faFileAudio} /> Audio (wav) <FontAwesomeIcon icon={faFlask} />
+                            <FontAwesomeIcon icon={faInfoCircle} />
+                          </>
+                        }
+                      />
+                      <Dropdown.Divider />
+                      <ExportWaveForm
+                        TOOLTIP_DEPLAY_IN_MILLISECONDS={TOOLTIP_DEPLAY_IN_MILLISECONDS}
+                        handleExportAudioPreviewWithVideoWaveform={this.handleExportAudioPreviewWithVideoWaveform}
+                        title="Export audio preview as video with animated wave form - Experimental feature, at the moment you cannot combine audio and video in the same export."
+                        text={
+                          <>
+                            <FontAwesomeIcon icon={faFileAudio} /> Animated Waveform (mp4) <FontAwesomeIcon icon={faFlask} />
+                            <FontAwesomeIcon icon={faInfoCircle} />
+                          </>
+                        }
+                      />
 
                       <Dropdown.Divider />
                       <ExportMenuItem
