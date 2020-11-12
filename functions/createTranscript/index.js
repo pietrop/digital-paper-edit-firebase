@@ -109,10 +109,35 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
     //  const [response] = await operation.promise();
     const transcript = gcpToDpe(initialApiResponse);
     const { paragraphs, words } = transcript;
+
+    change.ref
+      .collection('words')
+      .doc('words')
+      .set(
+        {
+          words,
+        },
+        {
+          merge: true,
+        }
+      );
+
+    change.ref
+      .collection('paragraphs')
+      .doc('paragraphs')
+      .set(
+        {
+          paragraphs,
+        },
+        {
+          merge: true,
+        }
+      );
+
     return change.ref.set(
       {
-        paragraphs,
-        words,
+        // paragraphs,
+        // words,
         status: 'done',
         sttEngine: 'GoogleCloud',
       },

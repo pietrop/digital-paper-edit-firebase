@@ -180,11 +180,11 @@ class ApiWrapper {
             const transcripts = querySnapshot.docs.map(doc => {
               console.log('doc.data()', doc.data(), doc.id);
               const tmpData = doc.data();
-              tmpData.transcript = { paragraphs: tmpData.paragraphs, words: tmpData.words };
-              delete tmpData.paragraphs;
-              delete tmpData.words;
+              // tmpData.transcript = { paragraphs: tmpData.paragraphs, words: tmpData.words };
+              // delete tmpData.paragraphs;
+              // delete tmpData.words;
               // Add the individual transcript firebase id to the data
-              console.log('tmpData', tmpData);
+              console.log('tmpData getTranscripts', tmpData);
               return {
                 id: doc.id,
                 ...tmpData,
@@ -283,8 +283,8 @@ class ApiWrapper {
               storageRefName,
               downloadURL,
               display: true,
-              paragraphs: [],
-              words: [],
+              // paragraphs: [],
+              // words: [],
               status: 'in-progress',
               created: firebase.firestore.FieldValue.serverTimestamp(),
               updated: firebase.firestore.FieldValue.serverTimestamp(),
@@ -348,7 +348,7 @@ class ApiWrapper {
 
       transcriptRef
         .get()
-        .then(doc => {
+        .then(async doc => {
           if (doc.exists) {
             const tmpData = doc.data();
             // In casee the url of the media expires, getting a new getDownloadURL from ref in cloud storage
@@ -358,18 +358,48 @@ class ApiWrapper {
             } else if (tmpData.audioUrl) {
               pathReference = storage.ref(tmpData.audioUrl);
             }
+
+            // Getting collections for words and transcripts
+            const wordsRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('words');
+
+            const wordRefSnapShot = await wordsRef.get();
+            const words = await wordRefSnapShot.data().words;
+
+            const paragraphsRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('paragraphs')
+              .doc('paragraphs');
+
+            const paragraphsRefSnapShot = await paragraphsRef.get();
+            const paragraphs = await paragraphsRefSnapShot.data().paragraphs;
+
+            const transcript = {
+              paragraphs,
+              words,
+            };
             // TODO: or could get it from the audio that is sent to STT
             // to ensure HTML5 compatibility, if non HTML5 audio/video is being uploaded as source file
             // const pathReference = storage.ref(tmpData.audioUrl);
             pathReference
               .getDownloadURL()
-              .then(function(url) {
+              .then(url => {
                 const tmpResult = {
                   id: doc.id,
                   projectTitle: projectData.title,
                   transcriptTitle: tmpData.title,
                   // TODO: integrate with transcript json data
-                  transcript: { paragraphs: tmpData.paragraphs, words: tmpData.words },
+                  // transcript: { paragraphs: tmpData.paragraphs, words: tmpData.words },
+
+                  transcript,
                   // TODO: integrate with cloud storage url data
                   // TODO: change this for url of video / audio preview (mp4 or wav)
                   // url: tmpData.downloadURL,
@@ -413,8 +443,31 @@ class ApiWrapper {
         .doc(transcriptId);
 
       const tmpData = data;
+      const { words, paragraphs } = data;
+      console.log('words', words);
+      console.log('paragraphs', paragraphs);
+      delete tmpData.words;
+      delete tmpData.paragraphs;
       const updated = firebase.firestore.FieldValue.serverTimestamp();
       // const { paragraphs, words } = data;
+
+      const wordsRef = db
+        .collection('projects')
+        .doc(projectId)
+        .collection('transcripts')
+        .doc(transcriptId)
+        .collection('words')
+        .doc('words')
+        .set({ words }, { merge: true });
+
+      const paragraphsRef = db
+        .collection('projects')
+        .doc(projectId)
+        .collection('transcripts')
+        .doc(transcriptId)
+        .collection('paragraphs')
+        .doc('paragraphs')
+        .set({ paragraphs }, { merge: true });
 
       docRef
         .set(data, { merge: true })
