@@ -68,7 +68,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
       // https://cloud.google.com/speech-to-text/docs/multiple-languages
       // alternativeLanguageCodes: ['es-ES', 'en-US'],
       // https://cloud.google.com/speech-to-text/docs/reference/rest/v1p1beta1/RecognitionConfig
-      // model: 'video'
+      model: 'video',
     },
     audio: {
       uri: `gs://${bucket}/${audioForSttRef}`,
@@ -115,6 +115,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
         words,
         status: 'done',
         sttEngine: 'GoogleCloud',
+        sttEngine: 'GoogleCloud-video',
       },
       {
         merge: true,
