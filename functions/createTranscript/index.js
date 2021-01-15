@@ -140,6 +140,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
         // paragraphs,
         // words,
         status: 'done',
+        // sttEngine: 'GoogleCloud',
         sttEngine: 'GoogleCloud-video',
       },
       {
