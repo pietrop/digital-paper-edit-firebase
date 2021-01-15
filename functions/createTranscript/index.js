@@ -68,6 +68,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
       // https://cloud.google.com/speech-to-text/docs/multiple-languages
       // alternativeLanguageCodes: ['es-ES', 'en-US'],
       // https://cloud.google.com/speech-to-text/docs/reference/rest/v1p1beta1/RecognitionConfig
+      // https://cloud.google.com/blog/products/gcp/toward-better-phone-call-and-video-transcription-with-new-cloud-speech-to-text
       model: 'video',
     },
     audio: {

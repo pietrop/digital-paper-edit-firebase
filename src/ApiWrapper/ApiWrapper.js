@@ -386,6 +386,7 @@ class ApiWrapper {
               paragraphs,
               words,
             };
+            console.log('transcript', transcript);
             // TODO: or could get it from the audio that is sent to STT
             // to ensure HTML5 compatibility, if non HTML5 audio/video is being uploaded as source file
             // const pathReference = storage.ref(tmpData.audioUrl);
