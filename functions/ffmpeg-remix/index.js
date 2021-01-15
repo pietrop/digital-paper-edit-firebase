@@ -90,7 +90,7 @@ const concat = (data, tmpDir, callback) => {
     ff.on('end', () => {
       console.log(`Created: ${data.output}`);
       // Clean up and delete temp files .ts
-      rimraf(`${tmpDir}/*.ts`, function() {
+      rimraf(`${tmpDir}/*.ts`, () => {
         console.log('delete .ts files');
       });
       callback(null, data);

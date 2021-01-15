@@ -35,20 +35,44 @@ exports.createHandler = async (req, res, admin, functions) => {
           console.log('transcript words');
           console.log('docPath', docPath);
 
-          await admin
-            .firestore()
-            .doc(docPath)
+          const transcriptRef = admin.firestore().doc(docPath);
+
+          await transcriptRef
+            .collection('words')
+            .doc('words')
             .set(
               {
-                paragraphs,
                 words,
-                status: 'done',
-                sttEngine: 'GoogleCloud',
               },
               {
                 merge: true,
               }
             );
+
+          await transcriptRef
+            .collection('paragraphs')
+            .doc('paragraphs')
+            .set(
+              {
+                paragraphs,
+              },
+              {
+                merge: true,
+              }
+            );
+
+          await transcriptRef.set(
+            {
+              // paragraphs,
+              // words,
+              status: 'done',
+              sttEngine: 'GoogleCloud',
+            },
+            {
+              merge: true,
+            }
+          );
+
           console.log('admin write');
           return res.sendStatus(200);
         } else {
