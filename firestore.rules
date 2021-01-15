@@ -17,12 +17,8 @@ service cloud.firestore {
 					return isVerified() && (isValidWSJEmail() || isValidDJEmail())
 			}
       
-    	function readWriteAccess(database,pId) {
-    	 return get(/databases/$(database)/documents/projects/$(pId)).data.roles[request.auth.token.email] == 'owner';
-    	}
-      
-      match /projects/{pId}/{document=**} {
-					allow read, write: if isValidEmail() && readWriteAccess(database,pId);
+      match /rivescript/{document=**} {
+					allow read, write: if isValidEmail();
 			}
       
       		
