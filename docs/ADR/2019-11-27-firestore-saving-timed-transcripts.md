@@ -202,17 +202,17 @@ Hard to know if this compression option would be reliable and consistent.
 article from [coderwall, compress your json data](https://coderwall.com/p/mekopw/jsonc-compress-your-json-data-up-to-80)
 
 ```js
-const fs = require("fs");
-const jsonc = require("jsonc");
-const gcpSttResponseJson = require("./create-1574786669322.json");
+const fs = require('fs');
+const jsonc = require('jsonc');
+const gcpSttResponseJson = require('./create-1574786669322.json');
 
-const gcpToDpe = require("gcp-to-dpe");
+const gcpToDpe = require('gcp-to-dpe');
 const gcpTranscript = gcpSttResponseJson.response;
 const dpeTranscript = gcpToDpe(gcpTranscript);
-fs.writeFileSync("dpe.json", JSON.stringify(dpeTranscript, null, 2));
+fs.writeFileSync('dpe.json', JSON.stringify(dpeTranscript, null, 2));
 
 const compressedJSON = jsonc.parse(dpeTranscript);
-fs.writeFileSync("jsonc-compressed.json", compressedJSON);
+fs.writeFileSync('jsonc-compressed.json', compressedJSON);
 ```
 
 got an error
@@ -237,17 +237,17 @@ Firestore can support binary data, so json could be compressed to binary.
 When trying this out
 
 ```js
-const fs = require("fs");
-const ubjson = require("@shelacek/ubjson");
-const gcpToDpe = require("gcp-to-dpe");
+const fs = require('fs');
+const ubjson = require('@shelacek/ubjson');
+const gcpToDpe = require('gcp-to-dpe');
 
-const gcpSttResponseJson = require("./create-1574786669322.json");
+const gcpSttResponseJson = require('./create-1574786669322.json');
 const gcpTranscript = gcpSttResponseJson.response;
 const dpeTranscript = gcpToDpe(gcpTranscript);
 
-const buffer = ubjson.encode({ dpeTranscript, from: ["UBJSON"] });
+const buffer = ubjson.encode({ dpeTranscript, from: ['UBJSON'] });
 
-fs.writeFileSync("Ubjson", buffer);
+fs.writeFileSync('Ubjson', buffer);
 ```
 
 Got an error
@@ -351,13 +351,13 @@ last but not least a document for the End timecodes
 eg quick example of code, for separate text, start, and end time.
 
 ```js
-const dpeJson = require("./dpe.json");
+const dpeJson = require('./dpe.json');
 
 const text = dpeJson.words
   .map(word => {
     return word.text;
   })
-  .join("\t");
+  .join('\t');
 
 console.log(text);
 
@@ -365,7 +365,7 @@ const startTime = dpeJson.words
   .map(word => {
     return word.start;
   })
-  .join("\t");
+  .join('\t');
 
 console.log(startTime);
 
@@ -373,7 +373,7 @@ const endTime = dpeJson.words
   .map(word => {
     return word.end;
   })
-  .join("\t");
+  .join('\t');
 
 console.log(endTime);
 ```
@@ -383,7 +383,7 @@ From 1.4M to 85K for end time, 85K for start time and 70K for text.
 Or combined
 
 ```js
-const dpeJson = require("./dpe.json");
+const dpeJson = require('./dpe.json');
 
 console.log(dpeJson);
 
@@ -391,7 +391,7 @@ const text = dpeJson.words
   .map(word => {
     return `${word.text}\t${word.start}\t${word.end}`;
   })
-  .join("\t");
+  .join('\t');
 
 console.log(text);
 ```
@@ -412,14 +412,14 @@ as a quick example of reassambly from tsv to json
 // const startTimeTsv  = fs.readFileSync('dpe-startTime.tsv').toString()
 // const endTimeTimeTsv  = fs.readFileSync('dpe-startTime.tsv').toString()
 
-const startTimeList = startTimeTsv.split("\t");
-const endTimeList = endTimeTimeTsv.split("\t");
+const startTimeList = startTimeTsv.split('\t');
+const endTimeList = endTimeTimeTsv.split('\t');
 
-const words = textTsv.split("\t").map((wordText, index) => {
+const words = textTsv.split('\t').map((wordText, index) => {
   return {
     text: wordText,
-    start: startTimeList[index],
-    end: endTimeList[index]
+    start: parseFloat(startTimeList[index]),
+    end: parseFloat(endTimeList[index]),
   };
 });
 
