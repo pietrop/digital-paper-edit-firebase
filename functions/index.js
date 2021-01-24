@@ -135,7 +135,7 @@ exports.onDeleteTranscriptCleanUp = functions
       .doc(projectId)
       .collection('transcripts')
       .doc(transcriptId)
-      .collection('words');
+      .collection('paragraphs');
 
     await paragraphsRef
       .get()
@@ -212,6 +212,13 @@ exports.onDeleteProjectCleanUp = functions
         // TODO: does it need to reject?
       });
 
+    const wordRef = db
+      .collection('projects')
+      .doc(projectId)
+      .collection('transcripts')
+      .doc(transcriptId)
+      .collection('words');
+
     await wordRef
       .get()
       .then(querySnapshot => {
@@ -231,7 +238,7 @@ exports.onDeleteProjectCleanUp = functions
       .doc(projectId)
       .collection('transcripts')
       .doc(transcriptId)
-      .collection('words');
+      .collection('paragraphs');
 
     await paragraphsRef
       .get()
