@@ -204,7 +204,7 @@ class ApiWrapper {
     });
   }
 
-  async createTranscript(projectId, formData) {
+  async createTranscript(projectId, formData, updateProgressValue) {
     // TODO: send file to google cloud storate
     const title = formData.get('title');
     const description = formData.get('description');
@@ -237,6 +237,7 @@ class ApiWrapper {
           // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log('Upload is ' + progress + '% done');
+          updateProgressValue(progress);
           // setUploadProgress(progress);
           switch (snapshot.state) {
             case firebase.storage.TaskState.PAUSED: // or 'paused'
