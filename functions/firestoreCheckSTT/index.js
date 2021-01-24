@@ -99,6 +99,23 @@ exports.createHandler = async (req, res, admin, functions) => {
           // Epoch, also known as Unix timestamps, is the number of seconds (not milliseconds!) that have elapsed since January 1, 1970 at 00:00:00 GMT
           const secondsSinceEpoch = getSecondsSinceEpoch(timeFromNowWhenToCheckAgainAsDate);
 
+          ////
+          // save GCP STT Progress percentage in firestore
+          // could change client to be able to show this on change and show progress for STT
+          if (resp.metadata && resp.metadata.progressPercent) {
+            await admin
+              .firestore()
+              .doc(docPath)
+              .set(
+                {
+                  progressPercent: resp.metadata.progressPercent,
+                },
+                {
+                  merge: true,
+                }
+              );
+          }
+          ////
           await admin
             .firestore()
             .doc(docPath)

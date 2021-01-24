@@ -215,7 +215,12 @@ class TranscriptForm extends Component {
             <Form.Control.Feedback type="invalid">Please chose a description for your transcript</Form.Control.Feedback>
           </Form.Group>
 
-          <ProgressBar animated variant="info" now={this.state.progressValue} label={`${this.state.progressValue}%`} />
+          {this.state.progressValue !== 0 && (
+            <Form.Group controlId="formTranscriptDescription">
+              <Form.Label>Upload progress </Form.Label>
+              <ProgressBar animated variant="info" now={this.state.progressValue} label={`${this.state.progressValue}%`} />
+            </Form.Group>
+          )}
 
           <Modal.Footer>
             <Button variant="primary" type="submit" disabled={this.state.uploading}>
