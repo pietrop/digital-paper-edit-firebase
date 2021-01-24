@@ -1,6 +1,7 @@
 const speech = require('@google-cloud/speech');
 const { CloudTasksClient } = require('@google-cloud/tasks');
 const gcpToDpe = require('gcp-to-dpe');
+const { serializeToTsv } = require('@pietrop/words-tsv-serializer');
 const { addMinutes } = require('./add-minutes');
 const { getSecondsSinceEpoch } = require('./seconds-since-epoch');
 const { convertToAudio } = require('./convertToAudio');
@@ -110,13 +111,13 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
     //  const [response] = await operation.promise();
     const transcript = gcpToDpe(initialApiResponse);
     const { paragraphs, words } = transcript;
-
+    const tsv = serializeToTsv(words);
     change.ref
       .collection('words')
       .doc('words')
       .set(
         {
-          words,
+          words: tsv,
         },
         {
           merge: true,

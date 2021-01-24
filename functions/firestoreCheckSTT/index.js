@@ -1,6 +1,7 @@
 const { CloudTasksClient } = require('@google-cloud/tasks');
 const fetch = require('node-fetch');
 const gcpToDpe = require('gcp-to-dpe');
+const { serializeToTsv } = require('@pietrop/words-tsv-serializer');
 const { getSttOperationUrl } = require('./get-stt-operation-url');
 const { getSecondsSinceEpoch } = require('../createTranscript/seconds-since-epoch');
 const { addMinutes } = require('../createTranscript/add-minutes');
@@ -32,6 +33,9 @@ exports.createHandler = async (req, res, admin, functions) => {
           // console.log('transcript', transcript);
           console.log('transcript gcpToDpe');
           const { paragraphs, words } = transcript;
+
+          const tsv = serializeToTsv(words);
+
           console.log('transcript words');
           console.log('docPath', docPath);
 
@@ -42,7 +46,7 @@ exports.createHandler = async (req, res, admin, functions) => {
             .doc('words')
             .set(
               {
-                words,
+                words: tsv,
               },
               {
                 merge: true,
