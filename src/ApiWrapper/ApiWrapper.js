@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { deserializeTsvOfWords, serializeToTsv } from '@pietrop/words-tsv-serializer';
 // import downloadjs from 'downloadjs';
 import firebase, { db, analytics, storage } from '../Firebase.js';
 
@@ -178,11 +179,12 @@ class ApiWrapper {
         .then(querySnapshot => {
           if (querySnapshot.docs.length > 0) {
             const transcripts = querySnapshot.docs.map(doc => {
-              console.log('doc.data()', doc.data(), doc.id);
+              console.log('doc.data() getTranscripts', doc.data(), doc.id);
               const tmpData = doc.data();
               // tmpData.transcript = { paragraphs: tmpData.paragraphs, words: tmpData.words };
               // delete tmpData.paragraphs;
               // delete tmpData.words;
+              // tmpData.words = deserializeTsvOfWords(tmpData.words);
               // Add the individual transcript firebase id to the data
               console.log('tmpData getTranscripts', tmpData);
               return {
@@ -204,7 +206,8 @@ class ApiWrapper {
     });
   }
 
-  async createTranscript(projectId, formData) {
+  async createTranscript(projectId, formData, updateProgressValue) {
+    console.log('createTranscript', 'createTranscript');
     // TODO: send file to google cloud storate
     const title = formData.get('title');
     const description = formData.get('description');
@@ -237,6 +240,7 @@ class ApiWrapper {
           // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log('Upload is ' + progress + '% done');
+          updateProgressValue(progress);
           // setUploadProgress(progress);
           switch (snapshot.state) {
             case firebase.storage.TaskState.PAUSED: // or 'paused'
@@ -369,7 +373,8 @@ class ApiWrapper {
               .doc('words');
 
             const wordRefSnapShot = await wordsRef.get();
-            const words = await wordRefSnapShot.data().words;
+            const wordsTsv = await wordRefSnapShot.data().words;
+            const words = deserializeTsvOfWords({ data: wordsTsv, textAttribute: 'text' });
 
             const paragraphsRef = db
               .collection('projects')
@@ -380,7 +385,8 @@ class ApiWrapper {
               .doc('paragraphs');
 
             const paragraphsRefSnapShot = await paragraphsRef.get();
-            const paragraphs = await paragraphsRefSnapShot.data().paragraphs;
+            const paragraphsTsv = await paragraphsRefSnapShot.data().paragraphs;
+            const paragraphs = deserializeTsvOfWords({ data: paragraphsTsv, textAttribute: 'speaker' });
 
             const transcript = {
               paragraphs,
@@ -459,7 +465,7 @@ class ApiWrapper {
         .doc(transcriptId)
         .collection('words')
         .doc('words')
-        .set({ words }, { merge: true });
+        .set({ words: serializeToTsv({ words, reduceSize: true, textAttribute: 'text' }) }, { merge: true });
 
       const paragraphsRef = db
         .collection('projects')
@@ -468,7 +474,7 @@ class ApiWrapper {
         .doc(transcriptId)
         .collection('paragraphs')
         .doc('paragraphs')
-        .set({ paragraphs }, { merge: true });
+        .set({ paragraphs: serializeToTsv({ words: paragraphs, reduceeSize: true, textAttribute: 'speaker' }) }, { merge: true });
 
       docRef
         .set(data, { merge: true })

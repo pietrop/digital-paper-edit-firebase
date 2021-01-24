@@ -110,6 +110,46 @@ exports.onDeleteTranscriptCleanUp = functions
         reject(error);
       });
 
+    const wordRef = db
+      .collection('projects')
+      .doc(projectId)
+      .collection('transcripts')
+      .doc(transcriptId)
+      .collection('words');
+
+    await wordRef
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.forEach(doc => {
+          doc.ref.delete();
+        });
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
+        // TODO: does it need to reject?
+        reject(error);
+      });
+
+    const paragraphsRef = db
+      .collection('projects')
+      .doc(projectId)
+      .collection('transcripts')
+      .doc(transcriptId)
+      .collection('words');
+
+    await paragraphsRef
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.forEach(doc => {
+          doc.ref.delete();
+        });
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
+        // TODO: does it need to reject?
+        reject(error);
+      });
+
     // delete meida associated with project in cloud storage
     function deleteMedia(storageRefPath, bucket) {
       const file = bucket.file(storageRefPath);
@@ -170,6 +210,40 @@ exports.onDeleteProjectCleanUp = functions
       .catch(error => {
         console.log('Error getting documents: ', error);
         // TODO: does it need to reject?
+      });
+
+    await wordRef
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.forEach(doc => {
+          doc.ref.delete();
+        });
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
+        // TODO: does it need to reject?
+        reject(error);
+      });
+
+    // delete paragraphs and words, as they are separate collections
+    const paragraphsRef = db
+      .collection('projects')
+      .doc(projectId)
+      .collection('transcripts')
+      .doc(transcriptId)
+      .collection('words');
+
+    await paragraphsRef
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.forEach(doc => {
+          doc.ref.delete();
+        });
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
+        // TODO: does it need to reject?
+        reject(error);
       });
 
     // Delete transcripts

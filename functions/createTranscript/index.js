@@ -111,25 +111,26 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
     //  const [response] = await operation.promise();
     const transcript = gcpToDpe(initialApiResponse);
     const { paragraphs, words } = transcript;
-    const tsv = serializeToTsv(words);
+    const wordsTsv = serializeToTsv({ words, reduceSize: true, textAttribute: 'text' });
     change.ref
       .collection('words')
       .doc('words')
       .set(
         {
-          words: tsv,
+          words: wordsTsv,
         },
         {
           merge: true,
         }
       );
 
+    const paragraphsTsv = serializeToTsv({ words: paragraphs, reduceeSize: true, textAttribute: 'speaker' });
     change.ref
       .collection('paragraphs')
       .doc('paragraphs')
       .set(
         {
-          paragraphs,
+          paragraphs: paragraphsTsv,
         },
         {
           merge: true,

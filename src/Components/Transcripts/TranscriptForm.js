@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Form from 'react-bootstrap/Form';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import ApiWrapper from '../../ApiWrapper/index.js';
@@ -28,6 +29,7 @@ class TranscriptForm extends Component {
       formData: null,
       adobeCepFilePath: null,
       savedNotification: null,
+      progressValue: 0,
     };
     // console.log(process.env);
   }
@@ -57,6 +59,12 @@ class TranscriptForm extends Component {
         // TODO: review logic for edge case
         alert('select a clip');
       }
+    });
+  };
+
+  updateProgressValue = value => {
+    this.setState({
+      progressValue: parseInt(value),
     });
   };
   // https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
@@ -110,7 +118,7 @@ class TranscriptForm extends Component {
     }
     // TODO: do you need a try catch?
     try {
-      ApiWrapper.createTranscript(this.state.projectId, this.state.formData, data)
+      ApiWrapper.createTranscript(this.state.projectId, this.state.formData, this.updateProgressValue)
         .then(response => {
           console.log('ApiWrapper.createTranscript-response ', response);
           // show message or redirect
@@ -206,6 +214,8 @@ class TranscriptForm extends Component {
             <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
             <Form.Control.Feedback type="invalid">Please chose a description for your transcript</Form.Control.Feedback>
           </Form.Group>
+
+          <ProgressBar animated variant="info" now={this.state.progressValue} label={`${this.state.progressValue}%`} />
 
           <Modal.Footer>
             <Button variant="primary" type="submit" disabled={this.state.uploading}>

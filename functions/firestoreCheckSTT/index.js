@@ -34,7 +34,7 @@ exports.createHandler = async (req, res, admin, functions) => {
           console.log('transcript gcpToDpe');
           const { paragraphs, words } = transcript;
 
-          const tsv = serializeToTsv(words);
+          const wordsTsv = serializeToTsv({ words, reduceSize: true, textAttribute: 'text' });
 
           console.log('transcript words');
           console.log('docPath', docPath);
@@ -46,19 +46,20 @@ exports.createHandler = async (req, res, admin, functions) => {
             .doc('words')
             .set(
               {
-                words: tsv,
+                words: wordsTsv,
               },
               {
                 merge: true,
               }
             );
 
+          const paragraphsTsv = serializeToTsv({ words: paragraphs, reduceeSize: true, textAttribute: 'speaker' });
           await transcriptRef
             .collection('paragraphs')
             .doc('paragraphs')
             .set(
               {
-                paragraphs,
+                paragraphs: paragraphsTsv,
               },
               {
                 merge: true,
