@@ -1,34 +1,27 @@
 import React from 'react';
-import Alert from 'react-bootstrap/Alert';
+// https://material-ui.com/components/alert/#description
+import { makeStyles } from '@material-ui/core/styles';
+import { Alert, AlertTitle } from '@material-ui/lab';
 
-// https://react-bootstrap.netlify.com/components/alerts/#dismissing
-class CustomAlert extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      show: true,
-    };
-  }
+const useStyles = makeStyles(theme => ({
+  root: {
+    width: '100%',
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
 
-  handleDismiss = () => this.setState({ show: false });
+export default function CustomAlert(props) {
+  const classes = useStyles();
 
-  render() {
-    if (this.state.show) {
-      return (
-        <Alert variant={this.props.variant} onClose={this.handleDismiss} dismissible>
-          {this.props.heading ? <Alert.Heading>{this.props.heading}</Alert.Heading> : ''}
-          {this.props.message}
-          {this.props.children}
-        </Alert>
-      );
-    } else {
-      return (
-        <>
-          <br />
-        </>
-      );
-    }
-  }
+  return (
+    <div className={classes.root}>
+      <Alert severity={props.variant}>
+        {props.heading ? <AlertTitle>{props.heading}</AlertTitle> : ''}
+        {props.message}
+        {props.children}
+      </Alert>
+    </div>
+  );
 }
-
-export default CustomAlert;

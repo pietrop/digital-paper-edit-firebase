@@ -1,13 +1,19 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Switch, Route, HashRouter } from 'react-router-dom';
-import 'bootstrap-css-only/css/bootstrap.css';
+// import 'bootstrap-css-only/css/bootstrap.css';
 // TODO: Note: Replace ^[theme]^ (examples: materia, darkly, slate, cosmo, spacelab, and superhero. See https://bootswatch.com for current theme names.)
 // https://www.npmjs.com/package/react-bootstrap-theme-switcher
 // import 'bootswatch/dist/litera/bootstrap.min.css';
 import CustomAlert from './Components/lib/CustomAlert';
-import Container from 'react-bootstrap/Container';
+// import Container from 'react-bootstrap/Container';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+
 import Row from 'react-bootstrap/Row';
-import Alert from 'react-bootstrap/Alert';
+// import Alert from 'react-bootstrap/Alert';
+import Alert from '@material-ui/lab/Alert';
+
 import Skeleton from '@material-ui/lab/Skeleton';
 import CustomNavbar from './CustomNavbar';
 import firebase from './Firebase.js';
@@ -20,12 +26,10 @@ const PaperEdit = lazy(() => import('./Components/PaperEdits/PaperEdit'));
 const demoWarningMessage = (
   <>
     <p>
-      {' '}
       This is a demo version of the app{' '}
-      <Alert.Link href="https://github.com/pietrop/digital-paper-edit-client" target="_blank" rel="noopener noreferrer">
+      <Link href="https://github.com/pietrop/digital-paper-edit-client" target="_blank" rel="noopener noreferrer">
         see project Github repository for more info
-      </Alert.Link>
-      .{' '}
+      </Link>
     </p>
     <p>This is a read-only demo you can only play around with existing projects!</p>
   </>

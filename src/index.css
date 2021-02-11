@@ -1,4 +1,9 @@
-body {
+/* TODO: Temporary, need to scope this to the component in a sensible way */
+* {
+  font-family: Roboto, sans-serif;
+}
+
+/* body {
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -34,6 +39,8 @@ code {
   background-color: #e9ecef !important;
   border-color: #ced4da !important;
 }
+ */
+
 /* .breadcrumb {
   margin-bottom: 1rem!important;
   background-color: transparent!important;
