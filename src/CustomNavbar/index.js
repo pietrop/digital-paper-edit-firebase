@@ -1,15 +1,31 @@
 import React, { useEffect } from 'react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMicrophone, faPhone, faCalendarAlt, faHeadphones, faFileAudio, faFileUpload, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import Container from 'react-bootstrap/Container';
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import Container from '@material-ui/core/Container';
+import CustomAlert from '../Components/lib/CustomAlert';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+  },
+}));
+
 // import CustomNotice from '../CustomNotice';
 
 function CustomNavbar(props) {
   const { firebase } = props;
+  const classes = useStyles();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -43,46 +59,33 @@ function CustomNavbar(props) {
   });
 
   return (
-    <>
-      <Navbar sticky="top" bg="light" expand="md">
-        <Navbar.Brand href="/#">
-          {' '}
-          {/* <FontAwesomeIcon icon={faHeadphones} size="1x" /> */}
-          Digital Paper Edit
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto"></Nav>
-          <Nav>
-            <Nav.Link href="#/projects">
-              {/* <FontAwesomeIcon icon={faFileAudio} title="Projects" size="1x" />  */}
-              Projects
-            </Nav.Link>
-          </Nav>
-          <Nav>
-            {firebase.auth().currentUser ? (
-              <>
-                <Nav.Link onClick={() => firebase.auth().signOut()} title={`sign out ${firebase.auth().currentUser.displayName}`}>
-                  {' '}
-                  {firebase.auth().currentUser.email} <FontAwesomeIcon icon={faSignOutAlt} />
-                </Nav.Link>
-              </>
-            ) : (
-              <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
-            )}
-          </Nav>
-          <></>
-        </Navbar.Collapse>
-      </Navbar>
+    <div className={classes.root}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" className={classes.title}>
+            Digital Paper Edit
+          </Typography>
+
+          {firebase.auth().currentUser ? (
+            <>
+              <Button color="inherit" onClick={() => firebase.auth().signOut()} title={`sign out ${firebase.auth().currentUser.displayName}`}>
+                {' '}
+                {firebase.auth().currentUser.email} <ExitToAppIcon />
+              </Button>
+            </>
+          ) : (
+            <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+          )}
+        </Toolbar>
+      </AppBar>
 
       {navigator.onLine ? null : (
         <Container>
           <br />
-          {/* <CustomNotice variant={'warning'} title={'Offline'} description={'You are offline'} /> */}
-          You are offline
+          <CustomAlert variant="warning" message="You are offline" />
         </Container>
       )}
-    </>
+    </div>
   );
 }
 

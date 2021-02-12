@@ -5,15 +5,9 @@ import { Switch, Route, HashRouter } from 'react-router-dom';
 // https://www.npmjs.com/package/react-bootstrap-theme-switcher
 // import 'bootswatch/dist/litera/bootstrap.min.css';
 import CustomAlert from './Components/lib/CustomAlert';
-// import Container from 'react-bootstrap/Container';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
-
-import Row from 'react-bootstrap/Row';
-// import Alert from 'react-bootstrap/Alert';
-import Alert from '@material-ui/lab/Alert';
-
 import Skeleton from '@material-ui/lab/Skeleton';
 import CustomNavbar from './CustomNavbar';
 import firebase from './Firebase.js';
@@ -89,13 +83,13 @@ function App(props) {
             fallback={
               <Container>
                 <br />
-                <Row>
+                <Grid>
                   <Skeleton variant="rect" width={'100%'} height={50} />
-                </Row>
+                </Grid>
                 <br />
-                <Row>
+                <Grid>
                   <Skeleton variant="rect" width={'100%'} height={600} />
-                </Row>
+                </Grid>
               </Container>
             }
           >

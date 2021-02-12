@@ -1,162 +1,161 @@
-import React, { Component } from 'react';
-import Card from 'react-bootstrap/Card';
+import React, { Component, useEffect } from 'react';
+// import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
-import Badge from 'react-bootstrap/Badge';
-import Alert from 'react-bootstrap/Alert';
+// import Button from 'react-bootstrap/Button';
+// import Badge from 'react-bootstrap/Badge';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Spinner from 'react-bootstrap/Spinner';
 import Accordion from 'react-bootstrap/Accordion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faCheck, faExclamationTriangle, faPen } from '@fortawesome/free-solid-svg-icons';
+import IconButton from '@material-ui/core/IconButton';
+import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
+import Grid from '@material-ui/core/Grid';
+import SyncIcon from '@material-ui/icons/Sync';
+import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
+import WarningOutlinedIcon from '@material-ui/icons/WarningOutlined';
+import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutlined';
 
-class CustomTranscriptCard extends Component {
-  handleDelete = () => {
+const useStyles = makeStyles({
+  root: {
+    // maxWidth: 345,
+    marginTop: '1em',
+    marginBottom: '1em',
+  },
+  media: {
+    height: 140,
+  },
+});
+
+function CustomTranscriptCard(props) {
+  const classes = useStyles();
+
+  const handleDelete = () => {
     //eslint-disable-next-line
     const confirmationPrompt = confirm("Click OK if you wish to delete, cancel if you don't");
     if (confirmationPrompt === true) {
-      if (this.props.handleDelete) {
-        this.props.handleDelete(this.props.id);
+      if (props.handleDelete) {
+        props.handleDelete(props.id);
       }
     } else {
       alert('All is good, it was not deleted');
     }
   };
-
-  handleEdit = () => {
-    this.props.handleEdit(this.props.id);
+  const handleEdit = () => {
+    props.handleEdit(props.id);
   };
 
-  // TODO: this can be refactored to clean up the logic
-  render() {
-    let status;
-    let errorMessageAlert;
-    // let statusBadge;
-    if (this.props.status === 'error') {
-      status = 'danger';
-    }
-    if (this.props.status === 'in-progress') {
-      status = 'info';
-      // statusBadge = <Badge variant="info">In progress</Badge>;
-    }
-    if (this.props.status === 'done') {
-      // statusBadge = <Badge variant="success">Success</Badge>;
-      status = 'success';
-    }
-    // let borderStatus;
-    // let showBtn = <a href={ `#${ this.props.showLink() }` }>  Show btn</a>;
-    let title = <a href={`#${this.props.showLink()}`}> {this.props.title}</a>;
-    if (status && status === 'info') {
-      title = this.props.title;
-    }
-    if (status && status === 'danger') {
-      title = this.props.title;
-      // borderStatus = 'danger';
-    }
+  let status;
+  let errorMessageAlert;
+  if (props.status === 'error') {
+    status = 'danger';
+  }
+  if (props.status === 'in-progress') {
+    status = 'info';
+    // statusBadge = <Badge variant="info">In progress</Badge>;
+  }
+  if (props.status === 'done') {
+    // statusBadge = <Badge variant="success">Success</Badge>;
+    status = 'success';
+  }
 
-    if (this.props.status === 'error') {
-      errorMessageAlert = (
-        <>
-          <Alert variant="danger">
-            <FontAwesomeIcon icon={faExclamationTriangle} /> {this.props.errorMessage}
-          </Alert>
-          <Badge variant="danger">Error</Badge>
-        </>
-      );
-    }
+  let title = <a href={`#${props.showLink()}`}> {props.title}</a>;
+  if (status && status === 'info') {
+    title = props.title;
+  }
+  if (status && status === 'danger') {
+    title = props.title;
+    // borderStatus = 'danger';
+  }
 
-    return (
-      <ListGroup.Item>
-        <Row>
-          <Col xs={12} sm={9} md={9} ld={9} xl={9}>
-            <Card.Title>
-              {this.props.icon ? this.props.icon : ''} {title}
-            </Card.Title>
-          </Col>
-          <Col xs={2} sm={1} md={1} ld={1} xl={1}>
-            <Card.Link>
-              <Button onClick={this.handleEdit} variant="secondary" size="sm">
-                <FontAwesomeIcon icon={faPen} />
-              </Button>
-            </Card.Link>
-          </Col>
-          <Col xs={2} sm={1} md={1} ld={1} xl={1}>
-            <Card.Link>
-              <Button onClick={this.handleDelete} variant="secondary" size="sm">
-                <FontAwesomeIcon icon={faTrash} />
-              </Button>
-            </Card.Link>
-          </Col>
-          <Col xs={1} sm={1} md={1} ld={1} xl={1}>
-            {status && status === 'info' ? (
-              <Button variant="info" size="sm" disabled>
-                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-              </Button>
-            ) : (
-              ''
-            )}
-            {status && status === 'danger' ? (
-              <Button variant="danger" size="sm" disabled>
-                <FontAwesomeIcon icon={faExclamationTriangle} />
-              </Button>
-            ) : (
-              ''
-            )}
-            {status && status === 'success' ? (
-              <Button variant="success" size="sm" disabled>
-                <FontAwesomeIcon icon={faCheck} />
-              </Button>
-            ) : (
-              ''
-            )}
-          </Col>
-        </Row>
-
-        <Row>
-          <Col xs={12} sm={12} md={12} ld={12} xl={12}>
-            <Card.Subtitle className="mb-2 text-muted">{this.props.subtitle}</Card.Subtitle>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12} sm={12} md={12} ld={12} xl={12}>
-            {this.props.sttEngine && this.props.clipName && (
-              <Accordion>
-                <Accordion.Toggle as={Button} variant="link" eventKey="0">
-                  <Badge variant="light">Info</Badge>
-                </Accordion.Toggle>
-                <Accordion.Collapse eventKey="0">
-                  <>
-                    {this.props.sttEngine ? (
-                      <>
-                        STT Engine: <Badge variant="light">{this.props.sttEngine}</Badge>
-                      </>
-                    ) : null}
-                    <br />
-                    {this.props.clipName ? (
-                      <>
-                        File Name: <Badge variant="light">{this.props.clipName}</Badge>
-                      </>
-                    ) : null}
-                  </>
-                </Accordion.Collapse>
-              </Accordion>
-            )}
-          </Col>
-        </Row>
-
-        {errorMessageAlert ? (
-          <>
-            <Row>
-              <Col xs={12} sm={12} md={12} ld={12} xl={12}>
-                {errorMessageAlert}
-              </Col>
-            </Row>
-          </>
-        ) : null}
-      </ListGroup.Item>
+  if (props.status === 'error') {
+    errorMessageAlert = (
+      <>
+        <Alert severity="danger">
+          <AlertTitle>Error</AlertTitle>
+          {props.errorMessage}
+        </Alert>
+      </>
     );
   }
+
+  return (
+    <Card className={classes.root}>
+      <CardActionArea>
+        <CardActions>
+          <Grid container container direction="row" justify="space-between" alignItems="flex-start">
+            <Grid item xs={12} sm={7} md={7} lg={7} xl={7}>
+              <Typography gutterBottom variant="h5" component="h2" color="textSecondary" noWrap title={props.title}>
+                {/* <Link href={`#${showLinkPath()}`}> */}
+                {props.icon ? props.icon : ''} {title}
+                {/* </Link> */}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={5} md={5} lg={5} xl={5}>
+              <Grid container direction="row" justify="flex-end" alignItems="flex-start">
+                <Grid item>
+                  <IconButton size="small" color="primary" onClick={handleEdit}>
+                    <EditIcon />
+                  </IconButton>
+                </Grid>
+                <Grid item item>
+                  <IconButton size="small" color="primary" onClick={handleDelete}>
+                    <DeleteOutlinedIcon />
+                  </IconButton>
+                </Grid>
+                <Grid item>
+                  {status && status === 'info' ? (
+                    <Button variant="info" size="sm" disabled>
+                      {/* <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> */}
+                      <SyncIcon style={{ color: '#35baf6' }} />
+                    </Button>
+                  ) : (
+                    ''
+                  )}
+                  {status && status === 'danger' ? (
+                    <Button variant="danger" size="sm" disabled>
+                      {/* <FontAwesomeIcon icon={faExclamationTriangle} /> */}
+                      <WarningOutlinedIcon color="secondary" />
+                    </Button>
+                  ) : (
+                    ''
+                  )}
+                  {status && status === 'success' ? (
+                    <Button variant="success" size="sm" disabled>
+                      {/* <FontAwesomeIcon icon={faCheck} /> */}
+                      <CheckBoxOutlinedIcon style={{ color: '#009688' }} />
+                    </Button>
+                  ) : (
+                    ''
+                  )}
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </CardActions>
+        <CardContent>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {props.description}
+          </Typography>
+          {/* <Typography variant="p" gutterBottom>
+            Created {props.date}
+          </Typography> */}
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
 }
 
 export default CustomTranscriptCard;
