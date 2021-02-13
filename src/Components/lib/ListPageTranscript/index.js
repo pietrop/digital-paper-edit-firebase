@@ -12,6 +12,7 @@ import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
 
 import SearchBar from '../SearchBar';
 import CustomTranscriptCard from '../CustomTranscriptCard';
@@ -50,7 +51,7 @@ function ListPageTranscript(props) {
   const handleSearch = searchText => {
     console.log('searchText', searchText);
     const results = props.items.filter(transcript => {
-      console.log('transcript', transcript);
+      // console.log('transcript', transcript);
       if (
         (transcript.title && includesText(transcript.title, searchText)) ||
         (transcript.description && includesText(transcript.description, searchText)) ||
@@ -86,7 +87,6 @@ function ListPageTranscript(props) {
               id={item.id}
               projectId={item.id}
               title={item.title}
-              subtitle={item.description}
               handleEdit={props.handleEdit}
               handleDelete={() => {
                 props.handleDelete(item.id);
@@ -96,7 +96,7 @@ function ListPageTranscript(props) {
                 return props.showLinkPath(item.id);
               }}
               status={item.status}
-              description={description}
+              description={item.description}
               disabled={item.status === 'done' ? true : false}
               errorMessage={item.status === 'error' ? item.errorMessage : null}
             />
@@ -123,12 +123,13 @@ function ListPageTranscript(props) {
   if (props.items !== null && props.items.length !== 0) {
     content = (
       <>
-        <Container
+        <List
+          className={classes.root}
           style={{ height: '75vh', overflow: 'scroll' }}
-          //  variant="flush"
+          // variant="flush"
         >
           {itemsCards}
-        </Container>
+        </List>
       </>
     );
   } else {
@@ -137,30 +138,31 @@ function ListPageTranscript(props) {
 
   return (
     <>
-      <Grid container direction="row" justify="space-around" alignItems="flex-end">
-        <Grid item xs={12} sm={6} md={6} ld={6} xl={6}>
-          {searchEl}
-        </Grid>
-        <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
-          <Button fullWidth={true} onClick={props.handleShowCreateNewItemForm} color="primary" block="true">
-            New {props.model}
-          </Button>
-        </Grid>
-        <Fab aria-label={'add'} className={classes.fab} color={'primary'} onClick={props.handleShowCreateNewItemForm}>
-          <AddIcon />
-        </Fab>
+      <Container maxWidth="md">
+        <Grid container direction="row" justify="space-around" alignItems="flex-end">
+          <Grid item xs={12} sm={6} md={6} ld={6} xl={6}>
+            {searchEl}
+          </Grid>
+          <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
+            <Button fullWidth={true} onClick={props.handleShowCreateNewItemForm} color="primary" block="true">
+              New {props.model}
+            </Button>
+          </Grid>
+          <Fab aria-label={'add'} className={classes.fab} color={'primary'} onClick={props.handleShowCreateNewItemForm}>
+            <AddIcon />
+          </Fab>
 
-        <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
-          <Button fullWidth={true} onClick={props.handleShowCreateNewBatchForm} color="primary" block="true">
-            New Batch {props.model}
-          </Button>
+          <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
+            <Button fullWidth={true} onClick={props.handleShowCreateNewBatchForm} color="primary" block="true">
+              New Batch {props.model}
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
 
-      {content}
+        {content}
+      </Container>
     </>
   );
-  // }
 }
 
 export default ListPageTranscript;

@@ -35,14 +35,10 @@ class SearchBar extends React.Component {
     return (
       <Grid container spacing={1} alignItems="flex-end">
         <Grid item>
-          {/* <Button variant="outlined" onClick={this.handleShowSearchBar}> */}
           <SearchIcon />
-          {/* </Button> */}
         </Grid>
         <Grid item xs={10} sm={11} md={11} ld={11} xl={11}>
-          {/* <Collapse in={this.showSearchInput}> */}
           <TextField id="input-with-icon-grid" label="Search" onChange={this.handleSearch} fullWidth={true} margin="normal" />
-          {/* </Collapse> */}
         </Grid>
       </Grid>
     );

@@ -27,7 +27,6 @@ class ApiWrapper {
   async getAllProjects() {
     const { currentUser } = await firebase.auth();
     const currentUserUid = currentUser.uid;
-    console.log('currentUserUid', currentUserUid, currentUser.email, currentUser.displayName);
     analytics.logEvent('getAllProjects', 'd');
     return new Promise((resolve, reject) => {
       db.collection('projects')
@@ -178,7 +177,7 @@ class ApiWrapper {
         .then(querySnapshot => {
           if (querySnapshot.docs.length > 0) {
             const transcripts = querySnapshot.docs.map(doc => {
-              console.log('doc.data()', doc.data(), doc.id);
+              // console.log('doc.data()', doc.data(), doc.id);
               const tmpData = doc.data();
               // tmpData.transcript = { paragraphs: tmpData.paragraphs, words: tmpData.words };
               // delete tmpData.paragraphs;
@@ -387,7 +386,7 @@ class ApiWrapper {
               paragraphs,
               words,
             };
-            console.log('transcript', transcript);
+            // console.log('transcript', transcript);
             // TODO: or could get it from the audio that is sent to STT
             // to ensure HTML5 compatibility, if non HTML5 audio/video is being uploaded as source file
             // const pathReference = storage.ref(tmpData.audioUrl);
@@ -434,7 +433,15 @@ class ApiWrapper {
   }
 
   async updateTranscript(projectId, transcriptId, queryParamsOptions, data) {
+    // TODO: there mgiht be a better way to do this.
+    // this being avoiding sending client side info to the
+    const { display, status } = data;
+    delete data.display;
+    delete data.status;
+    console.log('updateTranscript', projectId, transcriptId, queryParamsOptions, data);
     // const res = await corsFetch(this.transcriptsIdUrl(projectId, transcriptId, queryParamsOptions), 'PUT', data);
+    // if only updating title or descrition
+
     // return res;
     console.log('queryParamsOptions, data', queryParamsOptions, data);
     return new Promise((resolve, reject) => {
@@ -444,37 +451,40 @@ class ApiWrapper {
         .collection('transcripts')
         .doc(transcriptId);
 
-      const tmpData = data;
-      const { words, paragraphs } = data;
-      console.log('words', words);
-      console.log('paragraphs', paragraphs);
-      delete tmpData.words;
-      delete tmpData.paragraphs;
-      const updated = firebase.firestore.FieldValue.serverTimestamp();
-      // const { paragraphs, words } = data;
+      if (data.words && data.paragraphs) {
+        const tmpData = data;
+        const { words, paragraphs } = data;
+        console.log('words', words);
+        console.log('paragraphs', paragraphs);
+        delete tmpData.words;
+        delete tmpData.c;
+        const updated = firebase.firestore.FieldValue.serverTimestamp();
+        // const { paragraphs, words } = data;
 
-      const wordsRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('transcripts')
-        .doc(transcriptId)
-        .collection('words')
-        .doc('words')
-        .set({ words }, { merge: true });
+        const wordsRef = db
+          .collection('projects')
+          .doc(projectId)
+          .collection('transcripts')
+          .doc(transcriptId)
+          .collection('words')
+          .doc('words')
+          .set({ words }, { merge: true });
 
-      const paragraphsRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('transcripts')
-        .doc(transcriptId)
-        .collection('paragraphs')
-        .doc('paragraphs')
-        .set({ paragraphs }, { merge: true });
-
+        const paragraphsRef = db
+          .collection('projects')
+          .doc(projectId)
+          .collection('transcripts')
+          .doc(transcriptId)
+          .collection('paragraphs')
+          .doc('paragraphs')
+          .set({ paragraphs }, { merge: true });
+      }
       docRef
         .set(data, { merge: true })
         .then(doc => {
           // TODO: inconsistencies in the interface, some return ok boolean attribute, others status 'ok' string
+          data.status = status;
+          data.display = display;
           resolve({ ok: true, status: 'ok', transcript: data });
         })
         .catch(error => {

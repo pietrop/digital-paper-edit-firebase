@@ -115,8 +115,8 @@ class PaperEdits extends Component {
     }
   }
 
-  showLinkPathToItem = id => {
-    return `/projects/${this.state.projectId}/paperedits/${id}`;
+  showLinkPath = id => {
+    return `projects/${this.state.projectId}/paperedits/${id}`;
   };
 
   handleUpdateList = list => {
@@ -140,7 +140,7 @@ class PaperEdits extends Component {
   render() {
     return (
       <>
-        <Container style={{ marginBottom: '5em', marginTop: '1em' }}>
+        <Container maxWidth="md">
           <ListPage
             model={'Paper Edit'}
             items={this.state.items}
@@ -150,7 +150,7 @@ class PaperEdits extends Component {
             // editItem={ this.createNew }
             handleEdit={this.handleEditItem}
             handleDelete={this.handleDeleteItem}
-            showLinkPath={this.showLinkPathToItem}
+            showLinkPath={this.showLinkPath}
             handleUpdateList={this.handleUpdateList}
           />
           <ItemFormModal

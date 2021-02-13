@@ -1,46 +1,64 @@
 import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import ListGroup from 'react-bootstrap/ListGroup';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import Divider from '@material-ui/core/Divider';
+import ListItemText from '@material-ui/core/ListItemText';
 
 import SimpleCard from '../SimpleCard';
 
-class List extends React.Component {
-  render() {
-    const listItems = this.props.items
-      .map(item => {
-        // const date = `${item.created.toDate().toDateString()} ${item.created.toDate().toLocaleTimeString('en-US')}`;
-        if (item.display) {
-          return (
-            <SimpleCard
-              key={item.id}
-              id={item.id}
-              // date={date}
-              title={item.title}
-              icon={this.props.icon}
-              description={item.description}
-              handleEdit={this.props.handleEdit}
-              handleDelete={this.props.handleDelete}
-              showLinkPath={this.props.showLinkPath}
-            />
-          );
-        } else {
-          return null;
-        }
-      })
-      .filter(item => {
-        return item !== null;
-      });
+const useStyles = makeStyles(theme => ({
+  root: {
+    width: '100%',
+    // maxWidth: '36ch',
+    backgroundColor: theme.palette.background.paper,
+  },
+  inline: {
+    display: 'inline',
+  },
+}));
 
-    return (
-      <>
-        <div
-          style={{ height: '75vh', overflow: 'scroll' }}
-          // variant="flush"
-        >
-          {listItems}
-        </div>
-      </>
-    );
-  }
+function ListComponent(props) {
+  const classes = useStyles();
+  // render() {
+  const listItems = props.items
+    .map(item => {
+      // const date = `${item.created.toDate().toDateString()} ${item.created.toDate().toLocaleTimeString('en-US')}`;
+      if (item.display) {
+        return (
+          <SimpleCard
+            key={item.id}
+            id={item.id}
+            // date={date}
+            title={item.title}
+            icon={props.icon}
+            description={item.description}
+            handleEdit={props.handleEdit}
+            handleDelete={props.handleDelete}
+            showLinkPath={props.showLinkPath}
+          />
+        );
+      } else {
+        return null;
+      }
+    })
+    .filter(item => {
+      return item !== null;
+    });
+
+  return (
+    <>
+      <List
+        className={classes.root}
+        style={{ height: '75vh', overflow: 'scroll' }}
+        // variant="flush"
+      >
+        {listItems}
+      </List>
+    </>
+  );
+  // }
 }
 
-export default List;
+export default ListComponent;

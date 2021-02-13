@@ -1,27 +1,24 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
+
+import CustomLink from '../CustomLink';
 
 function CustomBreadcrumb(props) {
-  // const showLinkPath = item => {
-  //   return `${item.link}`;
-  // };
-
   const breadcrumbs = props.items.map((item, index) => {
     if (item.link) {
       return (
-        // <Link href={`#${showLinkPath(item)}`}>{item.name}</Link>
-
-        <Link color="inherit" key={index} href={`#${item.link}`}>
+        <CustomLink to={item.link} key={index}>
           {item.name}
-        </Link>
+        </CustomLink>
       );
     } else {
       return (
-        <Typography key={index} color="textPrimary">
-          {item.name}
-        </Typography>
+        <div key={index} style={{ overflow: 'hidden', textOverflow: 'ellipsis', width: '60vw' }}>
+          <Typography key={index} color="textPrimary" noWrap>
+            {item.name}
+          </Typography>
+        </div>
       );
     }
   });

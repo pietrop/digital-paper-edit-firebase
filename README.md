@@ -132,6 +132,12 @@ firebase login
 
 ## Usage - development
 
+```
+npm install --production=false
+```
+
+<!-- https://docs.npmjs.com/cli/v6/commands/npm-install -->
+
 ```console
 npm start
 ```

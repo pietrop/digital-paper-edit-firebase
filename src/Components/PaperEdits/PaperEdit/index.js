@@ -30,16 +30,20 @@ class PaperEdit extends Component {
   }
 
   componentDidMount = async () => {
-    ApiWrapper.getProgrammeScriptAndTranscripts(this.state.projectId, this.state.papereditId).then(json => {
-      console.log('componentDidMount - json getProgrammeScriptAndTranscripts', json);
-      console.log('projectTitle', json.project.title);
-      this.setState({
-        programmeTitle: json.programmeScript.title,
-        projectTitle: json.project.title,
-        transcripts: json.transcripts,
-        labelsOptions: json.labels,
+    try {
+      ApiWrapper.getProgrammeScriptAndTranscripts(this.state.projectId, this.state.papereditId).then(json => {
+        console.log('componentDidMount - json getProgrammeScriptAndTranscripts', json);
+        console.log('projectTitle', json.project.title);
+        this.setState({
+          programmeTitle: json.programmeScript.title,
+          projectTitle: json.project.title,
+          transcripts: json.transcripts,
+          labelsOptions: json.labels,
+        });
       });
-    });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   toggleTranscripts = () => {
@@ -79,11 +83,11 @@ class PaperEdit extends Component {
               items={[
                 {
                   name: 'Projects',
-                  link: '/projects',
+                  link: 'projects',
                 },
                 {
                   name: `Project: ${this.state.projectTitle}`,
-                  link: `/projects/${this.state.projectId}`,
+                  link: `projects/${this.state.projectId}`,
                 },
                 {
                   name: 'PaperEdits',

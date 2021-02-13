@@ -190,6 +190,7 @@ class Transcripts extends Component {
   // opens the modal for editing item
   handleEditItem = itemId => {
     const item = this.findItemById(this.state.items, itemId);
+    console.log('handleEditItem', item);
     this.setState({
       title: item.title,
       itemId: item.id,
@@ -218,8 +219,8 @@ class Transcripts extends Component {
     }
   }
 
-  showLinkPathToItem = id => {
-    return `/projects/${this.state.projectId}/transcripts/${id}/correct`;
+  showLinkPath = id => {
+    return `projects/${this.state.projectId}/transcripts/${id}/correct`;
   };
 
   handleUpdateList = list => {
@@ -269,7 +270,7 @@ class Transcripts extends Component {
   render() {
     return (
       <>
-        <Container style={{ marginBottom: '5em', marginTop: '1em' }}>
+        <Container>
           <ListPageTranscript
             model={'Transcript'}
             items={this.state.items}
@@ -277,7 +278,7 @@ class Transcripts extends Component {
             handleShowCreateNewBatchForm={this.handleShowCreateNewBatchForm}
             handleEdit={this.handleEditItem}
             handleDelete={this.handleDelete}
-            showLinkPath={this.showLinkPathToItem}
+            showLinkPath={this.showLinkPath}
             handleUpdateList={this.handleUpdateList}
             //
             handleCloseModal={this.handleCloseModal}
