@@ -63,7 +63,7 @@ function CustomNavbar(props) {
       <AppBar position="static" color="default">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            Digital Paper Edit
+            {process.env.REACT_APP_NAME}
           </Typography>
 
           {firebase.auth().currentUser ? (

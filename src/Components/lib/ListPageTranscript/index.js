@@ -148,6 +148,7 @@ function ListPageTranscript(props) {
               New {props.model}
             </Button>
           </Grid>
+
           <Fab aria-label={'add'} className={classes.fab} color={'primary'} onClick={props.handleShowCreateNewItemForm}>
             <AddIcon />
           </Fab>

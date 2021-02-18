@@ -19,6 +19,7 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     bottom: theme.spacing(2),
     right: theme.spacing(2),
+    zIndex: '1000',
   },
   // fabGreen: {
   //   color: theme.palette.common.white,
@@ -73,11 +74,11 @@ function Page(props) {
             New {props.model}
           </Button>
         </Grid>
-      </Grid>
 
-      <Fab aria-label={'add'} className={classes.fab} color={'primary'} onClick={props.handleShowCreateNewItemForm}>
-        <AddIcon />
-      </Fab>
+        <Fab aria-label={'add'} className={classes.fab} color={'primary'} onClick={props.handleShowCreateNewItemForm}>
+          <AddIcon />
+        </Fab>
+      </Grid>
 
       {props.items && props.items.length === 0 ? <i>There are no {props.model}, create a new one to get started</i> : null}
 

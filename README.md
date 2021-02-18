@@ -130,10 +130,16 @@ gsutil cors set cors.json gs://dj-con-innovation-dpe-web-poc.appspot.com
 firebase login
 ```
 
+```
+firebase use <firebase-project-name>
+```
+
 ## Usage - development
 
 ```
+
 npm install --production=false
+
 ```
 
 <!-- https://docs.npmjs.com/cli/v6/commands/npm-install -->

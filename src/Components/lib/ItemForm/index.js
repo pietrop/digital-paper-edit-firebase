@@ -27,6 +27,7 @@ class ItemForm extends Component {
 
   handleSubmit(event) {
     const form = event.currentTarget;
+    console.log('form.checkValidity()', form.checkValidity());
     if (!form.checkValidity()) {
       event.preventDefault();
       event.stopPropagation();
@@ -58,45 +59,48 @@ class ItemForm extends Component {
   render() {
     return (
       <>
-        {/* <div style={{ margin: '1em' }}>
-          <Grid container direction="column" justify="center" alignItems="stretch">
-            <Grid item xs={12} sm={12} md={12} lg={12}>
-              <FormControl>
-                <InputLabel htmlFor="my-input">Title</InputLabel>
-                <Input
-                  id="my-input"
-                  aria-describedby="my-helper-text"
-                  type="text"
-                  placeholder="Enter a project title"
-                  value={this.state.title}
-                  onChange={this.handleTitleChange}
-                  fullWidth="true"
-                />
-                <FormHelperText id="my-helper-text">Chose a title</FormHelperText>
-              </FormControl>
+        <div style={{ margin: '1em' }}>
+          <form validated={this.state.validated} onSubmit={e => this.handleSubmit(e)}>
+            <Grid container direction="column" justify="center" alignItems="stretch">
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <FormControl>
+                  <InputLabel htmlFor="my-input">Title</InputLabel>
+                  <Input
+                    id="my-input"
+                    aria-describedby="my-helper-text"
+                    type="text"
+                    required
+                    placeholder="Enter a project title"
+                    value={this.state.title}
+                    onChange={this.handleTitleChange}
+                    fullWidth="true"
+                  />
+                  <FormHelperText id="my-helper-text">Chose a title</FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item item xs={12} sm={12} md={12} lg={12}>
+                <FormControl>
+                  <InputLabel htmlFor="my-input">Description</InputLabel>
+                  <Input
+                    type="text"
+                    placeholder="Enter a project description"
+                    value={this.state.description}
+                    onChange={this.handleDescriptionChange}
+                    fullWidth="true"
+                  />
+                  <FormHelperText id="my-helper-text">Chose an optional description</FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item item xs={12} sm={12} md={12} lg={12}>
+                <Button variant="contained" color="primary" type="submit">
+                  Save
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item item xs={12} sm={12} md={12} lg={12}>
-              <FormControl>
-                <InputLabel htmlFor="my-input">Description</InputLabel>
-                <Input
-                  type="text"
-                  placeholder="Enter a project description"
-                  value={this.state.description}
-                  onChange={this.handleDescriptionChange}
-                  fullWidth="true"
-                />
-                <FormHelperText id="my-helper-text">Chose an optional description</FormHelperText>
-              </FormControl>
-            </Grid>
-            <Grid item item xs={12} sm={12} md={12} lg={12}>
-              <Button variant="contained" color="primary" type="submit">
-                Save
-              </Button>
-            </Grid>
-          </Grid>
-        </div> */}
+          </form>
+        </div>
 
-        <Form noValidate validated={this.state.validated} onSubmit={e => this.handleSubmit(e)}>
+        {/* <Form noValidate validated={this.state.validated} onSubmit={e => this.handleSubmit(e)}>
           <Form.Group controlId="formBasicEmail">
             <Form.Label>Title </Form.Label>
             <Form.Control required type="text" placeholder="Enter a project title" value={this.state.title} onChange={this.handleTitleChange} />
@@ -124,7 +128,7 @@ class ItemForm extends Component {
               Save
             </Button>
           </Modal.Footer>
-        </Form>
+        </Form> */}
       </>
     );
   }
