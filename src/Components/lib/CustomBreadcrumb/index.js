@@ -14,7 +14,7 @@ function CustomBreadcrumb(props) {
       );
     } else {
       return (
-        <div key={index} style={{ overflow: 'hidden', textOverflow: 'ellipsis', width: '60vw' }}>
+        <div key={index} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
           <Typography key={index} color="textPrimary" noWrap>
             {item.name}
           </Typography>

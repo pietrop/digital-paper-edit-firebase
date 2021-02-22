@@ -2,6 +2,7 @@ import React from 'react';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
+import { indigo } from '@material-ui/core/colors';
 import Button from '@material-ui/core/Button';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
@@ -16,17 +17,19 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import CustomLink from '../CustomLink';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   root: {
-    // maxWidth: 345,
-    marginTop: '1em',
-    marginBottom: '1em',
+    display: 'flex',
+    '& > *': {
+      margin: theme.spacing(1),
+    },
   },
-  media: {
-    height: 140,
+  indigo: {
+    // TODO: should pull from theme primary, so that if that change this changes as well
+    color: theme.palette.getContrastText(theme.palette.primary.main),
+    backgroundColor: theme.palette.primary.main,
   },
-});
-
+}));
 // const LinkBehavior = React.forwardRef((props, ref) => <RouterLink ref={ref} {...props} />);
 
 function CustomTranscriptCard(props) {
@@ -91,12 +94,29 @@ function CustomTranscriptCard(props) {
     <>
       {/* <Router> */}{' '}
       <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <CustomLink to={showLinkPath()}>
-            <Avatar alt={props.title}>{props.icon} </Avatar>
-          </CustomLink>
-        </ListItemAvatar>
-        <ListItemText primary={<CustomLink to={showLinkPath()}>{props.title}</CustomLink>} secondary={props.description} />
+        {status && status === 'success' ? (
+          <>
+            <ListItemAvatar>
+              <CustomLink to={showLinkPath()}>
+                <Avatar alt={props.title} className={classes.indigo}>
+                  {props.icon}{' '}
+                </Avatar>
+              </CustomLink>
+            </ListItemAvatar>
+            <ListItemText primary={<CustomLink to={showLinkPath()}>{props.title}</CustomLink>} secondary={props.description} />
+          </>
+        ) : (
+          <>
+            <ListItemAvatar>
+              <CustomLink>
+                <Avatar alt={props.title} className={classes.indigo}>
+                  {props.icon}{' '}
+                </Avatar>
+              </CustomLink>
+            </ListItemAvatar>
+            <ListItemText primary={<CustomLink>{props.title}</CustomLink>} secondary={props.description} />
+          </>
+        )}
 
         <ListItemSecondaryAction>
           <IconButton size="small" color="primary" onClick={handleEdit}>

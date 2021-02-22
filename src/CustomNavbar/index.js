@@ -8,6 +8,9 @@ import Button from '@material-ui/core/Button';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Container from '@material-ui/core/Container';
 import CustomAlert from '../Components/lib/CustomAlert';
+import MovieCreationOutlinedIcon from '@material-ui/icons/MovieCreationOutlined';
+import GraphicEqOutlinedIcon from '@material-ui/icons/GraphicEqOutlined';
+import LocalMoviesOutlinedIcon from '@material-ui/icons/LocalMoviesOutlined';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -60,8 +63,9 @@ function CustomNavbar(props) {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static" color="default">
+      <AppBar position="static" color="default" elevation={0}>
         <Toolbar>
+          <LocalMoviesOutlinedIcon />
           <Typography variant="h6" className={classes.title}>
             {process.env.REACT_APP_NAME}
           </Typography>

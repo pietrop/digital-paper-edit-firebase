@@ -11,7 +11,22 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import CustomLink from '../CustomLink';
 
+const useStyles = makeStyles(theme => ({
+  root: {
+    display: 'flex',
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+  indigo: {
+    // TODO: should pull from theme primary, so that if that change this changes as well
+    color: theme.palette.getContrastText(theme.palette.primary.main),
+    backgroundColor: theme.palette.primary.main,
+  },
+}));
+
 const SimpleCard = props => {
+  const classes = useStyles();
   const handleDelete = () => {
     //eslint-disable-next-line
     const confirmationPrompt = confirm("Click OK if you wish to delete, cancel if you don't");
@@ -36,7 +51,9 @@ const SimpleCard = props => {
       <ListItem alignItems="flex-start">
         <ListItemAvatar>
           <CustomLink to={showLinkPath()}>
-            <Avatar alt={props.title}>{props.icon} </Avatar>
+            <Avatar alt={props.title} className={classes.indigo}>
+              {props.icon}{' '}
+            </Avatar>
           </CustomLink>
         </ListItemAvatar>
 
