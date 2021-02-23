@@ -7,10 +7,14 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import CustomNavbar from './CustomNavbar';
 import firebase from './Firebase.js';
 
-const Projects = lazy(() => import('./Components/Projects/index.js'));
-const Project = lazy(() => import('./Components/Projects/Project.js'));
-const TranscriptCorrect = lazy(() => import('./Components/Transcripts/TranscriptCorrect.js'));
-const PaperEdit = lazy(() => import('./Components/PaperEdits/PaperEdit'));
+// const Projects = lazy(() => import('./Components/Projects/index.js'));
+// const Project = lazy(() => import('./Components/Projects/Project.js'));
+// const TranscriptCorrect = lazy(() => import('./Components/Transcripts/TranscriptCorrect.js'));
+// const PaperEdit = lazy(() => import('./Components/PaperEdits/PaperEdit'));
+import Projects from './Components/Projects/index.js';
+import Project from './Components/Projects/Project.js';
+import TranscriptCorrect from './Components/Transcripts/TranscriptCorrect.js';
+import PaperEdit from './Components/PaperEdits/PaperEdit';
 
 const demoWarningMessage = (
   <>
@@ -31,7 +35,7 @@ const NoMatch = () => {
 function App(props) {
   const [user, setUser] = useState(null);
 
-  const handleUserChange = isUserSignedIn => {
+  const handleUserChange = (isUserSignedIn) => {
     setUser(isUserSignedIn);
   };
 

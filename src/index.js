@@ -8,10 +8,13 @@ import { blue, indigo, green } from '@material-ui/core/colors';
 import 'fontsource-roboto';
 const darkBlueColor = '#084177';
 const darkRedColor = '#b2102f';
+const bootstrapBlue = '#007bff';
+const bootstrapRed = '#dc3545';
+const navyBlue = '#023E8A';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: darkBlueColor,
+      main: navyBlue,
     },
     secondary: {
       main: darkRedColor,

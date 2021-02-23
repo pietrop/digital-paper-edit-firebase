@@ -9,7 +9,8 @@ import ApiWrapper from '../../ApiWrapper/index.js';
 import CustomAlert from '../lib/CustomAlert/index.js';
 import Skeleton from '@material-ui/lab/Skeleton';
 
-const TranscriptEditor = React.lazy(() => import('slate-transcript-editor'));
+// const TranscriptEditor = React.lazy(() => import('slate-transcript-editor'));
+import TranscriptEditor from 'slate-transcript-editor';
 
 function TranscriptCorrect(props) {
   const [projectId, setProjectId] = useState(props.match.params.projectId);
@@ -26,7 +27,7 @@ function TranscriptCorrect(props) {
     try {
       ApiWrapper.getTranscript(projectId, transcriptId)
         // TODO: add error handling
-        .then(json => {
+        .then((json) => {
           console.log('json', json);
           setProjectTitle(json.projectTitle);
           setTranscriptTitle(json.transcriptTitle);
@@ -39,14 +40,14 @@ function TranscriptCorrect(props) {
     }
   });
 
-  const handleSave = autoSaveData => {
+  const handleSave = (autoSaveData) => {
     console.log('handleSave', autoSaveData);
     const data = autoSaveData;
     data.title = transcriptTitle;
     data.transcriptTitle = transcriptTitle;
     const queryParamsOptions = false;
     ApiWrapper.updateTranscript(projectId, transcriptId, queryParamsOptions, data)
-      .then(response => {
+      .then((response) => {
         console.log('ApiWrapper.updateTranscript', response);
         if (response.ok) {
           // show message or redirect
@@ -60,7 +61,7 @@ function TranscriptCorrect(props) {
           );
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.error('error saving transcript:: ', e);
         setSavedNotification(
           <CustomAlert

@@ -66,15 +66,18 @@ function CustomNavbar(props) {
       <AppBar position="static" color="default" elevation={0}>
         <Toolbar>
           <LocalMoviesOutlinedIcon />
-          <Typography variant="h6" className={classes.title}>
-            {process.env.REACT_APP_NAME}
-          </Typography>
+          <Typography className={classes.title}>{process.env.REACT_APP_NAME}</Typography>
 
           {firebase.auth().currentUser ? (
             <>
-              <Button color="inherit" onClick={() => firebase.auth().signOut()} title={`sign out ${firebase.auth().currentUser.displayName}`}>
+              <Button
+                color="inherit"
+                onClick={() => firebase.auth().signOut()}
+                title={`sign out ${firebase.auth().currentUser.displayName}`}
+                style={{ textTransform: 'none' }}
+              >
                 {' '}
-                {firebase.auth().currentUser.email} <ExitToAppIcon />
+                {firebase.auth().currentUser.email.toLowerCase()} <ExitToAppIcon />
               </Button>
             </>
           ) : (
