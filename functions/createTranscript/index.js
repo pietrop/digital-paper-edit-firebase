@@ -12,6 +12,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
   // access a particular field as you would any JS property
   let storageRef = newValue.storageRefName;
   const downloadURLLink = newValue.downloadURL;
+  const languageCode = newValue.languageCode ? newValue.languageCode : 'en-US';
   // https://firebase.google.com/docs/storage/admin/start
   const storage = admin.storage();
   // https://github.com/firebase/firebase-tools/issues/1573#issuecomment-517000981
@@ -64,12 +65,14 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
       encoding: 'OGG_OPUS',
       // in RecognitionConfig must either be unspecified or match the value in the FLAC header `16000`;
       sampleRateHertz: Number(SAMPLE_RATE_HERTZ).toString(),
-      languageCode: 'en-US',
+      // languageCode: 'en-US',
+      languageCode: languageCode,
       // https://cloud.google.com/speech-to-text/docs/multiple-languages
       // alternativeLanguageCodes: ['es-ES', 'en-US'],
       // https://cloud.google.com/speech-to-text/docs/reference/rest/v1p1beta1/RecognitionConfig
       // https://cloud.google.com/blog/products/gcp/toward-better-phone-call-and-video-transcription-with-new-cloud-speech-to-text
-      model: 'video',
+      // model: 'video',
+      model: languageCode === 'en-US' ? 'video' : 'default',
     },
     audio: {
       uri: `gs://${bucket}/${audioForSttRef}`,
@@ -111,29 +114,23 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
     const transcript = gcpToDpe(initialApiResponse);
     const { paragraphs, words } = transcript;
 
-    change.ref
-      .collection('words')
-      .doc('words')
-      .set(
-        {
-          words,
-        },
-        {
-          merge: true,
-        }
-      );
+    change.ref.collection('words').doc('words').set(
+      {
+        words,
+      },
+      {
+        merge: true,
+      }
+    );
 
-    change.ref
-      .collection('paragraphs')
-      .doc('paragraphs')
-      .set(
-        {
-          paragraphs,
-        },
-        {
-          merge: true,
-        }
-      );
+    change.ref.collection('paragraphs').doc('paragraphs').set(
+      {
+        paragraphs,
+      },
+      {
+        merge: true,
+      }
+    );
 
     return change.ref.set(
       {

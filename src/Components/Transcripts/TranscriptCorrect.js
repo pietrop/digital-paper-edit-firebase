@@ -38,7 +38,7 @@ function TranscriptCorrect(props) {
     } catch (e) {
       console.error(e);
     }
-  });
+  }, []);
 
   const handleSave = (autoSaveData) => {
     console.log('handleSave', autoSaveData);

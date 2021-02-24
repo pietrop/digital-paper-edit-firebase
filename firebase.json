@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "dj-con-innovation-dpe-web-poc",
     "public": "build",
     "ignore": [
       "firebase.json",

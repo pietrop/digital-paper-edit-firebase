@@ -1,6 +1,7 @@
 import React from 'react';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
 import BatchTranscriptForm from './BatchTranscriptForm';
 
 function NewBatchTranscriptFormModal(props) {
@@ -11,14 +12,16 @@ function NewBatchTranscriptFormModal(props) {
   return (
     <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={props.show} fullWidth={true} maxWidth={'xs'}>
       <DialogTitle id="simple-dialog-title">{props.modalTitle}</DialogTitle>
-      <BatchTranscriptForm
-        projectId={props.projectId}
-        title={props.title}
-        description={props.description}
-        id={props.id}
-        handleSaveForm={props.handleSaveForm}
-        handleCloseModal={props.handleCloseModal}
-      />
+      <DialogContent dividers={'paper'}>
+        <BatchTranscriptForm
+          projectId={props.projectId}
+          title={props.title}
+          description={props.description}
+          id={props.id}
+          handleSaveForm={props.handleSaveForm}
+          handleCloseModal={props.handleCloseModal}
+        />
+      </DialogContent>
     </Dialog>
   );
 }

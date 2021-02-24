@@ -204,6 +204,7 @@ class ApiWrapper {
     // TODO: send file to google cloud storate
     const title = formData.get('title');
     const description = formData.get('description');
+    const languageCode = formData.get('languageCode');
     const type = formData.get('type');
     const clipName = formData.get('file').name;
 
@@ -279,6 +280,7 @@ class ApiWrapper {
               clipName,
               storageRefName,
               downloadURL,
+              languageCode,
               display: true,
               // paragraphs: [],
               // words: [],
