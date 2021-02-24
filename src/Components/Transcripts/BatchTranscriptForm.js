@@ -304,15 +304,13 @@ class BatchTranscriptForm extends Component {
               </>
             )}
             <Grid item xs={12} sm={12} md={12} lg={12}>
-              <FormControl>
-                {this.state.progressValue !== 0 && (
-                  <>
-                    <br />
-                    <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
-                    <br />
-                  </>
-                )}
-              </FormControl>
+              {this.state.progressValue !== 0 && (
+                <>
+                  <br />
+                  <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
+                  <br />
+                </>
+              )}
             </Grid>
 
             <Grid item xs={12} sm={12} md={12} lg={12}>
