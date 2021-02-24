@@ -16,6 +16,19 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import CustomLink from '../CustomLink';
+// TODO: can add sttEngine info and language info the transcript card
+// import languages from '../../Transcripts/languages';
+// function findLanguage(languageCode) {
+//   const res = languages.find((lang) => {
+//     return lang.languageCode === languageCode;
+//   });
+//   // just as a fallback to catch potential mismatch issues
+//   if (res) {
+//     return `${res.Language} - ${res['Language (English name)']}`;
+//   } else {
+//     return 'NA';
+//   }
+// }
 
 const useStyles = makeStyles((theme) => ({
   root: {

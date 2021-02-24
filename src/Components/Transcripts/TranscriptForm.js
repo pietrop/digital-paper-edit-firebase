@@ -7,12 +7,24 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
+import Select from 'react-select';
 
 import CustomAlert from '../lib/CustomAlert/index.js';
 import ApiWrapper from '../../ApiWrapper/index.js';
 import whichJsEnv from '../../Util/which-js-env';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
-import './index.module.css';
+import languages from './languages';
+
+const LANGUAGE_US_ENGLISH_INDEX = 25;
+const LANGUAGE_CODE_US_ENGLISH = 'es-US';
+const DEFAULT_LANGUAGE_CODE = LANGUAGE_CODE_US_ENGLISH;
+const DEFAULT_LANGUAGE_OPTION_INDEX = LANGUAGE_US_ENGLISH_INDEX;
+const languagesOptions = languages.map((language) => {
+  return {
+    value: language.languageCode,
+    label: `${language.Language} - ${language['Language (English name)']}`,
+  };
+});
 
 class TranscriptForm extends Component {
   constructor(props) {
@@ -32,6 +44,7 @@ class TranscriptForm extends Component {
       adobeCepFilePath: null,
       savedNotification: null,
       progressValue: 0,
+      languageCode: DEFAULT_LANGUAGE_CODE,
     };
     // console.log(process.env);
   }
@@ -95,6 +108,9 @@ class TranscriptForm extends Component {
     if (whichJsEnv() !== 'cep') {
       formData.append('title', this.state.title);
       formData.append('description', this.state.description);
+      if (whichJsEnv() === 'browser') {
+        formData.append('languageCode', this.state.languageCode);
+      }
       console.log("formData.get('path')", formData.get('path'));
     }
     let data = {};
@@ -231,15 +247,36 @@ class TranscriptForm extends Component {
                   <FormHelperText className="text-muted">Chose an optional description for your Transcript</FormHelperText>
                   {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
                   {/* <Form.Control.Feedback type="invalid">Please chose a description for your transcript</Form.Control.Feedback> */}
-
-                  {this.state.progressValue !== 0 && (
-                    <>
+                </FormControl>
+              </Grid>
+              {whichJsEnv() === 'browser' && (
+                <>
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
+                      <InputLabel>Language</InputLabel>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
+                      <Select
+                        onChange={this.handleLanguageChange}
+                        options={languagesOptions}
+                        defaultValue={languagesOptions[DEFAULT_LANGUAGE_OPTION_INDEX]}
+                      />
+                    </FormControl>
+                  </Grid>
+                </>
+              )}
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                {this.state.progressValue === 0 && (
+                  <>
+                    <FormControl controlId="formTranscriptDescription" fullWidth={true}>
                       <br />
                       <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
                       <br />
-                    </>
-                  )}
-                </FormControl>
+                    </FormControl>
+                  </>
+                )}
               </Grid>
 
               <Grid item xs={12} sm={12} md={12} lg={12}>

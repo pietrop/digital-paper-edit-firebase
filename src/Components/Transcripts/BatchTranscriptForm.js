@@ -16,7 +16,6 @@ import Button from '@material-ui/core/Button';
 import ApiWrapper from '../../ApiWrapper/index.js';
 import CustomAlert from '../lib/CustomAlert/index.js';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
-import './index.module.css';
 import whichJsEnv from '../../Util/which-js-env';
 
 // setOriginalFetch(window.fetch);
