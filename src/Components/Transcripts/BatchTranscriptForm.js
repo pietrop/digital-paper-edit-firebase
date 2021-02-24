@@ -12,12 +12,24 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
+import Select from 'react-select';
 
 import ApiWrapper from '../../ApiWrapper/index.js';
 import CustomAlert from '../lib/CustomAlert/index.js';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
 import whichJsEnv from '../../Util/which-js-env';
+import languages from './languages';
 
+const LANGUAGE_US_ENGLISH_INDEX = 25;
+const LANGUAGE_CODE_US_ENGLISH = 'es-US';
+const DEFAULT_LANGUAGE_CODE = LANGUAGE_CODE_US_ENGLISH;
+const DEFAULT_LANGUAGE_OPTION_INDEX = LANGUAGE_US_ENGLISH_INDEX;
+const languagesOptions = languages.map((language) => {
+  return {
+    value: language.languageCode,
+    label: `${language.Language} - ${language['Language (English name)']}`,
+  };
+});
 // setOriginalFetch(window.fetch);
 // window.fetch = progressBarFetch;
 
@@ -39,6 +51,7 @@ class BatchTranscriptForm extends Component {
       adobeCepFilePath: null,
       savedNotification: null,
       progressValue: 0,
+      languageCode: DEFAULT_LANGUAGE_CODE,
     };
     // console.log(process.env);
   }
@@ -97,6 +110,12 @@ class BatchTranscriptForm extends Component {
     // if (this.state.title === '') {
     //   this.setState({ title: file.name });
     // }
+  };
+
+  handleLanguageChange = (selection) => {
+    const { value } = selection;
+    console.log(value);
+    this.setState({ languageCode: value });
   };
   // TODO: not quiet right, I think this just saw progress for last one
   // can be fixe later to do a progress bar for each upload
@@ -168,6 +187,8 @@ class BatchTranscriptForm extends Component {
         individualFileFormData.append('type', listOfFileTypes[index]);
         individualFileFormData.append('title', individualFile.name);
         individualFileFormData.append('description', '');
+        individualFileFormData.append('languageCode', this.state.languageCode);
+
         // individualFileFormData.append('type', file.type);
         const data = {
           title: individualFile.name,
@@ -233,55 +254,75 @@ class BatchTranscriptForm extends Component {
   render() {
     return (
       <>
-        <div style={{ margin: '1em' }}>
-          {this.state.savedNotification}
+        {this.state.savedNotification}
 
-          {whichJsEnv() === 'electron' && <NoNeedToConvertNotice />}
+        {whichJsEnv() === 'electron' && <NoNeedToConvertNotice />}
 
-          <form noValidate validated={this.state.validated} onSubmit={(e) => this.handleSubmit(e)}>
-            <Grid container direction="column" justify="center" alignItems="stretch">
-              <Grid item xs={12} sm={12} md={12} lg={12}>
-                <FormControl controlId="formTranscriptMediaFile">
-                  <InputLabel>Select Files </InputLabel>
-                  <Input
-                    required
-                    type="file"
-                    label="Upload"
-                    // accept="audio/*,video/*,.mxf"
-                    inputProps={{ multiple: true, accept: 'audio/*,video/*,.mxf' }}
-                    onChange={this.handleFileUpload}
-                  />
-                  <FormHelperText className="text-muted">Select multiple audio or video file to transcribe.</FormHelperText>
-                  <br />
-                  <FormHelperText className="text-muted">
-                    This allows you to batch transcribe multiple files, the transcript name will default to the clip name.
-                  </FormHelperText>
-                  <FormHelperText className="text-muted">You can change the default transcript name after you've clicked save.</FormHelperText>
-                  <br />
-                  <FormHelperText className="text-muted">
-                    Use command <code>⌘</code> + click or shift <code>⇧</code> + click to select multiple files.
-                  </FormHelperText>
-                  {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
-                  {/* <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback> */}
-
-                  {this.state.progressValue !== 0 && (
-                    <>
-                      <br />
-                      <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
-                      <br />
-                    </>
-                  )}
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12}>
+        <form noValidate validated={this.state.validated} onSubmit={(e) => this.handleSubmit(e)}>
+          <Grid container direction="column" justify="center" alignItems="stretch">
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <FormControl controlId="formTranscriptMediaFile">
+                <InputLabel>Select Files </InputLabel>
+                <Input
+                  required
+                  type="file"
+                  label="Upload"
+                  // accept="audio/*,video/*,.mxf"
+                  inputProps={{ multiple: true, accept: 'audio/*,video/*,.mxf' }}
+                  onChange={this.handleFileUpload}
+                />
+                <FormHelperText className="text-muted">Select multiple audio or video file to transcribe.</FormHelperText>
                 <br />
-                <Button variant="contained" color="primary" type="submit">
-                  Save
-                </Button>
-              </Grid>
+                <FormHelperText className="text-muted">
+                  This allows you to batch transcribe multiple files, the transcript name will default to the clip name.
+                </FormHelperText>
+                <FormHelperText className="text-muted">You can change the default transcript name after you've clicked save.</FormHelperText>
+                <br />
+                <FormHelperText className="text-muted">
+                  Use command <code>⌘</code> + click or shift <code>⇧</code> + click to select multiple files.
+                </FormHelperText>
+                {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
+                {/* <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback> */}
+              </FormControl>
             </Grid>
-          </form>
-        </div>
+            {whichJsEnv() === 'browser' && (
+              <>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                  <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
+                    <InputLabel>Language</InputLabel>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                  <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
+                    <Select
+                      onChange={this.handleLanguageChange}
+                      options={languagesOptions}
+                      defaultValue={languagesOptions[DEFAULT_LANGUAGE_OPTION_INDEX]}
+                    />
+                  </FormControl>
+                </Grid>
+              </>
+            )}
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <FormControl>
+                {this.state.progressValue !== 0 && (
+                  <>
+                    <br />
+                    <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
+                    <br />
+                  </>
+                )}
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <br />
+              <Button variant="contained" color="primary" type="submit">
+                Save
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
       </>
     );
   }

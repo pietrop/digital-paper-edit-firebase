@@ -101,6 +101,12 @@ class TranscriptForm extends Component {
     }
   };
 
+  handleLanguageChange = (selection) => {
+    const { value } = selection;
+    console.log(value);
+    this.setState({ languageCode: value });
+  };
+
   sendRequest = () => {
     this.setState({ uploading: true });
 
@@ -187,107 +193,105 @@ class TranscriptForm extends Component {
   render() {
     return (
       <>
-        <div style={{ margin: '1em' }}>
-          {this.state.savedNotification}
+        {this.state.savedNotification}
 
-          {whichJsEnv() === 'electron' && <NoNeedToConvertNotice />}
+        {whichJsEnv() === 'electron' && <NoNeedToConvertNotice />}
 
-          <form noValidate validated={this.state.validated} onSubmit={(e) => this.handleSubmit(e)}>
-            <Grid container direction="column" justify="center" alignItems="stretch">
-              <Grid item xs={12} sm={12} md={12} lg={12}>
-                {whichJsEnv() === 'cep' ? (
-                  <>
-                    <InputLabel>File </InputLabel>
-                    <Button variant="light" onClick={this.handleAdobeCepSetFilePath} block>
-                      Pick a file
-                    </Button>
-                    <InputLabel className="text-muted">
-                      Select an audio or video file to transcribe. Click on a file in the Adobe Premiere project browser window, and the click{' '}
-                      <code>pick a file</code> to select a file to transcribe. Then click <code>save</code> when you are ready to start the
-                      transcriptiion.
-                    </InputLabel>
-                  </>
-                ) : (
-                  <FormControl controlId="formTranscriptMediaFile" fullWidth={true}>
-                    <InputLabel>File </InputLabel>
-                    <Input required type="file" label="Upload" accept="audio/*,video/*,.mxf, audio/x-m4a" onChange={this.handleFileUpload} />
-                    <FormHelperText className="text-muted">Select an audio or video file to transcribe</FormHelperText>
-                    {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
-                    {/* <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback> */}
-                  </FormControl>
-                )}
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12}>
-                <FormControl controlId="formTranscriptTitle" fullWidth={true}>
-                  <InputLabel>Title </InputLabel>
-                  <Input
-                    required
-                    fullWidth={true}
-                    type="text"
-                    placeholder="Enter a transcript title"
-                    value={this.state.title}
-                    onChange={this.handleTitleChange}
-                  />
-                  <FormHelperText className="text-muted">Chose a title for your Transcript</FormHelperText>
-                  {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
-                  {/* <Form.Control.Feedback type="invalid">Please chose a title for your transcript</Form.Control.Feedback> */}
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12}>
-                <FormControl controlId="formTranscriptDescription" fullWidth={true}>
-                  <InputLabel>Description </InputLabel>
-                  <Input
-                    type="text"
-                    fullWidth={true}
-                    inputMultiline={true}
-                    placeholder="Enter a Transcript description"
-                    value={this.state.description}
-                    onChange={this.handleDescriptionChange}
-                  />
-                  <FormHelperText className="text-muted">Chose an optional description for your Transcript</FormHelperText>
-                  {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
-                  {/* <Form.Control.Feedback type="invalid">Please chose a description for your transcript</Form.Control.Feedback> */}
-                </FormControl>
-              </Grid>
-              {whichJsEnv() === 'browser' && (
+        <form noValidate validated={this.state.validated} onSubmit={(e) => this.handleSubmit(e)}>
+          <Grid container direction="column" justify="center" alignItems="stretch">
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              {whichJsEnv() === 'cep' ? (
                 <>
-                  <Grid item xs={12} sm={12} md={12} lg={12}>
-                    <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
-                      <InputLabel>Language</InputLabel>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={12} md={12} lg={12}>
-                    <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
-                      <Select
-                        onChange={this.handleLanguageChange}
-                        options={languagesOptions}
-                        defaultValue={languagesOptions[DEFAULT_LANGUAGE_OPTION_INDEX]}
-                      />
-                    </FormControl>
-                  </Grid>
+                  <InputLabel>File </InputLabel>
+                  <Button variant="light" onClick={this.handleAdobeCepSetFilePath} block>
+                    Pick a file
+                  </Button>
+                  <InputLabel className="text-muted">
+                    Select an audio or video file to transcribe. Click on a file in the Adobe Premiere project browser window, and the click{' '}
+                    <code>pick a file</code> to select a file to transcribe. Then click <code>save</code> when you are ready to start the
+                    transcriptiion.
+                  </InputLabel>
+                </>
+              ) : (
+                <FormControl controlId="formTranscriptMediaFile" fullWidth={true}>
+                  <InputLabel>File </InputLabel>
+                  <Input required type="file" label="Upload" accept="audio/*,video/*,.mxf, audio/x-m4a" onChange={this.handleFileUpload} />
+                  <FormHelperText className="text-muted">Select an audio or video file to transcribe</FormHelperText>
+                  {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
+                  {/* <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback> */}
+                </FormControl>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <FormControl controlId="formTranscriptTitle" fullWidth={true}>
+                <InputLabel>Title </InputLabel>
+                <Input
+                  required
+                  fullWidth={true}
+                  type="text"
+                  placeholder="Enter a transcript title"
+                  value={this.state.title}
+                  onChange={this.handleTitleChange}
+                />
+                <FormHelperText className="text-muted">Chose a title for your Transcript</FormHelperText>
+                {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
+                {/* <Form.Control.Feedback type="invalid">Please chose a title for your transcript</Form.Control.Feedback> */}
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <FormControl controlId="formTranscriptDescription" fullWidth={true}>
+                <InputLabel>Description </InputLabel>
+                <Input
+                  type="text"
+                  fullWidth={true}
+                  inputMultiline={true}
+                  placeholder="Enter a Transcript description"
+                  value={this.state.description}
+                  onChange={this.handleDescriptionChange}
+                />
+                <FormHelperText className="text-muted">Chose an optional description for your Transcript</FormHelperText>
+                {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
+                {/* <Form.Control.Feedback type="invalid">Please chose a description for your transcript</Form.Control.Feedback> */}
+              </FormControl>
+            </Grid>
+            {whichJsEnv() === 'browser' && (
+              <>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                  <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
+                    <InputLabel>Language</InputLabel>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                  <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
+                    <Select
+                      onChange={this.handleLanguageChange}
+                      options={languagesOptions}
+                      defaultValue={languagesOptions[DEFAULT_LANGUAGE_OPTION_INDEX]}
+                    />
+                  </FormControl>
+                </Grid>
+              </>
+            )}
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              {this.state.progressValue !== 0 && (
+                <>
+                  <FormControl controlId="formTranscriptDescription" fullWidth={true}>
+                    <br />
+                    <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
+                    <br />
+                  </FormControl>
                 </>
               )}
-              <Grid item xs={12} sm={12} md={12} lg={12}>
-                {this.state.progressValue === 0 && (
-                  <>
-                    <FormControl controlId="formTranscriptDescription" fullWidth={true}>
-                      <br />
-                      <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
-                      <br />
-                    </FormControl>
-                  </>
-                )}
-              </Grid>
-
-              <Grid item xs={12} sm={12} md={12} lg={12}>
-                <br />
-                <Button variant="contained" color="primary" type="submit" disabled={this.state.uploading}>
-                  Save
-                </Button>
-              </Grid>
             </Grid>
-          </form>
-        </div>
+
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <br />
+              <Button variant="contained" color="primary" type="submit" disabled={this.state.uploading}>
+                Save
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
       </>
     );
   }
