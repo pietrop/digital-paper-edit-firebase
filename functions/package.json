@@ -13,7 +13,7 @@
     "test": "mocha --reporter spec"
   },
   "engines": {
-    "node": "10"
+    "node": "12"
   },
   "dependencies": {
     "@google-cloud/speech": "^4.1.3",
