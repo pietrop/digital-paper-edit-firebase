@@ -9,7 +9,7 @@ function NewBatchTranscriptFormModal(props) {
   };
 
   return (
-    <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={props.show}>
+    <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={props.show} fullWidth={true} maxWidth={'xs'}>
       <DialogTitle id="simple-dialog-title">{props.modalTitle}</DialogTitle>
       <BatchTranscriptForm
         projectId={props.projectId}

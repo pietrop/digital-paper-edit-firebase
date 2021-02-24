@@ -1,14 +1,24 @@
 import React, { Component } from 'react';
+import path from 'path';
+
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Input from '@material-ui/core/Input';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Grid from '@material-ui/core/Grid';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Button from '@material-ui/core/Button';
+
 import ApiWrapper from '../../ApiWrapper/index.js';
 import CustomAlert from '../lib/CustomAlert/index.js';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
 import './index.module.css';
 import whichJsEnv from '../../Util/which-js-env';
 
-import path from 'path';
 // setOriginalFetch(window.fetch);
 // window.fetch = progressBarFetch;
 
@@ -29,21 +39,22 @@ class BatchTranscriptForm extends Component {
       formData: null,
       adobeCepFilePath: null,
       savedNotification: null,
+      progressValue: 0,
     };
     // console.log(process.env);
   }
 
-  handleTitleChange = event => {
+  handleTitleChange = (event) => {
     this.setState({ title: event.target.value });
   };
 
-  handleDescriptionChange = event => {
+  handleDescriptionChange = (event) => {
     this.setState({ description: event.target.value });
   };
 
   // This is used in Aobe CEP Panel integration only
   handleAdobeCepSetFilePath = () => {
-    window.__adobe_cep__.evalScript(`$._PPP.get_current_project_panel_selection_absolute_path()`, response => {
+    window.__adobe_cep__.evalScript(`$._PPP.get_current_project_panel_selection_absolute_path()`, (response) => {
       console.log('handleAdobeCepSetFilePath');
       if (response !== '') {
         console.log('handleAdobeCepSetFilePath', response);
@@ -61,7 +72,7 @@ class BatchTranscriptForm extends Component {
     });
   };
   // https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
-  handleFileUpload = e => {
+  handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     console.log('files', files);
     const formData = new FormData();
@@ -88,6 +99,14 @@ class BatchTranscriptForm extends Component {
     //   this.setState({ title: file.name });
     // }
   };
+  // TODO: not quiet right, I think this just saw progress for last one
+  // can be fixe later to do a progress bar for each upload
+  updateProgressValue = (value) => {
+    console.log('value');
+    this.setState({
+      progressValue: parseInt(value),
+    });
+  };
 
   sendRequest = () => {
     this.setState({ uploading: true });
@@ -95,7 +114,7 @@ class BatchTranscriptForm extends Component {
     const listOfFilesPath = formData.getAll('path');
     let data = {};
     if (whichJsEnv() === 'electron') {
-      listOfFilesPath.forEach(filePath => {
+      listOfFilesPath.forEach((filePath) => {
         data = {
           title: path.basename(filePath),
           description: `${path.basename(filePath)}`,
@@ -108,7 +127,7 @@ class BatchTranscriptForm extends Component {
         // rather then parsing a formData object in node etc..
         try {
           ApiWrapper.createTranscript(this.state.projectId, this.state.formData, data)
-            .then(response => {
+            .then((response) => {
               console.log('ApiWrapper.createTranscript-response ', response);
               // show message or redirect
               this.setState({
@@ -120,7 +139,7 @@ class BatchTranscriptForm extends Component {
               this.props.handleSaveForm(response.transcript);
               // this.props.handleCloseModal();
             })
-            .catch(e => {
+            .catch((e) => {
               console.log('error:::: ', e);
               this.setState({
                 uploading: false,
@@ -158,8 +177,8 @@ class BatchTranscriptForm extends Component {
         };
 
         try {
-          ApiWrapper.createTranscript(this.state.projectId, individualFileFormData, data)
-            .then(response => {
+          ApiWrapper.createTranscript(this.state.projectId, individualFileFormData, data, this.updateProgressValue)
+            .then((response) => {
               console.log('ApiWrapper.createTranscript-response ', response);
               // show message or redirect
               this.setState({
@@ -171,7 +190,7 @@ class BatchTranscriptForm extends Component {
               this.props.handleSaveForm(response.transcript);
               // this.props.handleCloseModal();
             })
-            .catch(e => {
+            .catch((e) => {
               console.log('error:::: ', e);
               this.setState({
                 uploading: false,
@@ -215,31 +234,55 @@ class BatchTranscriptForm extends Component {
   render() {
     return (
       <>
-        {this.state.savedNotification}
+        <div style={{ margin: '1em' }}>
+          {this.state.savedNotification}
 
-        {whichJsEnv() === 'electron' && <NoNeedToConvertNotice />}
+          {whichJsEnv() === 'electron' && <NoNeedToConvertNotice />}
 
-        <Form noValidate validated={this.state.validated} onSubmit={e => this.handleSubmit(e)}>
-          <Form.Group controlId="formTranscriptMediaFile">
-            <Form.Label>Select Files </Form.Label>
-            <Form.Control required type="file" label="Upload" accept="audio/*,video/*,.mxf" multiple="multiple" onChange={this.handleFileUpload} />
-            <Form.Text className="text-muted">Select multiple audio or video file to transcribe.</Form.Text>
-            <Form.Text className="text-muted">
-              This allows you to batch transcribe multiple files, the transcript name will default to the clip name.
-            </Form.Text>
-            <Form.Text className="text-muted">You can change the default transcript name after you've clicked save.</Form.Text>
-            <Form.Text className="text-muted">
-              Use command <code>⌘</code> + click or shift <code>⇧</code> + click to select multiple files.
-            </Form.Text>
-            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback>
-          </Form.Group>
-          <Modal.Footer>
-            <Button variant="primary" type="submit">
-              Save
-            </Button>
-          </Modal.Footer>
-        </Form>
+          <form noValidate validated={this.state.validated} onSubmit={(e) => this.handleSubmit(e)}>
+            <Grid container direction="column" justify="center" alignItems="stretch">
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <FormControl controlId="formTranscriptMediaFile">
+                  <InputLabel>Select Files </InputLabel>
+                  <Input
+                    required
+                    type="file"
+                    label="Upload"
+                    // accept="audio/*,video/*,.mxf"
+                    inputProps={{ multiple: true, accept: 'audio/*,video/*,.mxf' }}
+                    onChange={this.handleFileUpload}
+                  />
+                  <FormHelperText className="text-muted">Select multiple audio or video file to transcribe.</FormHelperText>
+                  <br />
+                  <FormHelperText className="text-muted">
+                    This allows you to batch transcribe multiple files, the transcript name will default to the clip name.
+                  </FormHelperText>
+                  <FormHelperText className="text-muted">You can change the default transcript name after you've clicked save.</FormHelperText>
+                  <br />
+                  <FormHelperText className="text-muted">
+                    Use command <code>⌘</code> + click or shift <code>⇧</code> + click to select multiple files.
+                  </FormHelperText>
+                  {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
+                  {/* <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback> */}
+
+                  {this.state.progressValue !== 0 && (
+                    <>
+                      <br />
+                      <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
+                      <br />
+                    </>
+                  )}
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <br />
+                <Button variant="contained" color="primary" type="submit">
+                  Save
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
       </>
     );
   }

@@ -119,7 +119,7 @@ class TranscriptForm extends Component {
     }
     // TODO: do you need a try catch?
     try {
-      ApiWrapper.createTranscript(this.state.projectId, this.state.formData, this.updateProgressValue)
+      ApiWrapper.createTranscript(this.state.projectId, this.state.formData, {}, this.updateProgressValue)
         .then((response) => {
           console.log('ApiWrapper.createTranscript-response ', response);
           // show message or redirect
