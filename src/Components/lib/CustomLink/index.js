@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 function LinkWrapper(props) {
   return (
     <>
-      <Button color="primary" component={Link} to={`/${props.to}`}>
+      <Button color="primary" component={Link} to={`/${props.to}`} disabled={props.disabled ? props.disabled : false}>
         {props.children}
       </Button>
     </>

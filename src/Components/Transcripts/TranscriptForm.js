@@ -1,23 +1,18 @@
 import React, { Component } from 'react';
-import Form from 'react-bootstrap/Form';
-import ProgressBar from 'react-bootstrap/ProgressBar';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-
+import path from 'path';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Grid from '@material-ui/core/Grid';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Button from '@material-ui/core/Button';
 
-import ApiWrapper from '../../ApiWrapper/index.js';
 import CustomAlert from '../lib/CustomAlert/index.js';
-import './index.module.css';
+import ApiWrapper from '../../ApiWrapper/index.js';
 import whichJsEnv from '../../Util/which-js-env';
-import path from 'path';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
-// setOriginalFetch(window.fetch);
-// window.fetch = progressBarFetch;
+import './index.module.css';
 
 class TranscriptForm extends Component {
   constructor(props) {
@@ -41,17 +36,17 @@ class TranscriptForm extends Component {
     // console.log(process.env);
   }
 
-  handleTitleChange = event => {
+  handleTitleChange = (event) => {
     this.setState({ title: event.target.value });
   };
 
-  handleDescriptionChange = event => {
+  handleDescriptionChange = (event) => {
     this.setState({ description: event.target.value });
   };
 
   // This is used in Aobe CEP Panel integration only
   handleAdobeCepSetFilePath = () => {
-    window.__adobe_cep__.evalScript(`$._PPP.get_current_project_panel_selection_absolute_path()`, response => {
+    window.__adobe_cep__.evalScript(`$._PPP.get_current_project_panel_selection_absolute_path()`, (response) => {
       console.log('handleAdobeCepSetFilePath');
       if (response !== '') {
         console.log('handleAdobeCepSetFilePath', response);
@@ -68,13 +63,13 @@ class TranscriptForm extends Component {
       }
     });
   };
-  updateProgressValue = value => {
+  updateProgressValue = (value) => {
     this.setState({
       progressValue: parseInt(value),
     });
   };
   // https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
-  handleFileUpload = e => {
+  handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     const file = files[0];
     // more on formData https://thoughtbot.com/blog/ridiculously-simple-ajax-uploads-with-formdata
@@ -125,7 +120,7 @@ class TranscriptForm extends Component {
     // TODO: do you need a try catch?
     try {
       ApiWrapper.createTranscript(this.state.projectId, this.state.formData, this.updateProgressValue)
-        .then(response => {
+        .then((response) => {
           console.log('ApiWrapper.createTranscript-response ', response);
           // show message or redirect
           this.setState({
@@ -137,7 +132,7 @@ class TranscriptForm extends Component {
           this.props.handleSaveForm(response.transcript);
           // this.props.handleCloseModal();
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('error:::: ', e);
           this.setState({
             uploading: false,
@@ -176,64 +171,86 @@ class TranscriptForm extends Component {
   render() {
     return (
       <>
-        {this.state.savedNotification}
+        <div style={{ margin: '1em' }}>
+          {this.state.savedNotification}
 
-        {whichJsEnv() === 'electron' && <NoNeedToConvertNotice />}
+          {whichJsEnv() === 'electron' && <NoNeedToConvertNotice />}
 
-        <Form noValidate validated={this.state.validated} onSubmit={e => this.handleSubmit(e)}>
-          {whichJsEnv() === 'cep' ? (
-            <>
-              <Button variant="light" onClick={this.handleAdobeCepSetFilePath} block>
-                Pick a file
-              </Button>
-              <Form.Text className="text-muted">
-                Select an audio or video file to transcribe. Click on a file in the Adobe Premiere project browser window, and the click{' '}
-                <code>pick a file</code> to select a file to transcribe. Then click <code>save</code> when you are ready to start the transcriptiion.
-              </Form.Text>
-            </>
-          ) : (
-            <Form.Group controlId="formTranscriptMediaFile">
-              <Form.Control required type="file" label="Upload" accept="audio/*,video/*,.mxf, audio/x-m4a" onChange={this.handleFileUpload} />
-              <Form.Text className="text-muted">Select an audio or video file to transcribe</Form.Text>
-              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-              <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback>
-            </Form.Group>
-          )}
+          <form noValidate validated={this.state.validated} onSubmit={(e) => this.handleSubmit(e)}>
+            <Grid container direction="column" justify="center" alignItems="stretch">
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                {whichJsEnv() === 'cep' ? (
+                  <>
+                    <InputLabel>File </InputLabel>
+                    <Button variant="light" onClick={this.handleAdobeCepSetFilePath} block>
+                      Pick a file
+                    </Button>
+                    <InputLabel className="text-muted">
+                      Select an audio or video file to transcribe. Click on a file in the Adobe Premiere project browser window, and the click{' '}
+                      <code>pick a file</code> to select a file to transcribe. Then click <code>save</code> when you are ready to start the
+                      transcriptiion.
+                    </InputLabel>
+                  </>
+                ) : (
+                  <FormControl controlId="formTranscriptMediaFile" fullWidth={true}>
+                    <InputLabel>File </InputLabel>
+                    <Input required type="file" label="Upload" accept="audio/*,video/*,.mxf, audio/x-m4a" onChange={this.handleFileUpload} />
+                    <FormHelperText className="text-muted">Select an audio or video file to transcribe</FormHelperText>
+                    {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
+                    {/* <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback> */}
+                  </FormControl>
+                )}
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <FormControl controlId="formTranscriptTitle" fullWidth={true}>
+                  <InputLabel>Title </InputLabel>
+                  <Input
+                    required
+                    fullWidth={true}
+                    type="text"
+                    placeholder="Enter a transcript title"
+                    value={this.state.title}
+                    onChange={this.handleTitleChange}
+                  />
+                  <FormHelperText className="text-muted">Chose a title for your Transcript</FormHelperText>
+                  {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
+                  {/* <Form.Control.Feedback type="invalid">Please chose a title for your transcript</Form.Control.Feedback> */}
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <FormControl controlId="formTranscriptDescription" fullWidth={true}>
+                  <InputLabel>Description </InputLabel>
+                  <Input
+                    type="text"
+                    fullWidth={true}
+                    inputMultiline={true}
+                    placeholder="Enter a Transcript description"
+                    value={this.state.description}
+                    onChange={this.handleDescriptionChange}
+                  />
+                  <FormHelperText className="text-muted">Chose an optional description for your Transcript</FormHelperText>
+                  {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
+                  {/* <Form.Control.Feedback type="invalid">Please chose a description for your transcript</Form.Control.Feedback> */}
 
-          <Form.Group controlId="formTranscriptTitle">
-            <Form.Label>Title </Form.Label>
-            <Form.Control required type="text" placeholder="Enter a transcript title" value={this.state.title} onChange={this.handleTitleChange} />
-            <Form.Text className="text-muted">Chose a title for your Transcript</Form.Text>
-            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            <Form.Control.Feedback type="invalid">Please chose a title for your transcript</Form.Control.Feedback>
-          </Form.Group>
+                  {this.state.progressValue !== 0 && (
+                    <>
+                      <br />
+                      <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
+                      <br />
+                    </>
+                  )}
+                </FormControl>
+              </Grid>
 
-          <Form.Group controlId="formTranscriptDescription">
-            <Form.Label>Description </Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter a Transcript description"
-              value={this.state.description}
-              onChange={this.handleDescriptionChange}
-            />
-            <Form.Text className="text-muted">Chose an optional description for your Transcript</Form.Text>
-            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            <Form.Control.Feedback type="invalid">Please chose a description for your transcript</Form.Control.Feedback>
-          </Form.Group>
-
-          {this.state.progressValue !== 0 && (
-            <Form.Group controlId="formTranscriptDescription">
-              <Form.Label>Upload progress </Form.Label>
-              <ProgressBar animated variant="info" now={this.state.progressValue} label={`${this.state.progressValue}%`} />
-            </Form.Group>
-          )}
-
-          <Modal.Footer>
-            <Button variant="primary" type="submit" disabled={this.state.uploading}>
-              Save
-            </Button>
-          </Modal.Footer>
-        </Form>
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <br />
+                <Button variant="contained" color="primary" type="submit" disabled={this.state.uploading}>
+                  Save
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
       </>
     );
   }

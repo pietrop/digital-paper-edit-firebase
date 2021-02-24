@@ -17,14 +17,14 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import CustomLink from '../CustomLink';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     '& > *': {
       margin: theme.spacing(1),
     },
   },
-  indigo: {
+  avatar: {
     // TODO: should pull from theme primary, so that if that change this changes as well
     color: theme.palette.getContrastText(theme.palette.primary.main),
     backgroundColor: theme.palette.primary.main,
@@ -98,7 +98,7 @@ function CustomTranscriptCard(props) {
           <>
             <ListItemAvatar>
               <CustomLink to={showLinkPath()}>
-                <Avatar alt={props.title} className={classes.indigo}>
+                <Avatar alt={props.title} className={classes.avatar}>
                   {props.icon}{' '}
                 </Avatar>
               </CustomLink>
@@ -108,13 +108,13 @@ function CustomTranscriptCard(props) {
         ) : (
           <>
             <ListItemAvatar>
-              <CustomLink>
-                <Avatar alt={props.title} className={classes.indigo}>
+              <CustomLink disabled={true}>
+                <Avatar alt={props.title} className={classes.avatar}>
                   {props.icon}{' '}
                 </Avatar>
               </CustomLink>
             </ListItemAvatar>
-            <ListItemText primary={<CustomLink>{props.title}</CustomLink>} secondary={props.description} />
+            <ListItemText primary={<CustomLink disabled={true}>{props.title}</CustomLink>} secondary={props.description} />
           </>
         )}
 
