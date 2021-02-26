@@ -12,7 +12,9 @@ import getTimeFromUserWordsSelection from './get-user-selection.js';
 import ApiWrapper from '../../../../ApiWrapper/index.js';
 import makeListOfUniqueSpeakers from './makeListOfUniqueSpeakers.js';
 import SplitButton from './SplitButton';
-const Paragraphs = React.lazy(() => import('./Paragraphs/index.js'));
+
+import Paragraphs from './Paragraphs/index.js';
+// const Paragraphs = React.lazy(() => import('./Paragraphs/index.js'));
 
 class Transcript extends Component {
   constructor(props) {

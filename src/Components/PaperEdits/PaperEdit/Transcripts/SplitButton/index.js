@@ -3,19 +3,14 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Grow from '@material-ui/core/Grow';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 // import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 // import MenuItem from '@material-ui/core/MenuItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHighlighter } from '@fortawesome/free-solid-svg-icons';
-import RightDrawer from '../RightDrawer';
+import CustomDrawer from '../../../../lib/CustomDrawer';
 
 export default function SplitButton({ options, handleCreateAnnotation, children }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -72,7 +67,7 @@ export default function SplitButton({ options, handleCreateAnnotation, children 
             );
           })}
         </Menu>
-        <RightDrawer btn={<SettingsOutlinedIcon />}>{children}</RightDrawer>
+        <CustomDrawer btn={<SettingsOutlinedIcon />}>{children}</CustomDrawer>
       </ButtonGroup>
     </>
   );

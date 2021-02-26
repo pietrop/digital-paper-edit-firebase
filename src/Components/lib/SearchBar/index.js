@@ -1,15 +1,7 @@
 import React from 'react';
-import InputGroup from 'react-bootstrap/InputGroup';
-// import FormControl from 'react-bootstrap/FormControl';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import FormControl from '@material-ui/core/FormControl';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import SearchIcon from '@material-ui/icons/Search';
-import Collapse from '@material-ui/core/Collapse';
-import Button from '@material-ui/core/Button';
 
 class SearchBar extends React.Component {
   constructor(props) {
@@ -19,14 +11,14 @@ class SearchBar extends React.Component {
     };
   }
 
-  handleSearch = e => {
+  handleSearch = (e) => {
     const searchText = e.target.value;
     this.props.handleSearch(searchText);
   };
 
   handleShowSearchBar = () => {
     console.log('handleShowSearchBar');
-    this.setState(state => {
+    this.setState((state) => {
       return { showSearchInput: !state.showSearchInput };
     });
   };

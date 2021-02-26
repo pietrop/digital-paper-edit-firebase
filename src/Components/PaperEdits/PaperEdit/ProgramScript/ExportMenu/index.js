@@ -20,7 +20,6 @@ import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 import Divider from '@material-ui/core/Divider';
 
 import whichJsEnv from '../../../../../Util/which-js-env';
-import { propTypes } from 'react-bootstrap/esm/Image';
 
 export default function ExportMenu(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);

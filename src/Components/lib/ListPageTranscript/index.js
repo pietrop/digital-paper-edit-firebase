@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 
 import Container from '@material-ui/core/Container';
-// import Grid from '@material-ui/core/Grid';
-// import Row from 'react-bootstrap/Row';
-// import Col from 'react-bootstrap/Col';
-// import Button from 'react-bootstrap/Button';
-import ListGroup from 'react-bootstrap/ListGroup';
-
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
@@ -19,7 +13,7 @@ import CustomTranscriptCard from '../CustomTranscriptCard';
 import includesText from '../../../Util/includes-text';
 import whichJsEnv from '../../../Util/which-js-env';
 // TODO: add error handling, eg custom alert if server is not responding
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   // root: {
   //   backgroundColor: theme.palette.background.paper,
   //   width: 500,
@@ -48,9 +42,9 @@ function ListPageTranscript(props) {
   // };
   // }
 
-  const handleSearch = searchText => {
+  const handleSearch = (searchText) => {
     console.log('searchText', searchText);
-    const results = props.items.filter(transcript => {
+    const results = props.items.filter((transcript) => {
       // console.log('transcript', transcript);
       if (
         (transcript.title && includesText(transcript.title, searchText)) ||
@@ -76,7 +70,7 @@ function ListPageTranscript(props) {
   let description;
   if (props.items) {
     itemsCards = props.items
-      .map(item => {
+      .map((item) => {
         if (item.display) {
           return (
             <CustomTranscriptCard
@@ -105,7 +99,7 @@ function ListPageTranscript(props) {
           return null;
         }
       })
-      .filter(item => {
+      .filter((item) => {
         return item !== null;
       });
   }

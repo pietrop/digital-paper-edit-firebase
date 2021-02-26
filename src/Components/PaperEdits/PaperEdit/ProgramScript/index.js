@@ -19,8 +19,6 @@ import SyncOutlinedIcon from '@material-ui/icons/SyncOutlined';
 import PlaylistAddOutlinedIcon from '@material-ui/icons/PlaylistAddOutlined';
 import timecodes from 'node-timecodes';
 import Skeleton from '@material-ui/lab/Skeleton';
-
-import ExportMenuItem from './ExportMenuItem';
 import getDataFromUserWordsSelection from './get-data-from-user-selection.js';
 import { divideWordsSelectionsIntoParagraphs, isOneParagraph } from './divide-words-selections-into-paragraphs/index.js';
 import ApiWrapper from '../../../../ApiWrapper/index.js';
@@ -28,7 +26,8 @@ import programmeScriptJsonToDocx from './programme-script-json-to-docx/index.js'
 import ExportWaveForm from './ExportWaveForm';
 import ProgrammeScriptElementsMenu from './ProgrammeScriptElementsMenu';
 
-const ProgrammeScript = React.lazy(() => import('./ProgrammeScript.js'));
+// const ProgrammeScript = React.lazy(() => import('./ProgrammeScript.js'));
+import ProgrammeScript from './ProgrammeScript.js';
 
 const TOOLTIP_DEPLAY_IN_MILLISECONDS = 3000;
 const defaultReelName = 'NA';

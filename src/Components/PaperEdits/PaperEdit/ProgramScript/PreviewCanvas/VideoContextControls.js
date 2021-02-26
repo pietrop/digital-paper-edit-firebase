@@ -1,4 +1,5 @@
 import React from 'react';
+import Grid from '@material-ui/core/Grid';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -36,7 +37,8 @@ class Controls extends React.PureComponent {
   render() {
     return (
       <>
-        <Col
+        <Grid
+          item
           sm={6}
           md={6}
           ld={6}
@@ -46,8 +48,9 @@ class Controls extends React.PureComponent {
           <Button size="sm" block variant="light" onClick={this.state.isPlaying ? this.handlePause : this.handlePlay}>
             {this.state.isPlaying ? pauseIcon : playIcon}
           </Button>
-        </Col>
-        <Col
+        </Grid>
+        <Grid
+          item
           sm={6}
           md={6}
           ld={6}
@@ -57,7 +60,7 @@ class Controls extends React.PureComponent {
           <Button size="sm" block variant="light" onClick={this.handleStop}>
             {stopIcon}
           </Button>
-        </Col>
+        </Grid>
       </>
     );
   }
