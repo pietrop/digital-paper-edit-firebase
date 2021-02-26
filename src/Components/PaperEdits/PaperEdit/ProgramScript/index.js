@@ -1,39 +1,22 @@
 import React, { Component, Suspense } from 'react';
-import Row from 'react-bootstrap/Row';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import GraphicEqOutlinedIcon from '@material-ui/icons/GraphicEqOutlined';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import ExportMenu from './ExportMenu';
 import cuid from 'cuid';
-import Card from 'react-bootstrap/Card';
 import PreviewCanvas from './PreviewCanvas2/index.js';
-import Button from 'react-bootstrap/Button';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Tooltip from 'react-bootstrap/Tooltip';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import EDL from '@pietrop/edl-composer';
 import generateADL from '@pietrop/aes31-adl-composer';
 import jsonToFCPX from '@pietrop/fcpx-xml-composer';
 import jsonToAudition from 'audition-xml-composer';
 import downloadjs from 'downloadjs';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faShare,
-  faMicrophoneAlt,
-  faStickyNote,
-  faHeading,
-  faPlus,
-  faSync,
-  faInfoCircle,
-  faTrash,
-  faListUl,
-  faFileCode,
-  faFileVideo,
-  faFileAudio,
-  faHeadphones,
-  faVideo,
-  faFileWord,
-  faFileAlt,
-  faFlask,
-} from '@fortawesome/free-solid-svg-icons';
+import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
+import SyncOutlinedIcon from '@material-ui/icons/SyncOutlined';
+import PlaylistAddOutlinedIcon from '@material-ui/icons/PlaylistAddOutlined';
 import timecodes from 'node-timecodes';
 import Skeleton from '@material-ui/lab/Skeleton';
 
@@ -41,9 +24,10 @@ import ExportMenuItem from './ExportMenuItem';
 import getDataFromUserWordsSelection from './get-data-from-user-selection.js';
 import { divideWordsSelectionsIntoParagraphs, isOneParagraph } from './divide-words-selections-into-paragraphs/index.js';
 import ApiWrapper from '../../../../ApiWrapper/index.js';
-import whichJsEnv from '../../../../Util/which-js-env';
 import programmeScriptJsonToDocx from './programme-script-json-to-docx/index.js';
 import ExportWaveForm from './ExportWaveForm';
+import ProgrammeScriptElementsMenu from './ProgrammeScriptElementsMenu';
+
 const ProgrammeScript = React.lazy(() => import('./ProgrammeScript.js'));
 
 const TOOLTIP_DEPLAY_IN_MILLISECONDS = 3000;
@@ -88,7 +72,7 @@ class ProgramScript extends Component {
   };
 
   componentDidMount = () => {
-    ApiWrapper.getPaperEdit(this.props.projectId, this.props.papereditId).then(json => {
+    ApiWrapper.getPaperEdit(this.props.projectId, this.props.papereditId).then((json) => {
       const programmeScript = json.programmeScript;
       // Adding an insert point at the end of the list
       programmeScript.elements.push(INSERT_POINT_ELEMENT);
@@ -112,7 +96,7 @@ class ProgramScript extends Component {
   };
 
   // TODO: save to server
-  handleProgrammeScriptOrderChange = list => {
+  handleProgrammeScriptOrderChange = (list) => {
     this.setState(
       ({ programmeScript }) => {
         programmeScript.elements = list;
@@ -129,7 +113,7 @@ class ProgramScript extends Component {
   };
 
   // TODO: save to server
-  handleDeleteProgrammeScriptElement = i => {
+  handleDeleteProgrammeScriptElement = (i) => {
     // TODO: add a prompt, like are you shure you want to delete, confirm etc..?
     this.setState(
       ({ programmeScript }) => {
@@ -149,7 +133,7 @@ class ProgramScript extends Component {
     );
   };
 
-  handleEditProgrammeScriptElement = i => {
+  handleEditProgrammeScriptElement = (i) => {
     const { programmeScript } = this.state;
     const elements = programmeScript.elements;
     const currentElement = elements[i];
@@ -214,7 +198,7 @@ class ProgramScript extends Component {
     const { programmeScript } = this.state;
     const elements = programmeScript.elements;
     // find insert point in list,
-    const insertPointElement = elements.find(el => {
+    const insertPointElement = elements.find((el) => {
       return el.type === 'insert-point';
     });
     // get insertpoint index
@@ -223,7 +207,7 @@ class ProgramScript extends Component {
     return indexOfInsertPoint;
   };
 
-  handleAddTranscriptSelectionToProgrammeScriptTmpSave = indexNumber => {
+  handleAddTranscriptSelectionToProgrammeScriptTmpSave = (indexNumber) => {
     // getting results of word selection from tmpSelection in state
     // tmpSelection in populated via the on mouse app selection listener
     // initialised in componentDidMount
@@ -262,7 +246,7 @@ class ProgramScript extends Component {
         programmeScript.elements = elements;
       } else {
         const paragraphs = divideWordsSelectionsIntoParagraphs(result.words);
-        paragraphs.reverse().forEach(paragraph => {
+        paragraphs.reverse().forEach((paragraph) => {
           const newElement = {
             id: cuid(),
             index: elements.length,
@@ -331,7 +315,7 @@ class ProgramScript extends Component {
         programmeScript.elements = elements;
       } else {
         const paragraphs = divideWordsSelectionsIntoParagraphs(result.words);
-        paragraphs.reverse().forEach(paragraph => {
+        paragraphs.reverse().forEach((paragraph) => {
           const newElement = {
             id: cuid(),
             index: elements.length,
@@ -376,10 +360,10 @@ class ProgramScript extends Component {
     };
 
     const programmeScriptPaperCuts = this.state.programmeScript.elements
-      .map(element => {
+      .map((element) => {
         if (element.type === 'paper-cut') {
           // Get clipName for current transcript
-          const currentTranscript = this.props.transcripts.find(tr => {
+          const currentTranscript = this.props.transcripts.find((tr) => {
             return tr.id === element.transcriptId;
           });
 
@@ -407,7 +391,7 @@ class ProgramScript extends Component {
 
         return null;
       })
-      .filter(el => {
+      .filter((el) => {
         return el !== null;
       });
     // adding ids to EDL
@@ -423,11 +407,11 @@ class ProgramScript extends Component {
 
   getSequenceJsonForFfmpegRemix = () => {
     const programmeScriptPaperCuts = this.state.programmeScript.elements
-      .map(element => {
+      .map((element) => {
         if (element.type === 'paper-cut') {
           console.log(element);
           // Get clipName for current transcript
-          const currentTranscript = this.props.transcripts.find(tr => {
+          const currentTranscript = this.props.transcripts.find((tr) => {
             return tr.id === element.transcriptId;
           });
           // TODO: add a check that exports only if urls all contain mp4s, if not cannot send to ffmpeg-remix(?)
@@ -441,7 +425,7 @@ class ProgramScript extends Component {
         }
         return null;
       })
-      .filter(el => {
+      .filter((el) => {
         return el !== null;
       });
 
@@ -468,7 +452,7 @@ class ProgramScript extends Component {
       projectOriginator: 'Digital Paper Edit',
       // TODO: it be good to change sequence for the ADL to be same schema
       // as the one for EDL and FCPX - for now just adjusting
-      edits: edlSq.events.map(event => {
+      edits: edlSq.events.map((event) => {
         return {
           start: event.startTime,
           end: event.endTime,
@@ -504,10 +488,10 @@ class ProgramScript extends Component {
     };
 
     const programmeScriptPaperCuts = this.state.programmeScript.elements
-      .map(element => {
+      .map((element) => {
         if (element.type === 'paper-cut') {
           // Get clipName for current transcript
-          const currentTranscript = this.props.transcripts.find(tr => {
+          const currentTranscript = this.props.transcripts.find((tr) => {
             return tr.id === element.transcriptId;
           });
 
@@ -543,7 +527,7 @@ class ProgramScript extends Component {
           return element;
         }
       })
-      .filter(el => {
+      .filter((el) => {
         return el !== null;
       });
     // adding ids to EDL
@@ -557,9 +541,9 @@ class ProgramScript extends Component {
     return edlSq;
   };
 
-  programmeScriptJsonToText = edlsqJson => {
+  programmeScriptJsonToText = (edlsqJson) => {
     const title = `# ${edlsqJson.title}\n\n`;
-    const body = edlsqJson.events.map(event => {
+    const body = edlsqJson.events.map((event) => {
       if (event.type === 'title') {
         return `## ${event.text}`;
       } else if (event.type === 'voice-over') {
@@ -571,7 +555,7 @@ class ProgramScript extends Component {
         return `${timecodes.fromSeconds(event.startTime)}\t${timecodes.fromSeconds(event.endTime)}\t${event.speaker}\t-\t${
           event.clipName
         }     \n${event.words
-          .map(word => {
+          .map((word) => {
             return word.text.replace(/'/, "'");
           })
           .join(' ')}`;
@@ -583,12 +567,12 @@ class ProgramScript extends Component {
     return `${title}${body.join('\n\n')}`;
   };
 
-  programmeScriptJsonToTextPaperCutsOnly = edlsqJson => {
-    const body = edlsqJson.events.map(event => {
+  programmeScriptJsonToTextPaperCutsOnly = (edlsqJson) => {
+    const body = edlsqJson.events.map((event) => {
       if (event.type === 'paper-cut') {
         // need to escape ' otherwise Premiere.jsx chockes
         return `${event.words
-          .map(word => {
+          .map((word) => {
             return word.text.replace(/'/, "'");
           })
           .join(' ')}`;
@@ -597,7 +581,7 @@ class ProgramScript extends Component {
       return null;
     });
 
-    return `${body.filter(e => e !== null).join('\n\n')}`;
+    return `${body.filter((e) => e !== null).join('\n\n')}`;
   };
 
   handleExportJson = () => {
@@ -609,11 +593,11 @@ class ProgramScript extends Component {
   handleCepExportSequence = () => {
     const programmeScriptJson = this.getProgrammeScriptJson();
 
-    const paperCuts = programmeScriptJson.events.filter(el => {
+    const paperCuts = programmeScriptJson.events.filter((el) => {
       return el.type === 'paper-cut';
     });
     // not quier sure how to escapte  ' in word text attribute, so since it's not needed for premiere export, removing the words
-    const paperCutsWithoutWords = paperCuts.map(el => {
+    const paperCutsWithoutWords = paperCuts.map((el) => {
       delete el.words;
       return el;
     });
@@ -625,7 +609,7 @@ class ProgramScript extends Component {
       },
     };
     const premiereCommandString = "$._PPP.create_sequence_from_paper_edit('" + JSON.stringify(tmpEdl) + "')";
-    window.__adobe_cep__.evalScript(premiereCommandString, function(response) {
+    window.__adobe_cep__.evalScript(premiereCommandString, function (response) {
       // done
       console.info('done exporting sequence');
     });
@@ -662,10 +646,10 @@ class ProgramScript extends Component {
     // playlist elements for  previe canvas
     // { type:'video', start:0, sourceStart: 30, duration:10, src:'https://download.ted.com/talks/MorganVague_2018X.mp4' },
     const playlist = this.state.programmeScript.elements
-      .map(element => {
+      .map((element) => {
         if (element.type === 'paper-cut') {
           // Get clipName for current transcript
-          const currentTranscript = this.props.transcripts.find(tr => {
+          const currentTranscript = this.props.transcripts.find((tr) => {
             return tr.id === element.transcriptId;
           });
           const duration = element.end - element.start;
@@ -685,7 +669,7 @@ class ProgramScript extends Component {
 
         return null;
       })
-      .filter(el => {
+      .filter((el) => {
         return el !== null;
       });
     // Workaround to mound and unmoun the `PreviewCanvas` component
@@ -706,7 +690,7 @@ class ProgramScript extends Component {
     });
   };
 
-  handleDoubleClickOnProgrammeScript = e => {
+  handleDoubleClickOnProgrammeScript = (e) => {
     if (e.target.className === 'words') {
       // const wordCurrentTime = e.target.dataset.start;
       // TODO: set current time in preview canvas
@@ -723,7 +707,7 @@ class ProgramScript extends Component {
       const elements = [...latestProgrammeScript.elements];
       // finding an removing insert point before saving to server
       // find insert point in list,
-      const insertPointElement = elements.find(el => {
+      const insertPointElement = elements.find((el) => {
         return el.type === 'insert-point';
       });
       if (insertPointElement) {
@@ -733,7 +717,7 @@ class ProgramScript extends Component {
       }
 
       latestProgrammeScript.elements = elements;
-      ApiWrapper.updatePaperEdit(this.props.projectId, this.props.papereditId, latestProgrammeScript).then(json => {
+      ApiWrapper.updatePaperEdit(this.props.projectId, this.props.papereditId, latestProgrammeScript).then((json) => {
         if (json.status === 'ok') {
           this.setState({ lastSaved: new Date() });
         }
@@ -742,7 +726,7 @@ class ProgramScript extends Component {
   };
 
   // TODO:
-  handleChangeInsertPointPosition = indexNumber => {
+  handleChangeInsertPointPosition = (indexNumber) => {
     const { programmeScript } = this.state;
     const latestProgrammeScript = { ...programmeScript };
     // insert new programme script
@@ -752,7 +736,7 @@ class ProgramScript extends Component {
       const elements = [...latestProgrammeScript.elements];
       // finding an removing insert point before saving to server
       // find insert point in list,
-      const insertPointElement = elements.find(el => {
+      const insertPointElement = elements.find((el) => {
         return el.type === 'insert-point';
       });
       // add new insert point
@@ -766,7 +750,7 @@ class ProgramScript extends Component {
       }
 
       latestProgrammeScript.elements = elements;
-      ApiWrapper.updatePaperEdit(this.props.projectId, this.props.papereditId, latestProgrammeScript).then(json => {
+      ApiWrapper.updatePaperEdit(this.props.projectId, this.props.papereditId, latestProgrammeScript).then((json) => {
         if (json.status === 'ok') {
           this.setState(
             {
@@ -783,7 +767,7 @@ class ProgramScript extends Component {
     }
   };
 
-  handleAdvancedSelectCheckbox = event => {
+  handleAdvancedSelectCheckbox = (event) => {
     const target = event.target;
     this.setState({
       isAdvancedSelect: target.checked,
@@ -798,7 +782,7 @@ class ProgramScript extends Component {
       const latestProgrammeScript = { ...programmeScript };
       // latestProgrammeScript.elements = [];
       latestProgrammeScript.elements = [{ ...INSERT_POINT_ELEMENT }];
-      ApiWrapper.updatePaperEdit(this.props.projectId, this.props.papereditId, latestProgrammeScript).then(json => {
+      ApiWrapper.updatePaperEdit(this.props.projectId, this.props.papereditId, latestProgrammeScript).then((json) => {
         if (json.status === 'ok') {
           this.setState(
             {
@@ -821,12 +805,7 @@ class ProgramScript extends Component {
     const sequence = this.getSequenceJsonForFfmpegRemix();
     const programmeScriptTitle = this.state.programmeScript.title;
     // timeNow -  eg "3-6-2020_5.41.35PM"
-    const timeNow = new Date()
-      .toLocaleString()
-      .replace(/\//g, '-')
-      .replace(/, /g, '_')
-      .replace(/:/g, '.')
-      .replace(/ /g, '');
+    const timeNow = new Date().toLocaleString().replace(/\//g, '-').replace(/, /g, '_').replace(/:/g, '.').replace(/ /g, '');
     const fileName = `${programmeScriptTitle}_${timeNow}.mp4`;
     ApiWrapper.exportAudioVideo({
       sequence,
@@ -835,7 +814,7 @@ class ProgramScript extends Component {
       waveForm: false,
       waveFormMode: false,
       waveFormColor: false,
-    }).then(res => {
+    }).then((res) => {
       console.log('exported', res);
     });
   };
@@ -844,12 +823,7 @@ class ProgramScript extends Component {
     const sequence = this.getSequenceJsonForFfmpegRemix();
     const programmeScriptTitle = this.state.programmeScript.title;
     // timeNow -  eg "3-6-2020_5.41.35PM"
-    const timeNow = new Date()
-      .toLocaleString()
-      .replace(/\//g, '-')
-      .replace(/, /g, '_')
-      .replace(/:/g, '.')
-      .replace(/ /g, '');
+    const timeNow = new Date().toLocaleString().replace(/\//g, '-').replace(/, /g, '_').replace(/:/g, '.').replace(/ /g, '');
     const fileName = `${programmeScriptTitle}_${timeNow}.wav`;
     ApiWrapper.exportAudioVideo({
       sequence,
@@ -858,7 +832,7 @@ class ProgramScript extends Component {
       waveFormMode: false,
       waveFormColor: false,
       projectId: this.props.projectId,
-    }).then(res => {
+    }).then((res) => {
       console.log('exported', res);
     });
   };
@@ -867,16 +841,11 @@ class ProgramScript extends Component {
     const sequence = this.getSequenceJsonForFfmpegRemix();
     const programmeScriptTitle = this.state.programmeScript.title;
     // timeNow -  eg "3-6-2020_5.41.35PM"
-    const timeNow = new Date()
-      .toLocaleString()
-      .replace(/\//g, '-')
-      .replace(/, /g, '_')
-      .replace(/:/g, '.')
-      .replace(/ /g, '');
+    const timeNow = new Date().toLocaleString().replace(/\//g, '-').replace(/, /g, '_').replace(/:/g, '.').replace(/ /g, '');
     const fileName = `${programmeScriptTitle}_${timeNow}.mp4`;
     const waveForm = true;
     // const waveFormMode = 'cline';
-    ApiWrapper.exportAudioVideo({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId: this.props.projectId }).then(res => {
+    ApiWrapper.exportAudioVideo({ sequence, fileName, waveForm, waveFormMode, waveFormColor, projectId: this.props.projectId }).then((res) => {
       console.log('exported', res);
     });
   };
@@ -886,288 +855,122 @@ class ProgramScript extends Component {
     return (
       <>
         <Card
-          style={
-            {
-              // backgroundColor:'#eee',
-              // boxShadow: '0 0 10px #ccc'
-            }
-          }
+          style={{
+            paddingTop: '5px',
+            // backgroundColor:'#eee',
+            // boxShadow: '0 0 10px #ccc'
+          }}
         >
-          <Card.Body style={{ padding: '1em', paddingTop: '0em', paddingBottom: '0.6em' }}>
+          <CardContent style={{ paddingTop: '0em', paddingBottom: '0.6em', padding: '0px' }}>
             {!this.state.resetPreview ? <PreviewCanvas playlist={this.state.playlist} width={300} /> : null}
-          </Card.Body>
-          <Card.Body style={{ paddingTop: '0px', paddingBottom: '0.6em' }}>
-            <Row noGutters>
-              <ButtonGroup style={{ width: '100%' }} vertical={position} block>
-                <OverlayTrigger
-                  placement={'top'}
-                  delay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                  overlay={
-                    <Tooltip>
-                      To add a text selection, select text in the transcript, then click this button to add it to the programme script, at the orange
-                      insert point/
-                    </Tooltip>
+          </CardContent>
+          <CardContent style={{ paddingTop: '0px', paddingBottom: '0.6em' }}>
+            <Grid container noGutters>
+              <ButtonGroup fullWidth={true} variant="text">
+                <Button
+                  color="primary"
+                  size="sm"
+                  onClick={this.handleAddTranscriptSelectionToProgrammeScript}
+                  title={
+                    'To add a text selection, select text in the transcript, then click this button to add it to the programme script, at the orange insert point'
                   }
                 >
-                  <Button variant="light" size="sm" onClick={this.handleAddTranscriptSelectionToProgrammeScript}>
-                    <FontAwesomeIcon icon={faPlus} /> Selection
-                  </Button>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement={'top'}
-                  delay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                  overlay={
-                    <Tooltip>
-                      Advanced selection - check this box to auto copy across transcript selections to insert point in programme script
-                    </Tooltip>
-                  }
-                >
-                  <Button variant="light" style={{ cursor: 'default' }}>
-                    <input
-                      style={{ cursor: 'pointer' }}
-                      name="advancedSelect"
-                      type="checkbox"
-                      checked={this.state.isAdvancedSelect}
-                      onChange={this.handleAdvancedSelectCheckbox}
-                    />{' '}
-                    <small className={'text-secondary'} style={{ marginBottom: '0em' }}>
-                      {'Auto copy selections'}
-                    </small>
-                  </Button>
-                </OverlayTrigger>
-                <DropdownButton as={ButtonGroup} variant="light" title={<FontAwesomeIcon icon={faListUl} />}>
-                  <ExportMenuItem
-                    tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                    onClick={() => {
-                      this.handleAddTranscriptElementToProgrammeScript('title');
-                    }}
-                    title="Add a title header element to the programme script"
-                    text={
-                      <>
-                        {' '}
-                        <FontAwesomeIcon icon={faHeading} /> Heading
-                      </>
-                    }
-                  />
-                  <ExportMenuItem
-                    tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                    onClick={() => {
-                      this.handleAddTranscriptElementToProgrammeScript('voice-over');
-                    }}
-                    title="Add a title voice over element to the programme script"
-                    text={
-                      <>
-                        {' '}
-                        <FontAwesomeIcon icon={faMicrophoneAlt} /> Voice Over
-                      </>
-                    }
-                  />
-                  <ExportMenuItem
-                    tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                    onClick={() => {
-                      this.handleAddTranscriptElementToProgrammeScript('note');
-                    }}
-                    title="Add a note element to the programme script"
-                    text={
-                      <>
-                        <FontAwesomeIcon icon={faStickyNote} /> Note
-                      </>
-                    }
-                  />
-                </DropdownButton>
+                  <PlaylistAddOutlinedIcon />
+                  {/* <FontAwesomeIcon icon={faPlus} /> */}
+                  Selection
+                </Button>
 
-                <OverlayTrigger
+                <Button
+                  color="primary"
+                  style={{ cursor: 'default' }}
+                  title={' Advanced selection - check this box to auto copy across transcript selections to insert point in programme script  '}
+                >
+                  <input
+                    style={{ cursor: 'pointer' }}
+                    name="advancedSelect"
+                    type="checkbox"
+                    checked={this.state.isAdvancedSelect}
+                    onChange={this.handleAdvancedSelectCheckbox}
+                  />{' '}
+                  <small className={'text-secondary'} style={{ marginBottom: '0em' }}>
+                    {'Auto copy selections'}
+                  </small>
+                </Button>
+              </ButtonGroup>
+              <ButtonGroup
+                fullWidth={true}
+                // color="primary"
+                variant="text"
+                // style={{ width: '100%' }} vertical={position} block
+              >
+                <ProgrammeScriptElementsMenu handleAddTranscriptElementToProgrammeScript={this.handleAddTranscriptElementToProgrammeScript} />
+
+                {/* <OverlayTrigger
                   placement={'top'}
                   delay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
                   overlay={<Tooltip>update programme script audio/video preview</Tooltip>}
+                > */}
+                <Button color="primary" onClick={this.handleUpdatePreview} title={'update programme script audio/video preview'}>
+                  {/* <FontAwesomeIcon icon={faSync} /> */}
+                  <SyncOutlinedIcon />
+                </Button>
+
+                <ExportMenu
+                  handleCepExportSequence={this.handleCepExportSequence}
+                  handleExportEDL={this.handleExportEDL}
+                  handleExportFCPX={this.handleExportFCPX}
+                  handleExportADL={this.handleExportADL}
+                  handleExportXML={this.handleExportXML}
+                  handleExportTxt={this.handleExportTxt}
+                  handleExportDocx={this.handleExportDocx}
+                  handleExportDocxWithClipReference={this.handleExportDocxWithClipReference}
+                  handleExportVideoPreview={this.handleExportVideoPreview}
+                  handleExportAudioPreview={this.handleExportAudioPreview}
+                  handleExportTxtOnyPaperCuts={this.handleExportTxtOnyPaperCuts}
+                  handleExportJson={this.handleExportJson}
                 >
-                  <Button variant="light" onClick={this.handleUpdatePreview}>
-                    <FontAwesomeIcon icon={faSync} />
-                  </Button>
-                </OverlayTrigger>
+                  <ExportWaveForm
+                    TOOLTIP_DEPLAY_IN_MILLISECONDS={TOOLTIP_DEPLAY_IN_MILLISECONDS}
+                    handleExportAudioPreviewWithVideoWaveform={this.handleExportAudioPreviewWithVideoWaveform}
+                    title="Export audio preview as video with animated wave form - Experimental feature, at the moment you cannot combine audio and video in the same export."
+                    text={
+                      <>
+                        <GraphicEqOutlinedIcon />
+                        {/* <FontAwesomeIcon icon={faFileAudio} /> */}
+                        Animated Waveform (mp4)
+                        <InfoOutlinedIcon />
+                        {/* <FontAwesomeIcon icon={faFlask} /> */}
+                        {/* <FontAwesomeIcon icon={faInfoCircle} /> */}
+                      </>
+                    }
+                  />
+                </ExportMenu>
+                {/* </OverlayTrigger> */}
 
-                <DropdownButton as={ButtonGroup} variant="light" title={<FontAwesomeIcon icon={faShare} />}>
-                  {whichJsEnv() === 'cep' ? (
-                    <>
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleCepExportSequence}
-                        title="export the programme script as a sequence in Adobe Premiere"
-                        text={
-                          <>
-                            Premiere - Sequence <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportEDL}
-                        title={
-                          'export EDL, edit decision list, to import the programme script as a sequence in video editing software - Avid, Premiere, Davinci Resolve, for FCPX choose FCPX XML'
-                        }
-                        text={
-                          <>
-                            {' '}
-                            <FontAwesomeIcon icon={faVideo} /> EDL - Video <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        title="export FCPX XML, to import the programme script as a sequence in Final Cut Pro X, video editing software"
-                        onClick={this.handleExportFCPX}
-                        text={
-                          <>
-                            {' '}
-                            <FontAwesomeIcon icon={faVideo} /> FCPX <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                      <Dropdown.Divider />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportADL}
-                        title="export ADL, audio decision list, to import the programme script as a sequence in audio editing software such as SADiE"
-                        text={
-                          <>
-                            {' '}
-                            <FontAwesomeIcon icon={faHeadphones} /> ADL - Audio <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportXML}
-                        title="export XML, audio decision list, to import the programme script as a sequence in audio editing software such as Audition"
-                        text={
-                          <>
-                            {' '}
-                            <FontAwesomeIcon icon={faHeadphones} /> XML - Audition <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                      <Dropdown.Divider />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportTxt}
-                        title="export Text, export the programme script as a text version"
-                        text={
-                          <>
-                            {' '}
-                            <FontAwesomeIcon icon={faFileAlt} /> Text File <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportTxtOnyPaperCuts}
-                        title="export Text, export only the text selection in the programme script as a text version"
-                        text={
-                          <>
-                            {' '}
-                            <FontAwesomeIcon icon={faFileAlt} /> Text File (only text selection) <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportDocx}
-                        title="export docx, export the programme script as a word document"
-                        text={
-                          <>
-                            <FontAwesomeIcon icon={faFileWord} /> Word Document <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportDocxWithClipReference}
-                        title="export docx, export the programme script as a word document, with clip name and timecode references, for text selections"
-                        text={
-                          <>
-                            <FontAwesomeIcon icon={faFileWord} /> Word Doc (with ref) <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-
-                      <Dropdown.Divider />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportVideoPreview}
-                        title="Export mp4 video preview - Experimental feature, at the moment you cannot combine audio and video in the same export."
-                        text={
-                          <>
-                            <FontAwesomeIcon icon={faFileVideo} /> Video (mp4) <FontAwesomeIcon icon={faFlask} />{' '}
-                            <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportAudioPreview}
-                        title="Export wav audio preview - Experimental feature, at the moment you cannot combine audio and video in the same export."
-                        text={
-                          <>
-                            <FontAwesomeIcon icon={faFileAudio} /> Audio (wav) <FontAwesomeIcon icon={faFlask} />
-                            <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                      <Dropdown.Divider />
-                      <ExportWaveForm
-                        TOOLTIP_DEPLAY_IN_MILLISECONDS={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        handleExportAudioPreviewWithVideoWaveform={this.handleExportAudioPreviewWithVideoWaveform}
-                        title="Export audio preview as video with animated wave form - Experimental feature, at the moment you cannot combine audio and video in the same export."
-                        text={
-                          <>
-                            <FontAwesomeIcon icon={faFileAudio} /> Animated Waveform (mp4) <FontAwesomeIcon icon={faFlask} />
-                            <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-
-                      <Dropdown.Divider />
-                      <ExportMenuItem
-                        tootlipDelay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
-                        onClick={this.handleExportJson}
-                        title="export Json, export the programme script as a json file"
-                        text={
-                          <>
-                            {' '}
-                            <FontAwesomeIcon icon={faFileCode} /> Json <FontAwesomeIcon icon={faInfoCircle} />
-                          </>
-                        }
-                      />
-                    </>
-                  )}
-                </DropdownButton>
-                <OverlayTrigger
+                {/* <OverlayTrigger
                   placement={'top'}
                   // delay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
                   overlay={<Tooltip>{` Last Saved at ${this.state.lastSaved.toLocaleString()}`}</Tooltip>}
-                >
-                  <Button variant="light" disabled>
-                    <small className={'text-secondary'} style={{ marginBottom: '0em' }}>{`${this.state.lastSaved.toLocaleTimeString()}`}</small>
-                  </Button>
-                </OverlayTrigger>
-                <OverlayTrigger
+                > */}
+                <Button color="primary" disabled title={` Last Saved at ${this.state.lastSaved.toLocaleString()}`}>
+                  <small className={'text-secondary'} style={{ marginBottom: '0em' }}>{`${this.state.lastSaved.toLocaleTimeString()}`}</small>
+                </Button>
+                {/* </OverlayTrigger> */}
+                {/* <OverlayTrigger
                   placement={'top'}
                   delay={TOOLTIP_DEPLAY_IN_MILLISECONDS}
                   overlay={<Tooltip>Delete programme script content.</Tooltip>}
-                >
-                  <Button variant="light" onClick={this.handleDeleteProgrammeScriptContent}>
-                    <FontAwesomeIcon icon={faTrash} />
-                  </Button>
-                </OverlayTrigger>
+                > */}
+                <Button color="primary" onClick={this.handleDeleteProgrammeScriptContent} title={'Delete programme script content.'}>
+                  {/* <FontAwesomeIcon icon={faTrash} /> */}
+                  <DeleteOutlineOutlinedIcon />
+                </Button>
+                {/* </OverlayTrigger> */}
               </ButtonGroup>
-            </Row>
-          </Card.Body>
+            </Grid>
+          </CardContent>
           <hr style={{ margin: '0px' }} />
-          <Card.Body style={{ padding: '0px' }}>
+          <CardContent style={{ padding: '0px' }}>
             <article
               style={{
                 height: '55vh',
@@ -1206,7 +1009,7 @@ class ProgramScript extends Component {
                 </Suspense>
               ) : null}
             </article>
-          </Card.Body>
+          </CardContent>
         </Card>
       </>
     );

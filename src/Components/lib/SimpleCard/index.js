@@ -11,7 +11,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import CustomLink from '../CustomLink';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     '& > *': {
@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const SimpleCard = props => {
+const SimpleCard = (props) => {
   const classes = useStyles();
   const handleDelete = () => {
     //eslint-disable-next-line

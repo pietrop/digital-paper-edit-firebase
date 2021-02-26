@@ -1,61 +1,66 @@
-import React, { Component } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faTag
-} from '@fortawesome/free-solid-svg-icons';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
+import React, { Component, useState } from 'react';
+import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
+import Button from '@material-ui/core/Button';
 import LabelForm from './LabelForm.js';
+import Modal from '@material-ui/core/Modal';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    position: 'absolute',
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
 
-class LabelModal extends Component {
-  constructor(props, context) {
-    super(props, context);
-
-    this.state = {
-      show: false,
-      color: this.props.color,
-      label: this.props.label,
-      description:  this.props.description,
-      labelId: this.props.labelId
-    };
-  }
-
-  handleClose = () => {
-    this.setState({
-      show: false,
-      // color: randomColor(),
-      // label: '',
-      // description: ''
-    });
-    // Clear all input fields in form?
-  }
-
-  handleShow = () => {
-    this.setState({ show: true });
-  }
-
-  render() {
-    return (
-      <>
-      
-        <Button variant="link" onClick={ this.handleShow } block>{this.props.openBtn}</Button>
-        <Modal show={ this.state.show } onHide={ this.handleClose }>
-          <Modal.Header closeButton>
-            <Modal.Title><FontAwesomeIcon icon={ faTag } />  Label </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <LabelForm
-              onLabelSaved={ this.props.onLabelSaved }
-              label={ this.props.label }
-              description={ this.props.description }
-              color={ this.props.color }
-              labelId={ this.props.labelId }
-              handleClose={ this.handleClose }
-            />
-          </Modal.Body>
-        </Modal>
-      </>
-    );
-  }
+function rand() {
+  return Math.round(Math.random() * 20) - 10;
 }
+
+function getModalStyle() {
+  const top = 50 + rand();
+  const left = 50 + rand();
+
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+  };
+}
+
+const LabelModal = ({ color, label, description, labelId, onLabelSaved, openBtn }) => {
+  const classes = useStyles();
+
+  const [show, setShow] = useState(false);
+  const [modalStyle] = React.useState(getModalStyle);
+
+  const handleClose = () => {
+    setShow(false);
+  };
+
+  const handleShow = () => {
+    setShow(true);
+  };
+
+  return (
+    <>
+      <Button onClick={handleShow} block>
+        {openBtn}
+      </Button>
+
+      <Modal open={show} onClose={handleClose}>
+        <div style={modalStyle} className={classes.paper}>
+          <Typography variant="h5">
+            <SettingsOutlinedIcon />
+            Label
+          </Typography>
+          <LabelForm onLabelSaved={onLabelSaved} label={label} description={description} color={color} labelId={labelId} handleClose={handleClose} />
+        </div>
+      </Modal>
+    </>
+  );
+};
 export default LabelModal;

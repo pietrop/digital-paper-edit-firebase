@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import VideoContextProgressBar from './VideoContextProgressBar';
-import Controls from '../Controls';
-import Row from 'react-bootstrap/Row';
+import Controls from './Controls';
+import Grid from '@material-ui/core/Grid';
+import Input from '@material-ui/core/Input';
+import TextField from '@material-ui/core/TextField';
+import TimerOutlinedIcon from '@material-ui/icons/TimerOutlined';
 import PropTypes from 'prop-types';
 import VideoContext from 'videocontext';
 
 const VideoContextPreview = (props) => {
-  const [ videoContext, setVideoContext ] = useState();
+  const [videoContext, setVideoContext] = useState();
 
   const updateVideoContext = (media) => {
     media.forEach(({ type, sourceStart, start, duration, src }) => {
@@ -19,7 +22,7 @@ const VideoContextPreview = (props) => {
 
   const handleStop = () => {
     videoContext.pause();
-    setVideoContext(vc => {
+    setVideoContext((vc) => {
       vc.currentTime = 0;
 
       return vc;
@@ -30,8 +33,7 @@ const VideoContextPreview = (props) => {
     if (props.canvasRef && props.canvasRef.current) {
       setVideoContext(new VideoContext(props.canvasRef.current));
     }
-
-  }, [ props.canvasRef ]);
+  }, [props.canvasRef]);
 
   if (videoContext) {
     updateVideoContext(props.playlist);
@@ -43,32 +45,46 @@ const VideoContextPreview = (props) => {
 
   return (
     <>
-      <Row
-        className={ 'justify-content-center' }
-        style={ { backgroundColor: 'black' } }
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+        className={'justify-content-center'}
+        style={{ backgroundColor: '#353839' }}
       >
-        <canvas
-          ref={ props.canvasRef }
-          width={ props.width }
-          height={ props.width * 0.5625 }
-        />
-      </Row>
-      <Row
-        className={ 'justify-content-center' }
-        style={ { backgroundColor: 'lightgrey' } }
-      >
-        <VideoContextProgressBar videoContext={ videoContext }/>
-      </Row>
-      <Row style={ { marginTop: '0.4em' } }>
+        <canvas ref={props.canvasRef} width={props.width} height={props.width * 0.5625} />
+      </Grid>
+      <Grid container className={'justify-content-center'} style={{ backgroundColor: 'lightgrey' }}>
+        <VideoContextProgressBar videoContext={videoContext} />
+      </Grid>
+      <Grid container style={{ marginTop: '0.4em' }}>
         <Controls
-          handlePlay={ videoContext ? () => videoContext.play() : () => console.log('handlePlay') }
-          handlePause={ videoContext ? () => videoContext.pause() : () => console.log('handlePause') }
-          handleStop={ videoContext ? () => handleStop() : () => console.log('handleStop') }
-        />
-      </Row>
-      <Row className={ 'justify-content-center' }>
-        Total duration: {videoContext ? secondsToHHMMSSFormat(videoContext.duration) : '00:00:00'}
-      </Row>
+          handlePlay={videoContext ? () => videoContext.play() : () => console.log('handlePlay')}
+          handlePause={videoContext ? () => videoContext.pause() : () => console.log('handlePause')}
+          handleStop={videoContext ? () => handleStop() : () => console.log('handleStop')}
+        >
+          <Grid
+            container
+            direction="row"
+            justify="center"
+            alignItems="center"
+            // className={'justify-content-center'}
+          >
+            <Grid item xs={10} sm={10} md={10} lg={10} xl={10}>
+              <TextField
+                title="total duration"
+                fullWidth={true}
+                disabled
+                // id="input-with-icon-grid"
+                // label="Total duration"
+                value={videoContext ? secondsToHHMMSSFormat(videoContext.duration) : '00:00:00'}
+              />
+            </Grid>
+            {/* </Grid> */}
+          </Grid>
+        </Controls>
+      </Grid>
     </>
   );
 };
@@ -77,11 +93,11 @@ VideoContextPreview.propTypes = {
   canvasRef: PropTypes.any,
   playlist: PropTypes.array,
   videoContext: PropTypes.any,
-  width: PropTypes.any
+  width: PropTypes.any,
 };
 
 VideoContextPreview.defaultProps = {
-  playlist: []
+  playlist: [],
 };
 
 export default VideoContextPreview;

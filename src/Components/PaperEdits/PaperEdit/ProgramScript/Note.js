@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStickyNote } from '@fortawesome/free-solid-svg-icons';
+import NoteOutlinedIcon from '@material-ui/icons/NoteOutlined';
+import Typography from '@material-ui/core/Typography';
 
 class Note extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-
-    };
+    this.state = {};
   }
 
   render() {
     return (
-      <p className={ 'text-secondary' }>
-        <FontAwesomeIcon icon={ faStickyNote } /> { this.props.text }
-      </p>
+      // <p className={'text-secondary'}>
+      <Typography variant="body2" display="block" gutterBottom color={'textSecondary'}>
+        <NoteOutlinedIcon /> {this.props.text}
+      </Typography>
+      // </p>
     );
   }
 }

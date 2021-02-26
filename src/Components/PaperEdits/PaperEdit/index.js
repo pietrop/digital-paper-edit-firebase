@@ -1,11 +1,8 @@
 import React, { Component, Suspense } from 'react';
-// import Container from 'react-bootstrap/Container';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -13,8 +10,10 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import CustomBreadcrumb from '../../lib/CustomBreadcrumb/index.js';
 import ApiWrapper from '../../../ApiWrapper/index.js';
 
-const Transcripts = React.lazy(() => import('./Transcripts/index.js'));
-const ProgramScript = React.lazy(() => import('./ProgramScript/index.js'));
+// const Transcripts = React.lazy(() => import('./Transcripts/index.js'));
+// const ProgramScript = React.lazy(() => import('./ProgramScript/index.js'));
+import Transcripts from './Transcripts/index.js';
+import ProgramScript from './ProgramScript/index.js';
 
 class PaperEdit extends Component {
   constructor(props) {
@@ -119,23 +118,11 @@ class PaperEdit extends Component {
           <Grid container>
             <Grid
               item
-              xs={{ span: 12, offset: 0 }}
-              sm={{
-                span: this.state.isProgramScriptShown ? 7 : 12,
-                offset: this.state.isProgramScriptShown ? 0 : 0,
-              }}
-              md={{
-                span: this.state.isProgramScriptShown ? 7 : 12,
-                offset: this.state.isProgramScriptShown ? 0 : 0,
-              }}
-              lg={{
-                span: this.state.isProgramScriptShown ? 7 : 10,
-                offset: this.state.isProgramScriptShown ? 0 : 1,
-              }}
-              xl={{
-                span: this.state.isProgramScriptShown ? 7 : 10,
-                offset: this.state.isProgramScriptShown ? 0 : 1,
-              }}
+              xs={12}
+              sm={this.state.isProgramScriptShown ? 7 : 12}
+              md={this.state.isProgramScriptShown ? 7 : 12}
+              lg={this.state.isProgramScriptShown ? 7 : 10}
+              xl={this.state.isProgramScriptShown ? 7 : 10}
               style={{ display: this.state.isTranscriptsShown ? 'block' : 'none' }}
             >
               <div className={['d-block', 'd-sm-none'].join(' ')}>
@@ -168,23 +155,11 @@ class PaperEdit extends Component {
             </Grid>
             <Grid
               item
-              xs={{ span: 12, offset: 0 }}
-              sm={{
-                span: this.state.isTranscriptsShown ? 5 : 12,
-                offset: this.state.isTranscriptsShown ? 0 : 0,
-              }}
-              md={{
-                span: this.state.isTranscriptsShown ? 5 : 12,
-                offset: this.state.isTranscriptsShown ? 0 : 0,
-              }}
-              lg={{
-                span: this.state.isTranscriptsShown ? 5 : 10,
-                offset: this.state.isTranscriptsShown ? 0 : 1,
-              }}
-              xl={{
-                span: this.state.isTranscriptsShown ? 5 : 8,
-                offset: this.state.isTranscriptsShown ? 0 : 2,
-              }}
+              xs={12}
+              sm={this.state.isTranscriptsShown ? 5 : 12}
+              md={this.state.isTranscriptsShown ? 5 : 12}
+              lg={this.state.isTranscriptsShown ? 5 : 10}
+              xl={this.state.isTranscriptsShown ? 5 : 8}
               style={{ display: this.state.isProgramScriptShown ? 'block' : 'none' }}
             >
               <Suspense
@@ -215,6 +190,8 @@ class PaperEdit extends Component {
                   </>
                 }
               >
+                <br />
+                <br />
                 <ProgramScript projectId={this.state.projectId} papereditId={this.state.papereditId} transcripts={this.state.transcripts} />
               </Suspense>
             </Grid>

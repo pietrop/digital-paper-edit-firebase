@@ -55,7 +55,7 @@ class Transcripts extends Component {
     const result = await ApiWrapper.getTranscripts(this.state.projectId);
     // TODO: add error handling
     if (result) {
-      const tmpList = result.transcripts.map(item => {
+      const tmpList = result.transcripts.map((item) => {
         item.display = true;
 
         return item;
@@ -67,9 +67,9 @@ class Transcripts extends Component {
     }
   };
 
-  areThereTranscriptsInProgress = items => {
+  areThereTranscriptsInProgress = (items) => {
     if (items.length !== 0) {
-      const result = items.find(transcript => {
+      const result = items.find((transcript) => {
         return transcript.status === 'in-progress';
       });
 
@@ -83,7 +83,7 @@ class Transcripts extends Component {
   // inside --> newTranscriptFormModal --> TranscriptForm
   // component - could be refactored
   // but needs to take into account file upload from form in TranscriptForm
-  handleSaveItem = item => {
+  handleSaveItem = (item) => {
     console.log('handleSaveItem', item);
     const newItem = item;
     newItem.display = true;
@@ -105,7 +105,7 @@ class Transcripts extends Component {
   };
 
   // TODO: adjust for multiuple
-  handleSaveBatch = itemsProps => {
+  handleSaveBatch = (itemsProps) => {
     console.log('handleSaveBatch', itemsProps);
 
     this.setState({
@@ -113,7 +113,7 @@ class Transcripts extends Component {
     });
 
     if (itemsProps.length) {
-      const newItems = itemsProps.map(item => {
+      const newItems = itemsProps.map((item) => {
         item.display = true;
         return item;
       });
@@ -153,14 +153,14 @@ class Transcripts extends Component {
     }
   };
 
-  handleSaveEditedItem = transcript => {
+  handleSaveEditedItem = (transcript) => {
     const newEditedItem = transcript;
     console.log('newEditedITem', newEditedItem);
     // display attribute for search
     newEditedItem.display = true;
     // Update existing
     const { items } = this.state;
-    const itemIdex = items.findIndex(item => item.id === transcript.id);
+    const itemIdex = items.findIndex((item) => item.id === transcript.id);
     const newItemsList = [...items];
     // preserve status info
     transcript.status = newItemsList[itemIdex].status;
@@ -168,7 +168,7 @@ class Transcripts extends Component {
     const queryParamsOptions = false;
     const transcriptId = newEditedItem.id;
     // TODO: add error handling, eg message, wasn't able to update etc..
-    ApiWrapper.updateTranscript(this.state.projectId, transcriptId, queryParamsOptions, newEditedItem).then(response => {
+    ApiWrapper.updateTranscript(this.state.projectId, transcriptId, queryParamsOptions, newEditedItem).then((response) => {
       if (response.ok) {
         console.log('ApiWrapper.updateTranscript', response, newItemsList);
         this.setState({
@@ -180,7 +180,7 @@ class Transcripts extends Component {
   };
 
   findItemById = (list, id) => {
-    const result = list.filter(p => {
+    const result = list.filter((p) => {
       return p.id === id;
     });
 
@@ -188,7 +188,7 @@ class Transcripts extends Component {
   };
 
   // opens the modal for editing item
-  handleEditItem = itemId => {
+  handleEditItem = (itemId) => {
     const item = this.findItemById(this.state.items, itemId);
     console.log('handleEditItem', item);
     this.setState({
@@ -205,9 +205,9 @@ class Transcripts extends Component {
     // on successful then update state
     const result = await ApiWrapper.deleteTranscript(this.state.projectId, transcriptId);
     // TODO: some error handling, error message saying something went wrong
-    const findId = item => item.id !== transcriptId;
+    const findId = (item) => item.id !== transcriptId;
     if (result.ok) {
-      const tmpNewList = this.state.items.filter(item => findId(item));
+      const tmpNewList = this.state.items.filter((item) => findId(item));
       this.setState(
         {
           items: tmpNewList,
@@ -219,11 +219,11 @@ class Transcripts extends Component {
     }
   }
 
-  showLinkPath = id => {
+  showLinkPath = (id) => {
     return `projects/${this.state.projectId}/transcripts/${id}/correct`;
   };
 
-  handleUpdateList = list => {
+  handleUpdateList = (list) => {
     this.setState({ items: list });
   };
 
@@ -263,7 +263,7 @@ class Transcripts extends Component {
     });
   };
 
-  handleUpdateList = list => {
+  handleUpdateList = (list) => {
     this.setState({ items: list, isNewItemModalShow: false });
   };
 

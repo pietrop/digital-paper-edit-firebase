@@ -6,6 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Skeleton from '@material-ui/lab/Skeleton';
 import CustomNavbar from './CustomNavbar';
 import firebase from './Firebase.js';
+import useOnlineStatus from './Components/lib/useOnlineStatus';
 
 // const Projects = lazy(() => import('./Components/Projects/index.js'));
 // const Project = lazy(() => import('./Components/Projects/Project.js'));
@@ -33,6 +34,7 @@ const NoMatch = () => {
 };
 
 function App(props) {
+  const online = useOnlineStatus();
   const [user, setUser] = useState(null);
 
   const handleUserChange = (isUserSignedIn) => {
@@ -50,7 +52,7 @@ function App(props) {
     );
   }
 
-  if (!navigator.onLine) {
+  if (!online) {
     offlineWarning = (
       <>
         <br />

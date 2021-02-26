@@ -1,17 +1,67 @@
 import React, { Component } from 'react';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
-import Nav from 'react-bootstrap/Nav';
-import Tab from 'react-bootstrap/Tab';
-import Button from 'react-bootstrap/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClock, faExclamationTriangle, faSearch } from '@fortawesome/free-solid-svg-icons';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+
+import WarningIcon from '@material-ui/icons/Warning';
+import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
+import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
+import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 
 import Transcript from './Transcript.js';
 import SearchBarTranscripts from './SearchBarTranscripts/index.js';
 import onlyCallOnce from '../../../../Util/only-call-once/index.js';
 import makeListOfUniqueSpeakers from './makeListOfUniqueSpeakers.js';
 import Paragraphs from './Paragraphs/index.js';
+
+// move as separate component
+// https://material-ui.com/components/tabs/#vertical-tabs
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div role="tabpanel" hidden={value !== index} id={`vertical-tabpanel-${index}`} aria-labelledby={`vertical-tab-${index}`} {...other}>
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `vertical-tab-${index}`,
+    'aria-controls': `vertical-tabpanel-${index}`,
+  };
+}
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.paper,
+    display: 'flex',
+    height: 224,
+  },
+  tabs: {
+    borderRight: `1px solid ${theme.palette.divider}`,
+  },
+}));
+
+//  const classes = useStyles();
 
 class Transcripts extends Component {
   constructor(props) {
@@ -25,6 +75,7 @@ class Transcripts extends Component {
       selectedOptionTranscriptsSearch: [],
       showParagraphsMatchingSearch: false,
       showAdvancedSearchViewSearchingAcrossTranscripts: false,
+      tabValue: 0,
     };
   }
 
@@ -47,11 +98,8 @@ class Transcripts extends Component {
       });
     }
   };
-  highlightWords = searchString => {
-    const listOfSearchWords = searchString
-      .toLowerCase()
-      .trim()
-      .split(' ');
+  highlightWords = (searchString) => {
+    const listOfSearchWords = searchString.toLowerCase().trim().split(' ');
     const pCSS = `.paragraph[data-paragraph-text*="${listOfSearchWords.join(' ')}"]`;
 
     const wordsToSearchCSS = listOfSearchWords.map((searchWord, index) => {
@@ -79,30 +127,30 @@ class Transcripts extends Component {
   };
 
   // To search across all transcripts
-  handleLabelsSearchChange = selectedOptionLabelSearch => {
+  handleLabelsSearchChange = (selectedOptionLabelSearch) => {
     this.setState({
       selectedOptionLabelSearch,
     });
   };
   // To search across all transcripts
-  handleSpeakersSearchChange = selectedOptionSpeakerSearch => {
+  handleSpeakersSearchChange = (selectedOptionSpeakerSearch) => {
     this.setState({
       selectedOptionSpeakerSearch,
     });
   };
   // To search across all transcripts
-  handleTranscriptSearchChange = selectedOptionTranscriptsSearch => {
+  handleTranscriptSearchChange = (selectedOptionTranscriptsSearch) => {
     this.setState({
       selectedOptionTranscriptsSearch,
     });
   };
   // To search across all transcripts
-  handleShowParagraphsMatchingSearch = isShowParagraphsMatchingSearch => {
+  handleShowParagraphsMatchingSearch = (isShowParagraphsMatchingSearch) => {
     this.setState({ showParagraphsMatchingSearch: isShowParagraphsMatchingSearch });
   };
 
   // TODO: Not yet implemented - low priority
-  handleWordClick = e => {
+  handleWordClick = (e) => {
     if (e.target.className === 'words') {
       const wordEl = e.target;
       console.log('wordEl', wordEl);
@@ -123,8 +171,13 @@ class Transcripts extends Component {
     });
   };
 
+  handleTabChange = (event, newValue) => {
+    console.log('handleChange', newValue);
+    this.setState({ tabValue: newValue });
+  };
+
   handleShowAdvancedSearchViewSearchingAcrossTranscripts = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       if (!prevState.showAdvancedSearchViewSearchingAcrossTranscripts) {
         return {
           showAdvancedSearchViewSearchingAcrossTranscripts: true,
@@ -154,23 +207,24 @@ class Transcripts extends Component {
       // won't show when they are done in this view
       // only in project's view list of transcript you get a UI update when they are done
       return (
-        <Nav.Item key={transcript.id}>
-          <Nav.Link disabled={transcript.status !== 'done' ? true : false} eventKey={transcript.id}>
-            {transcript.status === 'in-progress' ? <FontAwesomeIcon icon={faClock} /> : ''}
-            {(transcript.status !== 'done' && transcript.status !== 'in-progress') || transcript.status === 'error' ? (
-              <FontAwesomeIcon icon={faExclamationTriangle} />
-            ) : (
-              ''
-            )}
-            {`  ${transcript.transcriptTitle}`}
-          </Nav.Link>
-        </Nav.Item>
+        <Tab
+          key={transcript.id}
+          label={
+            <>
+              {transcript.status === 'in-progress' ? <QueryBuilderIcon /> : ''}
+              {(transcript.status !== 'done' && transcript.status !== 'in-progress') || transcript.status === 'error' ? <WarningIcon /> : ''}
+              {`  ${transcript.transcriptTitle}`}
+            </>
+          }
+          {...a11yProps(index)}
+          disabled={transcript.status !== 'done' ? true : false}
+        />
       );
     });
     // id - value - label - color - description
     // const transcriptOptions = [{value: 'test', label: 'test'}];
     const transcriptsOptions = this.props.transcripts
-      .map(transcript => {
+      .map((transcript) => {
         if (transcript.id && transcript.transcriptTitle) {
           return {
             id: transcript.id,
@@ -185,18 +239,18 @@ class Transcripts extends Component {
           };
         }
       }) // Filter to show only transcripts that are done. excluding in progress and errored
-      .filter(transcript => {
+      .filter((transcript) => {
         return transcript.status === 'done';
       });
 
-    const transcriptsUniqueListOfSpeakers2D = this.props.transcripts.map(transcript => {
+    const transcriptsUniqueListOfSpeakers2D = this.props.transcripts.map((transcript) => {
       if (transcript.transcript && transcript.transcript.paragraphs) {
         return makeListOfUniqueSpeakers(transcript.transcript.paragraphs);
       } else {
         return { value: 'test', label: 'test' };
       }
     });
-    const transcriptsUniqueListOfSpeakers = transcriptsUniqueListOfSpeakers2D.reduce(function(prev, curr) {
+    const transcriptsUniqueListOfSpeakers = transcriptsUniqueListOfSpeakers2D.reduce(function (prev, curr) {
       return prev.concat(curr);
     });
     // remove duplicates
@@ -223,9 +277,9 @@ class Transcripts extends Component {
       />
     );
 
-    const transcriptsElTab = this.props.transcripts.map(transcript => {
+    const transcriptsElTab = this.props.transcripts.map((transcript, index) => {
       return (
-        <Tab.Pane key={transcript.id} eventKey={transcript.id}>
+        <TabPanel key={transcript.id} value={this.state.tabValue} index={index}>
           <Transcript
             status={transcript.status}
             projectId={this.props.projectId}
@@ -235,14 +289,14 @@ class Transcripts extends Component {
             transcript={transcript.transcript}
             url={transcript.url}
           />
-        </Tab.Pane>
+        </TabPanel>
       );
     });
 
     const searchedParagraphsAcrossTranscripts = this.props.transcripts.map((transcript, index) => {
       if (
         transcript.transcript &&
-        this.state.selectedOptionTranscriptsSearch.find(t => {
+        this.state.selectedOptionTranscriptsSearch.find((t) => {
           return transcript.id === t.id;
         })
       ) {
@@ -277,14 +331,14 @@ class Transcripts extends Component {
 
     return (
       <>
-        <style scoped>
-          {/* This is to style of the Paragraph component programmatically */}
-          {`${this.state.sentenceToSearchCSS} { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
-          {`${this.state.sentenceToSearchCSSInHighlights} { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
-        </style>
-        <Tab.Container defaultActiveKey={this.props.transcripts[0] ? this.props.transcripts[0].id : 'first'}>
-          <Row>
-            <Col sm={!this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? 3 : 0}>
+        <Container disableGutters={true}>
+          <style scoped>
+            {/* This is to style of the Paragraph component programmatically */}
+            {`${this.state.sentenceToSearchCSS} { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
+            {`${this.state.sentenceToSearchCSSInHighlights} { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
+          </style>
+          <Grid container disableGutters={true}>
+            <Grid item xs={12} sm={!this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? 4 : 0}>
               {!this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? (
                 <>
                   <Button
@@ -293,43 +347,52 @@ class Transcripts extends Component {
                     block
                     title={'Search across transcripts in this project'}
                     size={'sm'}
+                    fullWidth={true}
+                    title={"Search across this project's transcripts "}
                   >
-                    <FontAwesomeIcon icon={faSearch} /> Project's Transcripts
+                    <SearchOutlinedIcon /> <DescriptionOutlinedIcon />
+                    {/* Project's Transcripts */}
                   </Button>
                   <hr />
-
-                  <Nav variant="pills" className="flex-column">
-                    <div style={{ height: '97vh', overflow: 'scroll' }}>{transcriptsElNav}</div>
-                  </Nav>
+                  <div style={{ height: '20vh' }}>
+                    <Tabs
+                      orientation="vertical"
+                      variant="scrollable"
+                      value={this.state.tabValue}
+                      onChange={this.handleTabChange}
+                      aria-label="Vertical tabs example"
+                      // className={classes.tabs}
+                    >
+                      {transcriptsElNav}
+                    </Tabs>
+                  </div>
                 </>
               ) : null}
-            </Col>
+            </Grid>
 
-            <Col sm={!this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? 9 : 12}>
-              <Tab.Content>
-                {this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? (
-                  <>
-                    {' '}
-                    {searchBarTranscriptsElement}
-                    <section
-                      style={{
-                        height: '80vh',
-                        overflow: 'auto',
-                        border: 'solid',
-                        borderWidth: '0.01em',
-                        borderColor: 'lightgrey',
-                      }}
-                    >
-                      {searchedParagraphsAcrossTranscripts}
-                    </section>
-                  </>
-                ) : (
-                  <>{transcriptsElTab}</>
-                )}
-              </Tab.Content>
-            </Col>
-          </Row>
-        </Tab.Container>
+            <Grid item sm={!this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? 8 : 12}>
+              {this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? (
+                <>
+                  {' '}
+                  {searchBarTranscriptsElement}
+                  <section
+                    style={{
+                      height: '80vh',
+                      overflow: 'auto',
+                      border: 'solid',
+                      borderWidth: '0.01em',
+                      borderColor: 'lightgrey',
+                    }}
+                  >
+                    {searchedParagraphsAcrossTranscripts}
+                  </section>
+                </>
+              ) : (
+                <>{transcriptsElTab}</>
+              )}
+            </Grid>
+          </Grid>
+        </Container>
       </>
     );
   }

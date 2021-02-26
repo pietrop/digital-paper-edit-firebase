@@ -4,15 +4,23 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
-import { blue, indigo, green } from '@material-ui/core/colors';
+import { blue, indigo, green, purple } from '@material-ui/core/colors';
+
 import 'fontsource-roboto';
 const darkBlueColor = '#084177';
 const darkRedColor = '#b2102f';
 const bootstrapBlue = '#007bff';
 const bootstrapRed = '#dc3545';
 const navyBlue = '#023E8A';
+const customBlue = '#1769aa';
 const theme = createMuiTheme({
   palette: {
+    background: {
+      // paper: '#424242',
+      // default: '#303030',
+      // paper: '#fff',
+      // default: '#fafafa',
+    },
     primary: {
       main: navyBlue,
     },

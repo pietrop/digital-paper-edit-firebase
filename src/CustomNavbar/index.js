@@ -11,8 +11,9 @@ import CustomAlert from '../Components/lib/CustomAlert';
 import MovieCreationOutlinedIcon from '@material-ui/icons/MovieCreationOutlined';
 import GraphicEqOutlinedIcon from '@material-ui/icons/GraphicEqOutlined';
 import LocalMoviesOutlinedIcon from '@material-ui/icons/LocalMoviesOutlined';
+import MovieFilterOutlinedIcon from '@material-ui/icons/MovieFilterOutlined';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -32,7 +33,7 @@ function CustomNavbar(props) {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         props.handleUserChange(true);
       } else {
@@ -65,7 +66,8 @@ function CustomNavbar(props) {
     <div className={classes.root}>
       <AppBar position="static" color="default" elevation={0}>
         <Toolbar>
-          <LocalMoviesOutlinedIcon />
+          <MovieFilterOutlinedIcon />
+          {'   '}
           <Typography className={classes.title}>{process.env.REACT_APP_NAME}</Typography>
 
           {firebase.auth().currentUser ? (

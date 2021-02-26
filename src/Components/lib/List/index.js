@@ -8,11 +8,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 import SimpleCard from '../SimpleCard';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
     // maxWidth: '36ch',
-    backgroundColor: theme.palette.background.paper,
+    // backgroundColor: theme.palette.background.paper,
   },
   inline: {
     display: 'inline',
@@ -23,7 +23,7 @@ function ListComponent(props) {
   const classes = useStyles();
   // render() {
   const listItems = props.items
-    .map(item => {
+    .map((item) => {
       // const date = `${item.created.toDate().toDateString()} ${item.created.toDate().toLocaleTimeString('en-US')}`;
       if (item.display) {
         return (
@@ -43,7 +43,7 @@ function ListComponent(props) {
         return null;
       }
     })
-    .filter(item => {
+    .filter((item) => {
       return item !== null;
     });
 
