@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,7 +15,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Collapse from '@material-ui/core/collapse';
+import InfoIcon from '@material-ui/icons/Info';
+import Chip from '@material-ui/core/Chip';
 import CustomLink from '../CustomLink';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 // TODO: can add sttEngine info and language info the transcript card
 // import languages from '../../Transcripts/languages';
 // function findLanguage(languageCode) {
@@ -47,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CustomTranscriptCard(props) {
   const classes = useStyles();
+  const [isInfoVisible, setIsInfoVisible] = useState(false);
 
   const handleDelete = () => {
     //eslint-disable-next-line
@@ -116,7 +121,23 @@ function CustomTranscriptCard(props) {
                 </Avatar>
               </CustomLink>
             </ListItemAvatar>
-            <ListItemText primary={<CustomLink to={showLinkPath()}>{props.title}</CustomLink>} secondary={props.description} />
+            <ListItemText
+              primary={<CustomLink to={showLinkPath()}>{props.title}</CustomLink>}
+              secondary={
+                <>
+                  {props.description}
+
+                  <Collapse in={isInfoVisible} unmountOnExit>
+                    <br />
+                    {props.sttEngine && <Chip avatar={<Avatar>{props.sttEngine[0]}</Avatar>} label={props.sttEngine} />}
+                    {props.languageCode && (
+                      <Chip avatar={<Avatar>{props.languageCode.substring(0, 2).toUpperCase()}</Avatar>} label={props.languageCode} />
+                    )}
+                    {props.clipName && <Chip label={props.clipName} />}
+                  </Collapse>
+                </>
+              }
+            />
           </>
         ) : (
           <>
@@ -127,11 +148,36 @@ function CustomTranscriptCard(props) {
                 </Avatar>
               </CustomLink>
             </ListItemAvatar>
-            <ListItemText primary={<CustomLink disabled={true}>{props.title}</CustomLink>} secondary={props.description} />
+            <ListItemText
+              primary={<CustomLink disabled={true}>{props.title}</CustomLink>}
+              secondary={
+                <>
+                  {props.description}
+                  {props.sttEngine}
+                </>
+              }
+            />
           </>
         )}
 
         <ListItemSecondaryAction>
+          <IconButton
+            size="small"
+            color="primary"
+            onClick={() => {
+              setIsInfoVisible(!isInfoVisible);
+            }}
+          >
+            <InfoOutlinedIcon />
+            {/* <Chip
+              label={<InfoIcon />}
+              color="primary"
+              variant="outlined"
+              // onClick={() => {
+              //   setIsInfoVisible(!isInfoVisible);
+              // }}
+            ></Chip> */}
+          </IconButton>
           <IconButton size="small" color="primary" onClick={handleEdit}>
             <EditIcon />
           </IconButton>
