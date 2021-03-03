@@ -21,7 +21,7 @@ import whichJsEnv from '../../Util/which-js-env';
 import languages from './languages';
 
 const LANGUAGE_US_ENGLISH_INDEX = 25;
-const LANGUAGE_CODE_US_ENGLISH = 'es-US';
+const LANGUAGE_CODE_US_ENGLISH = 'en-US';
 const DEFAULT_LANGUAGE_CODE = LANGUAGE_CODE_US_ENGLISH;
 const DEFAULT_LANGUAGE_OPTION_INDEX = LANGUAGE_US_ENGLISH_INDEX;
 const languagesOptions = languages.map((language) => {
