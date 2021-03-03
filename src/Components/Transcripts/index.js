@@ -270,53 +270,53 @@ class Transcripts extends Component {
   render() {
     return (
       <>
-        <Container>
-          <ListPageTranscript
-            model={'Transcript'}
-            items={this.state.items}
-            handleShowCreateNewItemForm={this.handleShowCreateNewItemForm}
-            handleShowCreateNewBatchForm={this.handleShowCreateNewBatchForm}
-            handleEdit={this.handleEditItem}
-            handleDelete={this.handleDelete}
-            showLinkPath={this.showLinkPath}
-            handleUpdateList={this.handleUpdateList}
-            //
-            handleCloseModal={this.handleCloseModal}
-            handleCloseBatchModal={this.handleCloseBatchModal}
-            icon={<DescriptionOutlinedIcon />}
-          />
-          <NewTranscriptFormModal
-            projectId={this.state.projectId}
-            title={this.state.title}
-            description={this.state.description}
-            id={this.state.itemId}
-            modalTitle={'New Transcript'}
-            show={this.state.isNewItemModalShow}
-            handleCloseModal={this.handleCloseModal}
-            handleSaveForm={this.handleSaveItem}
-          />
+        {/* <Container> */}
+        <ListPageTranscript
+          model={'Transcript'}
+          items={this.state.items}
+          handleShowCreateNewItemForm={this.handleShowCreateNewItemForm}
+          handleShowCreateNewBatchForm={this.handleShowCreateNewBatchForm}
+          handleEdit={this.handleEditItem}
+          handleDelete={this.handleDelete}
+          showLinkPath={this.showLinkPath}
+          handleUpdateList={this.handleUpdateList}
+          //
+          handleCloseModal={this.handleCloseModal}
+          handleCloseBatchModal={this.handleCloseBatchModal}
+          icon={<DescriptionOutlinedIcon />}
+        />
+        <NewTranscriptFormModal
+          projectId={this.state.projectId}
+          title={this.state.title}
+          description={this.state.description}
+          id={this.state.itemId}
+          modalTitle={'New Transcript'}
+          show={this.state.isNewItemModalShow}
+          handleCloseModal={this.handleCloseModal}
+          handleSaveForm={this.handleSaveItem}
+        />
 
-          <NewBatchTranscriptFormModal
-            projectId={this.state.projectId}
-            title={this.state.title}
-            description={this.state.description}
-            id={this.state.itemId}
-            modalTitle={'New Batch Transcripts'}
-            show={this.state.isNewBatchModalShow}
-            handleCloseModal={this.handleCloseBatchModal}
-            handleSaveForm={this.handleSaveBatch}
-          />
+        <NewBatchTranscriptFormModal
+          projectId={this.state.projectId}
+          title={this.state.title}
+          description={this.state.description}
+          id={this.state.itemId}
+          modalTitle={'New Batch Transcripts'}
+          show={this.state.isNewBatchModalShow}
+          handleCloseModal={this.handleCloseBatchModal}
+          handleSaveForm={this.handleSaveBatch}
+        />
 
-          <ItemFormModal
-            title={this.state.title}
-            description={this.state.description}
-            id={this.state.itemId}
-            modalTitle={'Edit Transcript'}
-            show={this.state.isEditItemModalShow}
-            handleCloseModal={this.handleCloseModalEdit}
-            handleSaveForm={this.handleSaveEditedItem}
-          />
-        </Container>
+        <ItemFormModal
+          title={this.state.title}
+          description={this.state.description}
+          id={this.state.itemId}
+          modalTitle={'Edit Transcript'}
+          show={this.state.isEditItemModalShow}
+          handleCloseModal={this.handleCloseModalEdit}
+          handleSaveForm={this.handleSaveEditedItem}
+        />
+        {/* </Container> */}
       </>
     );
   }
