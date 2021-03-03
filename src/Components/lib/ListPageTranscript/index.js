@@ -133,30 +133,30 @@ function ListPageTranscript(props) {
 
   return (
     <>
-      {/* <Container maxWidth="md"> */}
-      <Grid container direction="row" justify="space-around" alignItems="flex-end">
-        <Grid item xs={12} sm={6} md={6} ld={6} xl={6}>
-          {searchEl}
-        </Grid>
-        <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
-          <Button fullWidth={true} onClick={props.handleShowCreateNewItemForm} color="primary" block="true">
-            New {props.model}
-          </Button>
+      <Container maxWidth="md">
+        <Grid container direction="row" justify="space-around" alignItems="flex-end">
+          <Grid item xs={12} sm={6} md={6} ld={6} xl={6}>
+            {searchEl}
+          </Grid>
+          <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
+            <Button fullWidth={true} onClick={props.handleShowCreateNewItemForm} color="primary" block="true">
+              New {props.model}
+            </Button>
+          </Grid>
+
+          <Fab aria-label={'add'} style={{ zIndex: '1' }} className={classes.fab} color={'primary'} onClick={props.handleShowCreateNewItemForm}>
+            <AddIcon />
+          </Fab>
+
+          <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
+            <Button fullWidth={true} onClick={props.handleShowCreateNewBatchForm} color="primary" block="true">
+              New Batch {props.model}
+            </Button>
+          </Grid>
         </Grid>
 
-        <Fab aria-label={'add'} style={{ zIndex: '1' }} className={classes.fab} color={'primary'} onClick={props.handleShowCreateNewItemForm}>
-          <AddIcon />
-        </Fab>
-
-        <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
-          <Button fullWidth={true} onClick={props.handleShowCreateNewBatchForm} color="primary" block="true">
-            New Batch {props.model}
-          </Button>
-        </Grid>
-      </Grid>
-
-      {content}
-      {/* </Container>     */}
+        {content}
+      </Container>
     </>
   );
 }
