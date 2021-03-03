@@ -1,7 +1,8 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
+import Button from '@material-ui/core/Button';
+// import Button from 'react-bootstrap/Button';
+// import Col from 'react-bootstrap/Col';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons';
 
@@ -64,6 +65,7 @@ class Controls extends React.PureComponent {
       </>
     );
   }
+  q;
 }
 
 export default Controls;
