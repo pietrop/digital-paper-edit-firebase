@@ -8,12 +8,15 @@ import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
 import Select from 'react-select';
-
+import Chip from '@material-ui/core/Chip';
+import Avatar from '@material-ui/core/Avatar';
 import CustomAlert from '../lib/CustomAlert/index.js';
 import ApiWrapper from '../../ApiWrapper/index.js';
 import whichJsEnv from '../../Util/which-js-env';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
 import languages from './languages';
+
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 const LANGUAGE_US_ENGLISH_INDEX = 25;
 const LANGUAGE_CODE_US_ENGLISH = 'en-US';
@@ -25,6 +28,12 @@ const languagesOptions = languages.map((language) => {
     label: `${language.Language} - ${language['Language (English name)']}`,
   };
 });
+
+// https://stackoverflow.com/questions/5953239/how-do-i-change-file-extension-with-javascript
+function changeExtension(file, extension) {
+  const basename = path.basename(file, path.extname(file));
+  return path.join(path.dirname(file), basename + extension);
+}
 
 class TranscriptForm extends Component {
   constructor(props) {
@@ -45,8 +54,27 @@ class TranscriptForm extends Component {
       savedNotification: null,
       progressValue: 0,
       languageCode: DEFAULT_LANGUAGE_CODE,
+      audioPreviewSrc: '',
+      audioPreviewProgressValue: 0,
+      audioPreviewProgressValueAsTime: 0,
     };
     // console.log(process.env);
+    // TODO: parse that and show time progress
+    // maybe even speed
+    // size=    1536kB time=00:01:44.17 bitrate= 120.8kbits/s speed=29.7x
+    this.ffmpeg = createFFmpeg({
+      // log: true,
+      logger: ({ message }) => {
+        const timeDurationRegex = /time=(.*) bitrate=/;
+        const match = timeDurationRegex.exec(message);
+        if (match) {
+          const duration = match[1];
+          // console.log('duration', duration);
+          this.setState({ audioPreviewProgressValueAsTime: duration });
+        }
+        // console.log('message', message);
+      },
+    });
   }
 
   handleTitleChange = (event) => {
@@ -81,10 +109,46 @@ class TranscriptForm extends Component {
       progressValue: parseInt(value),
     });
   };
+
+  transcode = async ({ target: { files } }) => {
+    console.log('called transcoding');
+    const { name } = files[0];
+    console.log('name', name);
+    await this.ffmpeg.load();
+    this.ffmpeg.FS('writeFile', name, await fetchFile(files[0]));
+
+    this.ffmpeg.setProgress((progress) => {
+      const { ratio } = progress;
+      // console.log('progress', progress);
+      // console.log('ratio', ratio);
+      this.setState({
+        audioPreviewProgressValue: ratio * 100,
+      });
+    });
+
+    await this.ffmpeg.run('-i', name, 'output.mp3');
+    const data = this.ffmpeg.FS('readFile', 'output.mp3');
+    // const video = document.getElementById('player');
+    const blobData = new Blob([data.buffer], { type: 'audio/mp3' });
+    const url = URL.createObjectURL(blobData);
+    console.log('url', url);
+    this.setState({ audioPreviewSrc: url });
+    const newName = changeExtension(name, '.mp3');
+    const file = new File([blobData], newName, {
+      type: 'audio/mp3',
+    });
+    return file;
+  };
+
   // https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
-  handleFileUpload = (e) => {
+  handleFileUpload = async (e) => {
+    // TODO: max file size of 2gig video to use ffmpeg client side to convert to audio
     const files = Array.from(e.target.files);
-    const file = files[0];
+    // TODO: logic if it's video transcoding, otherwise if it's audio just go ahead
+    // const file = files[0];
+    const file = await this.transcode(e);
+    console.log('file', file, file.type, file.path, file.name);
+
     // more on formData https://thoughtbot.com/blog/ridiculously-simple-ajax-uploads-with-formdata
     const formData = new FormData();
     formData.append('file', file);
@@ -117,10 +181,10 @@ class TranscriptForm extends Component {
       if (whichJsEnv() === 'browser') {
         formData.append('languageCode', this.state.languageCode);
       }
-      console.log("formData.get('path')", formData.get('path'));
     }
     let data = {};
     if (whichJsEnv() === 'electron') {
+      console.log("formData.get('path')", formData.get('path'));
       // if client run inside of electron
       // is easier to pass another object with title, description
       // as well as the additional path to the file
@@ -216,12 +280,38 @@ class TranscriptForm extends Component {
                 <FormControl controlId="formTranscriptMediaFile" fullWidth={true}>
                   <InputLabel>File </InputLabel>
                   <Input required type="file" label="Upload" accept="audio/*,video/*,.mxf, audio/x-m4a" onChange={this.handleFileUpload} />
-                  <FormHelperText className="text-muted">Select an audio or video file to transcribe</FormHelperText>
+                  <FormHelperText className="text-muted">
+                    Select an audio or video file to transcribe. <br />
+                    For video files, there's a limit to <code>2Gig</code> in file size
+                  </FormHelperText>
                   {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
                   {/* <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback> */}
                 </FormControl>
               )}
             </Grid>
+
+            {this.state.audioPreviewProgressValue ? (
+              <>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                  <br />
+                  <br />
+                  <InputLabel>Audio Preview </InputLabel>
+                  <Chip label={this.state.audioPreviewProgressValueAsTime} />
+                  <Chip avatar={<Avatar>%</Avatar>} label={parseInt(this.state.audioPreviewProgressValue)} />
+                  <FormControl controlId="formTranscriptDescription" fullWidth={true}>
+                    <br />
+                    <LinearProgress variant="determinate" fullWidth={true} value={this.state.audioPreviewProgressValue} />
+                    <br />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                  <FormControl controlId="formTranscriptTitle" fullWidth={true}>
+                    {this.state.audioPreviewSrc ? <audio src={this.state.audioPreviewSrc} controls style={{ width: '100%' }}></audio> : null}
+                  </FormControl>
+                </Grid>
+              </>
+            ) : null}
+
             <Grid item xs={12} sm={12} md={12} lg={12}>
               <FormControl controlId="formTranscriptTitle" fullWidth={true}>
                 <InputLabel>Title </InputLabel>
