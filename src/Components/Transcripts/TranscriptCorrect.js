@@ -8,9 +8,18 @@ import CustomBreadcrumb from '../lib/CustomBreadcrumb/index.js';
 import ApiWrapper from '../../ApiWrapper/index.js';
 import CustomAlert from '../lib/CustomAlert/index.js';
 import Skeleton from '@material-ui/lab/Skeleton';
+import MuiAlert from '@material-ui/lab/Alert';
+import Button from '@material-ui/core/Button';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 // const TranscriptEditor = React.lazy(() => import('slate-transcript-editor'));
 import TranscriptEditor from 'slate-transcript-editor';
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function TranscriptCorrect(props) {
   const [projectId, setProjectId] = useState(props.match.params.projectId);
@@ -55,26 +64,20 @@ function TranscriptCorrect(props) {
           // More discrete auto save notification
 
           setSavedNotification(
-            <small className={'text-success'}>
-              Transcript: <b>{transcriptTitle}</b> has been saved at <b>{new Date().toLocaleString()}</b>
-            </small>
+            <Alert
+              onClose={() => {
+                setSavedNotification(null);
+              }}
+              severity="success"
+            >
+              {`Saved transcript: ${transcriptTitle}`}
+            </Alert>
           );
         }
       })
       .catch((e) => {
         console.error('error saving transcript:: ', e);
-        setSavedNotification(
-          <CustomAlert
-            dismissable={true}
-            variant={'danger'}
-            heading={'Error saving transcript'}
-            message={
-              <p>
-                There was an error trying to save this transcript: <b>{transcriptTitle}</b>
-              </p>
-            }
-          />
-        );
+        setSavedNotification(`There was an error trying to save this transcript: ${transcriptTitle} `);
       });
   };
 
@@ -118,6 +121,20 @@ function TranscriptCorrect(props) {
         }
         fluid
       >
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={savedNotification}
+          autoHideDuration={6000}
+          onClose={() => {
+            setSavedNotification(null);
+          }}
+        >
+          {savedNotification}
+        </Snackbar>
+
         <br />
         <Row>
           <Col sm={12} md={12} ld={12} xl={12} style={{ marginBottom: '0' }}>
@@ -142,7 +159,7 @@ function TranscriptCorrect(props) {
             />
           </Col>
         </Row>
-        {savedNotification}
+        {/* {savedNotification} */}
         {transcriptJson !== null && (
           <Suspense
             fallback={
