@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import path from 'path';
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
@@ -15,8 +16,7 @@ import ApiWrapper from '../../ApiWrapper/index.js';
 import whichJsEnv from '../../Util/which-js-env';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
 import languages from './languages';
-
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import getMediaType from '../../Util/get-media-type';
 
 const LANGUAGE_US_ENGLISH_INDEX = 25;
 const LANGUAGE_CODE_US_ENGLISH = 'en-US';
@@ -114,6 +114,7 @@ class TranscriptForm extends Component {
     console.log('called transcoding');
     const { name } = files[0];
     console.log('name', name);
+
     await this.ffmpeg.load();
     this.ffmpeg.FS('writeFile', name, await fetchFile(files[0]));
 
@@ -145,9 +146,13 @@ class TranscriptForm extends Component {
     // TODO: max file size of 2gig video to use ffmpeg client side to convert to audio
     const files = Array.from(e.target.files);
     // TODO: logic if it's video transcoding, otherwise if it's audio just go ahead
-    // const file = files[0];
-    const file = await this.transcode(e);
+    let file = files[0];
     console.log('file', file, file.type, file.path, file.name);
+    const mediaType = getMediaType(file.name);
+    if (mediaType === 'video') {
+      file = await this.transcode(e);
+      console.log('file', file, file.type, file.path, file.name);
+    }
 
     // more on formData https://thoughtbot.com/blog/ridiculously-simple-ajax-uploads-with-formdata
     const formData = new FormData();
