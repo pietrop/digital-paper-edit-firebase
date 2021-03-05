@@ -1,3 +1,4 @@
+const functions = require('firebase-functions');
 // from https://github.com/pietrop/digital-paper-edit-electron/blob/master/src/ElectronWrapper/ffmpeg-remix/index.js
 const async = require('async');
 const ffmpeg = require('fluent-ffmpeg');
@@ -7,7 +8,7 @@ const os = require('os');
 const rimraf = require('rimraf');
 
 const ingest = (data, tmpDir, waveForm, waveFormMode, waveFormColor) => {
-  console.log('ingest', data, tmpDir, waveForm, waveFormMode, waveFormColor);
+  functions.logger.log('ingest', data, tmpDir, waveForm, waveFormMode, waveFormColor);
   return (input, callback) => {
     const ff = ffmpeg(input.source);
 
@@ -45,17 +46,17 @@ const ingest = (data, tmpDir, waveForm, waveFormMode, waveFormColor) => {
     }
     ff.output(input.path);
 
-    ff.on('start', commandLine => {
-      console.log(`Spawned: ${commandLine}`);
+    ff.on('start', (commandLine) => {
+      functions.logger.log(`Spawned: ${commandLine}`);
     });
 
     ff.on('error', (err, stdout, stderr) => {
-      console.log(err);
+      functions.logger.log(err);
       callback(err, null);
     });
 
     ff.on('end', () => {
-      console.log(`Created: ${input.path}`);
+      functions.logger.log(`Created: ${input.path}`);
       callback(null, input);
     });
 
@@ -78,20 +79,20 @@ const concat = (data, tmpDir, callback) => {
     ff.input(`concat:${input.join('|')}`);
     ff.output(data.output);
 
-    ff.on('start', commandLine => {
-      console.log(`Spawned: ${commandLine}`);
+    ff.on('start', (commandLine) => {
+      functions.logger.log(`Spawned: ${commandLine}`);
     });
 
     ff.on('error', (err, stdout, stderr) => {
-      console.log(err);
+      functions.logger.log(err);
       callback(err);
     });
 
     ff.on('end', () => {
-      console.log(`Created: ${data.output}`);
+      functions.logger.log(`Created: ${data.output}`);
       // Clean up and delete temp files .ts
       rimraf(`${tmpDir}/*.ts`, () => {
-        console.log('delete .ts files');
+        functions.logger.log('delete .ts files');
       });
       callback(null, data);
     });
@@ -100,8 +101,8 @@ const concat = (data, tmpDir, callback) => {
   };
 };
 
-module.exports = function(data, waveForm, waveFormMode, waveFormColor, callback) {
-  console.log('exports', data, waveForm, waveFormMode, waveFormColor);
+module.exports = function (data, waveForm, waveFormMode, waveFormColor, callback) {
+  functions.logger.log('exports', data, waveForm, waveFormMode, waveFormColor);
   const tmpDir = os.tmpdir();
   if (data.limit) {
     async.mapLimit(data.input, data.limit, ingest(data, tmpDir, waveForm, waveFormMode, waveFormColor), concat(data, tmpDir, callback));

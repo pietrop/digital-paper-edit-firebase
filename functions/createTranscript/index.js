@@ -1,3 +1,4 @@
+const functions = require('firebase-functions');
 const speech = require('@google-cloud/speech');
 const { CloudTasksClient } = require('@google-cloud/tasks');
 const gcpToDpe = require('gcp-to-dpe');
@@ -85,7 +86,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
   // if (metadataRes.duration && metadataRes.duration <= 60) {
   //   const [shortResponse] = await client.recognize(request);
   //   //  const transcription = response.results.map(result => result.alternatives[0].transcript).join('\n');
-  //   //  console.log('Transcription: ', transcription);
+  //   //   functions.logger.log('Transcription: ', transcription);
   //   const transcript = gcpToDpe(shortResponse);
   //   const { paragraphs, words } = transcript;
   //   return change.ref.set(
@@ -103,12 +104,22 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
   // initialApiResponse.name is the operation name/"id"
   // initialApiResponse.done is the status of the operation
   const [operation, initialApiResponse] = await client.longRunningRecognize(request);
-  console.log('initialApiResponse', initialApiResponse.name);
+  functions.logger.log('initialApiResponse', initialApiResponse.name);
 
   const sttOperationName = initialApiResponse.name;
   const sttOperationStatus = initialApiResponse.done;
 
-  // TODO: I don't think the first response will have just have the results as is?
+  // TODO: if initial response has an error here should do
+  // if(initialApiResponse.error){
+  //   // TODDO: save to db update status: 'error' +save erro object
+  //   // see firstore check stt function for actual code
+  // }
+
+  // TODO: Remember to refactor this to serialize the data same as firestoreCheckSTT
+  // OR remove it, so that it always just goes through that one function
+  // OR abstract common part into a helper function and use that
+  //
+  // TODO: But I don't think the first response will have just have the results as is?
   if (sttOperationStatus && initialApiResponse.response && initialApiResponse.response.results) {
     //  const [response] = await operation.promise();
     const transcript = gcpToDpe(initialApiResponse);
@@ -155,7 +166,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
     const queuePath = tasksClient.queuePath(project, location, queue);
 
     const url = `https://${location}-${project}.cloudfunctions.net/firestoreCheckSTT`;
-    console.log('url firestoreCheckSTT', url);
+    functions.logger.log('url firestoreCheckSTT', url);
     const docPath = change.ref.path;
 
     const payload = { sttOperationName, docPath };
@@ -195,7 +206,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
       parent: queuePath,
       task,
     });
-    console.log(`Created task ${response.name}`);
+    functions.logger.log(`Created task ${response.name}`);
     return null;
   }
   // }

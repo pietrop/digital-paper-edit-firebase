@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 // import downloadjs from 'downloadjs';
 import firebase, { db, analytics, storage } from '../Firebase.js';
+import { deserializeTranscript, serializeTranscript } from '@pietrop/serialize-stt-words';
 
 const DEFAULT_LABEL = {
   //TODO: is _id needed, or is it just needed for electron database?
@@ -354,27 +355,69 @@ class ApiWrapper {
               pathReference = storage.ref(tmpData.audioUrl);
             }
 
-            // Getting collections for words and transcripts
-            const wordsRef = db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId).collection('words').doc('words');
-
-            const wordRefSnapShot = await wordsRef.get();
-            const words = await wordRefSnapShot.data().words;
-
-            const paragraphsRef = db
+            // Getting collections for words and transcripts and serializing it back into a transcript
+            //  wordStartTimes, wordEndTimes, textList, paragraphStartTimes, paragraphEndTimes, speakersLit;
+            const wordStartTimesRef = db
               .collection('projects')
               .doc(projectId)
               .collection('transcripts')
               .doc(transcriptId)
-              .collection('paragraphs')
-              .doc('paragraphs');
+              .collection('words')
+              .doc('wordStartTimes');
+            const wordStartTimesRefSnaphot = await wordStartTimesRef.get();
+            const wordStartTimes = await wordStartTimesRefSnaphot.data().wordStartTimes;
 
-            const paragraphsRefSnapShot = await paragraphsRef.get();
-            const paragraphs = await paragraphsRefSnapShot.data().paragraphs;
+            const wordEndTimesRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('wordEndTimes');
+            const wordEndTimesRefSnaphot = await wordEndTimesRef.get();
+            const wordEndTimes = await wordEndTimesRefSnaphot.data().wordEndTimes;
 
-            const transcript = {
-              paragraphs,
-              words,
-            };
+            const textListRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('textList');
+            const textListRefSnaphot = await textListRef.get();
+            const textList = await textListRefSnaphot.data().textList;
+
+            const paragraphStartTimesRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('paragraphStartTimes');
+            const paragraphStartTimesRefSnaphot = await paragraphStartTimesRef.get();
+            const paragraphStartTimes = await paragraphStartTimesRefSnaphot.data().paragraphStartTimes;
+
+            const paragraphEndTimesRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('paragraphEndTimes');
+            const paragraphEndTimesRefSnaphot = await paragraphEndTimesRef.get();
+            const paragraphEndTimes = await paragraphEndTimesRefSnaphot.data().paragraphEndTimes;
+
+            const speakersLitRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('speakersLit');
+            const speakersLitRefSnaphot = await speakersLitRef.get();
+            const speakersLit = await speakersLitRefSnaphot.data().speakersLit;
+
+            const transcript = deserializeTranscript({ wordStartTimes, wordEndTimes, textList, paragraphStartTimes, paragraphEndTimes, speakersLit });
             // console.log('transcript', transcript);
             // TODO: or could get it from the audio that is sent to STT
             // to ensure HTML5 compatibility, if non HTML5 audio/video is being uploaded as source file
@@ -427,18 +470,22 @@ class ApiWrapper {
     const { display, status } = data;
     delete data.display;
     delete data.status;
-    console.log('updateTranscript', projectId, transcriptId, queryParamsOptions, data);
+    // console.log('updateTranscript', projectId, transcriptId, queryParamsOptions, data);
     // const res = await corsFetch(this.transcriptsIdUrl(projectId, transcriptId, queryParamsOptions), 'PUT', data);
     // if only updating title or descrition
 
     // return res;
-    console.log('queryParamsOptions, data', queryParamsOptions, data);
-    return new Promise((resolve, reject) => {
+    // console.log('queryParamsOptions, data', queryParamsOptions, data);
+    return new Promise(async (resolve, reject) => {
       const docRef = db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId);
 
       if (data.words && data.paragraphs) {
         const tmpData = data;
         const { words, paragraphs } = data;
+        const { wordStartTimes, wordEndTimes, textList, paragraphStartTimes, paragraphEndTimes, speakersLit } = serializeTranscript({
+          words,
+          paragraphs,
+        });
         console.log('words', words);
         console.log('paragraphs', paragraphs);
         delete tmpData.words;
@@ -446,36 +493,96 @@ class ApiWrapper {
         const updated = firebase.firestore.FieldValue.serverTimestamp();
         // const { paragraphs, words } = data;
 
-        const wordsRef = db
-          .collection('projects')
-          .doc(projectId)
-          .collection('transcripts')
-          .doc(transcriptId)
-          .collection('words')
-          .doc('words')
-          .set({ words }, { merge: true });
+        await db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId).collection('words').doc('wordStartTimes').set(
+          {
+            wordStartTimes,
+          },
+          {
+            merge: true,
+          }
+        );
 
-        const paragraphsRef = db
-          .collection('projects')
-          .doc(projectId)
-          .collection('transcripts')
-          .doc(transcriptId)
-          .collection('paragraphs')
-          .doc('paragraphs')
-          .set({ paragraphs }, { merge: true });
+        await db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId).collection('words').doc('wordEndTimes').set(
+          {
+            wordEndTimes,
+          },
+          {
+            merge: true,
+          }
+        );
+
+        await db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId).collection('words').doc('textList').set(
+          {
+            textList,
+          },
+          {
+            merge: true,
+          }
+        );
+
+        await db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId).collection('words').doc('paragraphStartTimes').set(
+          {
+            paragraphStartTimes,
+          },
+          {
+            merge: true,
+          }
+        );
+
+        await db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId).collection('words').doc('paragraphEndTimes').set(
+          {
+            paragraphEndTimes,
+          },
+          {
+            merge: true,
+          }
+        );
+
+        await db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId).collection('words').doc('speakersLit').set(
+          {
+            speakersLit,
+          },
+          {
+            merge: true,
+          }
+        );
+
+        // /////
+
+        // const wordsRef = db
+        //   .collection('projects')
+        //   .doc(projectId)
+        //   .collection('transcripts')
+        //   .doc(transcriptId)
+        //     .collection('words')
+        //     .doc('words')
+        //     .set({ words }, { merge: true });
+
+        //   const paragraphsRef = db
+        //     .collection('projects')
+        //     .doc(projectId)
+        //     .collection('transcripts')
+        //     .doc(transcriptId)
+        //     .collection('paragraphs')
+        //     .doc('paragraphs')
+        //     .set({ paragraphs }, { merge: true });
+        // }
+
+        //
+
+        docRef
+          .set(data, { merge: true })
+          .then((doc) => {
+            // TODO: inconsistencies in the interface, some return ok boolean attribute, others status 'ok' string
+            data.status = status;
+            data.display = display;
+            resolve({ ok: true, status: 'ok', transcript: data });
+          })
+          .catch((error) => {
+            console.log('Error getting document:', error);
+            reject('No such document updateTranscript!');
+          });
       }
-      docRef
-        .set(data, { merge: true })
-        .then((doc) => {
-          // TODO: inconsistencies in the interface, some return ok boolean attribute, others status 'ok' string
-          data.status = status;
-          data.display = display;
-          resolve({ ok: true, status: 'ok', transcript: data });
-        })
-        .catch((error) => {
-          console.log('Error getting document:', error);
-          reject('No such document updateTranscript!');
-        });
     });
   }
 

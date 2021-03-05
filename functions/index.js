@@ -33,6 +33,8 @@ exports.createTranscript = functions
 // function to retrieve STT data from GCP STT operation
 // does this    ?
 exports.firestoreCheckSTT = functions.runWith(MAX_RUNTIME_OPTS).https.onRequest(async (req, res) => {
+  // TODO: probl dont' need to pass functions to stt check could just
+  // do const functions = require('firebase-functions'); in module?
   return await firestoreCheckSTTHandler.createHandler(req, res, admin, functions);
 });
 
@@ -49,7 +51,7 @@ exports.onNewTranscriptConvertToMp4Preview = functions
     const bucket = admin.storage().bucket();
     const filePath = downloadURLLink;
     const fileName = path.basename(storageRef); // clipName
-    console.log('fileName', fileName);
+    functions.logger.log('fileName', fileName);
     const targetTempFileName = fileName.replace(/\.[^/.]+$/, '') + `${VIDEO_PRREVIEW_PREFIX_NAME}.${AUDIO_EXTENSION_VIDEO}`;
     const targetTempFilePath = path.join(os.tmpdir(), targetTempFileName);
     // save exports into dedicated project folder? eg  'exports',
@@ -60,7 +62,7 @@ exports.onNewTranscriptConvertToMp4Preview = functions
       outputFullPathName: targetTempFilePath,
     });
 
-    console.log('newFile', newFile);
+    functions.logger.log('newFile', newFile);
 
     await bucket.upload(targetTempFilePath, {
       destination: targetStorageFilePath,
@@ -90,22 +92,17 @@ exports.onDeleteTranscriptCleanUp = functions
     const projectId = context.params.projectId;
     const transcriptId = context.params.transcriptId;
     // delete annotations for project being deleted
-    const annotationsRef = db
-      .collection('projects')
-      .doc(projectId)
-      .collection('transcripts')
-      .doc(transcriptId)
-      .collection('annotations');
+    const annotationsRef = db.collection('projects').doc(projectId).collection('transcripts').doc(transcriptId).collection('annotations');
 
     await annotationsRef
       .get()
-      .then(querySnapshot => {
-        return querySnapshot.forEach(doc => {
+      .then((querySnapshot) => {
+        return querySnapshot.forEach((doc) => {
           doc.ref.delete();
         });
       })
-      .catch(error => {
-        console.log('Error getting documents: ', error);
+      .catch((error) => {
+        functions.logger.log('Error getting documents: ', error);
         // TODO: does it need to reject?
         reject(error);
       });
@@ -133,61 +130,52 @@ exports.onDeleteProjectCleanUp = functions
   .onDelete(async (snap, context) => {
     const projectId = context.params.projectId;
     // Delete labels
-    const labelsRef = db
-      .collection('projects')
-      .doc(projectId)
-      .collection('labels');
+    const labelsRef = db.collection('projects').doc(projectId).collection('labels');
 
     await labelsRef
       .get()
-      .then(querySnapshot => {
-        return querySnapshot.forEach(doc => {
+      .then((querySnapshot) => {
+        return querySnapshot.forEach((doc) => {
           // Add the individual transcript firebase id to the data
           doc.ref.delete();
         });
         // TODO: does it need to resolve?
       })
-      .catch(error => {
-        console.log('Error getting documents: ', error);
+      .catch((error) => {
+        functions.logger.log('Error getting documents: ', error);
         // TODO: does it need to reject?
       });
 
     // Delete paper edits
-    const paperEditsRef = db
-      .collection('projects')
-      .doc(projectId)
-      .collection('paperedits');
+    const paperEditsRef = db.collection('projects').doc(projectId).collection('paperedits');
 
     await paperEditsRef
       .get()
-      .then(querySnapshot => {
-        return querySnapshot.forEach(doc => {
+      .then((querySnapshot) => {
+        return querySnapshot.forEach((doc) => {
           // Add the individual transcript firebase id to the data
           doc.ref.delete();
         });
         // TODO: does it need to resolve?
       })
-      .catch(error => {
-        console.log('Error getting documents: ', error);
+      .catch((error) => {
+        functions.logger.log('Error getting documents: ', error);
         // TODO: does it need to reject?
       });
 
     // Delete transcripts
-    const transcriptRef = db
-      .collection('projects')
-      .doc(projectId)
-      .collection('transcripts');
+    const transcriptRef = db.collection('projects').doc(projectId).collection('transcripts');
 
     await transcriptRef
       .get()
-      .then(querySnapshot => {
-        return querySnapshot.forEach(doc => {
+      .then((querySnapshot) => {
+        return querySnapshot.forEach((doc) => {
           doc.ref.delete();
         });
         // TODO: does it need to resolve?
       })
-      .catch(error => {
-        console.log('Error getting documents: ', error);
+      .catch((error) => {
+        functions.logger.log('Error getting documents: ', error);
         // TODO: does it need to reject?
         reject(error);
       });
@@ -196,26 +184,26 @@ exports.onDeleteProjectCleanUp = functions
 // https://firebase.google.com/docs/functions/callable#web
 // https://github.com/pietrop/digital-paper-edit-electron/blob/master/src/ElectronWrapper/ffmpeg-remix/index.js
 exports.ffmpegRemix = functions.runWith(MAX_RUNTIME_OPTS).https.onCall(async (data, context) => {
-  console.log('data', JSON.stringify(data));
+  functions.logger.log('data', JSON.stringify(data));
   const bucket = admin.storage().bucket();
   const fileName = data.output;
   const projectId = data.projectId;
 
   const localFileNamePath = path.join(os.tmpdir(), data.output);
   data.output = localFileNamePath;
-  console.log('data.output', data.output);
+  functions.logger.log('data.output', data.output);
   const { waveForm, waveFormMode, waveFormColor } = data;
   return new Promise((resolve, reject) =>
     remix(data, waveForm, waveFormMode, waveFormColor, async (err, result) => {
       if (err) {
-        console.log('err', err);
+        functions.logger.log('err', err);
         reject(err);
       }
-      console.log('result', JSON.stringify(result));
-      console.log('result.path', result.path);
-      console.log('fileName', fileName);
-      console.log('projectId', projectId);
-      console.log('remix data.output,', data.output);
+      functions.logger.log('result', JSON.stringify(result));
+      functions.logger.log('result.path', result.path);
+      functions.logger.log('fileName', fileName);
+      functions.logger.log('projectId', projectId);
+      functions.logger.log('remix data.output,', data.output);
       // TODO: get projectId, to set the folder in destination
       // when adding to the bucket
       const destination = `${projectId}/exports/${fileName}`;
@@ -239,6 +227,6 @@ exports.ffmpegRemix = functions.runWith(MAX_RUNTIME_OPTS).https.onCall(async (da
 });
 
 // exports.ffmpegRemixAudio = functions.https.onCall((data, context) => {
-//   console.log('data', data);
+//    functions.logger.log('data', data);
 //   // ...
 // });
