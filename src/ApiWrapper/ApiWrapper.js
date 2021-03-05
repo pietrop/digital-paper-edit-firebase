@@ -465,6 +465,10 @@ class ApiWrapper {
   }
 
   async updateTranscript(projectId, transcriptId, queryParamsOptions, data) {
+    console.log('projectId', projectId);
+    console.log('transcriptId', transcriptId);
+    console.log('queryParamsOptions', queryParamsOptions);
+    console.log('data', data);
     // TODO: there mgiht be a better way to do this.
     // this being avoiding sending client side info to the
     const { display, status } = data;
@@ -489,7 +493,7 @@ class ApiWrapper {
         console.log('words', words);
         console.log('paragraphs', paragraphs);
         delete tmpData.words;
-        delete tmpData.c;
+        delete tmpData.paragraphs;
         const updated = firebase.firestore.FieldValue.serverTimestamp();
         // const { paragraphs, words } = data;
 
@@ -570,6 +574,20 @@ class ApiWrapper {
 
         //
 
+        docRef
+          .set(data, { merge: true })
+          .then((doc) => {
+            // TODO: inconsistencies in the interface, some return ok boolean attribute, others status 'ok' string
+            data.status = status;
+            data.display = display;
+            resolve({ ok: true, status: 'ok', transcript: data });
+          })
+          .catch((error) => {
+            console.log('Error getting document:', error);
+            reject('No such document updateTranscript!');
+          });
+        // TODO: if editing transcript, title, description in transcript list view
+      } else {
         docRef
           .set(data, { merge: true })
           .then((doc) => {
