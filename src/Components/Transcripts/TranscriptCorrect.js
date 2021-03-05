@@ -77,7 +77,16 @@ function TranscriptCorrect(props) {
       })
       .catch((e) => {
         console.error('error saving transcript:: ', e);
-        setSavedNotification(`There was an error trying to save this transcript: ${transcriptTitle} `);
+        setSavedNotification(
+          <Alert
+            onClose={() => {
+              setSavedNotification(null);
+            }}
+            severity="error"
+          >
+            {`There was an error trying to save this transcript: ${transcriptTitle} `}
+          </Alert>
+        );
       });
   };
 
