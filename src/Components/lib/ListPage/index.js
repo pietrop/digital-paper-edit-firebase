@@ -8,7 +8,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   // root: {
   //   backgroundColor: theme.palette.background.paper,
   //   width: 500,
@@ -34,8 +34,8 @@ function Page(props) {
   const [showSearchInput, setShowSearchInput] = useState(false);
   const classes = useStyles();
 
-  const handleSearch = searchText => {
-    const results = props.items.filter(project => {
+  const handleSearch = (searchText) => {
+    const results = props.items.filter((project) => {
       if (includesText(project.title, searchText) || includesText(project.description, searchText)) {
         project.display = true;
 
