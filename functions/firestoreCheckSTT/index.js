@@ -42,7 +42,14 @@ exports.createHandler = async (req, res, admin, functions) => {
           // resp.response.result
           //  functions.logger.log('transcript');
           const transcript = gcpToDpe(resp);
-          const { wordStartTimes, wordEndTimes, textList, paragraphStartTimes, paragraphEndTimes, speakersLit } = serializeTranscript(transcript);
+          const {
+            wordStartTimes,
+            wordEndTimes,
+            textList,
+            paragraphStartTimes,
+            paragraphEndTimes,
+            speakersLit,
+          } = serializeTranscript(transcript);
 
           //  functions.logger.log('transcript', transcript);
           functions.logger.log('transcript gcpToDpe');
@@ -52,59 +59,77 @@ exports.createHandler = async (req, res, admin, functions) => {
 
           const transcriptRef = admin.firestore().doc(docPath);
 
-          await transcriptRef.collection('words').doc('wordStartTimes').set(
-            {
-              wordStartTimes,
-            },
-            {
-              merge: true,
-            }
-          );
+          await transcriptRef
+            .collection('words')
+            .doc('wordStartTimes')
+            .set(
+              {
+                wordStartTimes: JSON.stringify(wordStartTimes),
+              },
+              {
+                merge: true,
+              }
+            );
 
-          await transcriptRef.collection('words').doc('wordEndTimes').set(
-            {
-              wordEndTimes,
-            },
-            {
-              merge: true,
-            }
-          );
+          await transcriptRef
+            .collection('words')
+            .doc('wordEndTimes')
+            .set(
+              {
+                wordEndTimes: JSON.stringify(wordEndTimes),
+              },
+              {
+                merge: true,
+              }
+            );
 
-          await transcriptRef.collection('words').doc('textList').set(
-            {
-              textList,
-            },
-            {
-              merge: true,
-            }
-          );
+          await transcriptRef
+            .collection('words')
+            .doc('textList')
+            .set(
+              {
+                textList: JSON.stringify(textList),
+              },
+              {
+                merge: true,
+              }
+            );
 
-          await transcriptRef.collection('words').doc('paragraphStartTimes').set(
-            {
-              paragraphStartTimes,
-            },
-            {
-              merge: true,
-            }
-          );
+          await transcriptRef
+            .collection('words')
+            .doc('paragraphStartTimes')
+            .set(
+              {
+                paragraphStartTimes: JSON.stringify(paragraphStartTimes),
+              },
+              {
+                merge: true,
+              }
+            );
 
-          await transcriptRef.collection('words').doc('paragraphEndTimes').set(
-            {
-              paragraphEndTimes,
-            },
-            {
-              merge: true,
-            }
-          );
+          await transcriptRef
+            .collection('words')
+            .doc('paragraphEndTimes')
+            .set(
+              {
+                paragraphEndTimes: JSON.stringify(paragraphEndTimes),
+              },
+              {
+                merge: true,
+              }
+            );
 
-          await transcriptRef.collection('words').doc('speakersLit').set(
-            {
-              speakersLit,
-            },
-            {
-              merge: true,
-            }
-          );
+          await transcriptRef
+            .collection('words')
+            .doc('speakersLit')
+            .set(
+              {
+                speakersLit: JSON.stringify(speakersLit),
+              },
+              {
+                merge: true,
+              }
+            );
 
           // await transcriptRef.collection('words').doc('words').set(
           //   {
@@ -139,6 +164,20 @@ exports.createHandler = async (req, res, admin, functions) => {
           functions.logger.log('admin write');
           return res.sendStatus(200);
         } else {
+          // // TODO: try this in cloud function to see if can get progress through to client
+          // if (resp && resp.metadata && resp.metadata.progressPercent) {
+          //   await admin
+          //     .firestore()
+          //     .doc(docPath)
+          //     .set(
+          //       {
+          //         sttProgressPercent: resp.metadata.progressPercent,
+          //       },
+          //       {
+          //         merge: true,
+          //       }
+          //     );
+          // }
           functions.logger.log('else, not ready - trying task again!');
           //TODO: run cloud task
           const project = admin.instanceId().app.options.projectId;
@@ -153,7 +192,10 @@ exports.createHandler = async (req, res, admin, functions) => {
           // time of expiration expressed in epoch seconds
           const now = new Date();
           const timeFromNowWhenToCheckAgainInMinutes = 5;
-          const timeFromNowWhenToCheckAgainAsDate = addMinutes(now, timeFromNowWhenToCheckAgainInMinutes);
+          const timeFromNowWhenToCheckAgainAsDate = addMinutes(
+            now,
+            timeFromNowWhenToCheckAgainInMinutes
+          );
           // Epoch, also known as Unix timestamps, is the number of seconds (not milliseconds!) that have elapsed since January 1, 1970 at 00:00:00 GMT
           const secondsSinceEpoch = getSecondsSinceEpoch(timeFromNowWhenToCheckAgainAsDate);
 
