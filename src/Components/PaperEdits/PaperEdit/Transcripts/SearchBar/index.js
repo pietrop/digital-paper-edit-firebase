@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import FormControl from 'react-bootstrap/FormControl';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import Input from '@material-ui/core/Input';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
+import FilterListOutlinedIcon from '@material-ui/icons/FilterListOutlined';
+import LocalOfferOutlinedIcon from '@material-ui/icons/LocalOfferOutlined';
+import PersonOutlinedIcon from '@material-ui/icons/PersonOutlined';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from 'react-select';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter, faTag, faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
 import colourStyles from '../LabelsList/select-color-styles.js';
 import speakersColorStyles from './select-speakers-color-styles.js';
 
@@ -22,19 +25,20 @@ class SearchBar extends Component {
     };
   }
 
-  handleSpeakersSearchChange = selectedOptionSpeakerSearch => {
+  handleSpeakersSearchChange = (selectedOptionSpeakerSearch) => {
     this.props.handleSpeakersSearchChange(selectedOptionSpeakerSearch);
     this.setState({ selectedOptionSpeakerSearch });
   };
 
-  handleLabelsSearchChange = selectedOptionLabelSearch => {
+  handleLabelsSearchChange = (selectedOptionLabelSearch) => {
+    console.log('handleLabelsSearchChange', selectedOptionLabelSearch);
     this.props.handleLabelsSearchChange(selectedOptionLabelSearch);
     this.setState({ selectedOptionLabelSearch });
   };
 
   handleShowParagraphsMatchingSearch = () => {
     this.setState(
-      state => {
+      (state) => {
         this.props.handleShowParagraphsMatchingSearch(!state.showParagraphsMatchingSearch);
         return { showParagraphsMatchingSearch: !state.showParagraphsMatchingSearch };
       },
@@ -43,7 +47,7 @@ class SearchBar extends Component {
   };
 
   handleFilterResults = () => {
-    this.setState(state => {
+    this.setState((state) => {
       if (!state.isShowingFilterOptions) {
         this.props.handleShowParagraphsMatchingSearch(true);
         return {
@@ -72,73 +76,41 @@ class SearchBar extends Component {
   render() {
     return (
       <>
-        <InputGroup className="mb-3">
-          <InputGroup.Prepend>
-            <InputGroup.Text>
-              <FontAwesomeIcon icon={faSearch} />
-            </InputGroup.Text>
-          </InputGroup.Prepend>
-          {/* Search */}
-          <FormControl
-            //  TODO: pass labels, speakers, and paragraph pref
-            onChange={e => {
-              this.props.handleSearch(e, {
-                showParagraphsMatchingSearch: this.state.showParagraphsMatchingSearch,
-                showLabelsSearchPreferences: this.state.showLabelsSearchPreferences,
-                showSpeakersSearchPreferences: this.state.showSpeakersSearchPreferences,
-              });
-            }}
-            placeholder="Search text..."
-            aria-label="search"
-            aria-describedby="search"
-          />
-          <InputGroup.Append>
-            <InputGroup.Text style={{ cursor: 'pointer' }} onClick={this.handleFilterResults}>
-              <FontAwesomeIcon icon={faFilter} title="Filter results" />
-            </InputGroup.Text>
+        <Grid container spacing={1}>
+          <Grid item xs={1} sm={1} md={1} lg={1} lg={1}>
+            <SearchOutlinedIcon />
+          </Grid>
+          <Grid item xs={9} sm={9} md={9} lg={9} lg={9}>
+            <Input
+              fullWidth={true}
+              //  TODO: pass labels, speakers, and paragraph pref
+              onChange={(e) => {
+                this.props.handleSearch(e, {
+                  showParagraphsMatchingSearch: this.state.showParagraphsMatchingSearch,
+                  showLabelsSearchPreferences: this.state.showLabelsSearchPreferences,
+                  showSpeakersSearchPreferences: this.state.showSpeakersSearchPreferences,
+                });
+              }}
+              placeholder="Search text..."
+              aria-label="search"
+              aria-describedby="search"
+            />
+          </Grid>
 
-            {/* </Button> */}
-          </InputGroup.Append>
-        </InputGroup>
-
-        {this.state.showLabelsSearchPreferences ? (
+          <Grid item xs={1} sm={1} md={1} lg={1} lg={1}>
+            <Button color="primary" onClick={this.handleFilterResults}>
+              <FilterListOutlinedIcon />
+            </Button>
+          </Grid>
+        </Grid>
+        <br />
+        {this.state.showSpeakersSearchPreferences && (
           <>
-            <Row className="mb-3">
-              <Col xs={1} sm={1} md={1} ld={1} xl={1}>
-                <InputGroup.Prepend>
-                  <InputGroup.Text>
-                    <FontAwesomeIcon icon={faTag} />
-                  </InputGroup.Text>
-                </InputGroup.Prepend>
-              </Col>
-              <Col xs={10} sm={11} md={11} ld={11} xl={11}>
-                <Select
-                  value={this.state.selectedOptionLabelSearch}
-                  onChange={this.handleLabelsSearchChange}
-                  isMulti
-                  isSearchable
-                  options={this.props.labelsOptions}
-                  styles={colourStyles}
-                  placeholder={'Filter by labels...'}
-                />
-              </Col>
-            </Row>
-          </>
-        ) : (
-          ''
-        )}
-
-        {this.state.showSpeakersSearchPreferences ? (
-          <>
-            <Row className="mb-3">
-              <Col xs={1} sm={1} md={1} ld={1} xl={1}>
-                <InputGroup.Prepend>
-                  <InputGroup.Text>
-                    <FontAwesomeIcon icon={faUser} />
-                  </InputGroup.Text>
-                </InputGroup.Prepend>
-              </Col>
-              <Col xs={10} sm={11} md={11} ld={11} xl={11}>
+            <Grid container>
+              <Grid item xs={1} sm={1} md={1} ld={1} xl={1}>
+                <PersonOutlinedIcon />
+              </Grid>
+              <Grid item xs={10} sm={11} md={11} ld={11} xl={11}>
                 <Select
                   value={this.state.selectedOptionSpeakerSearch}
                   onChange={this.handleSpeakersSearchChange}
@@ -148,30 +120,48 @@ class SearchBar extends Component {
                   styles={speakersColorStyles}
                   placeholder={'Filter by speakers...'}
                 />
-              </Col>
-            </Row>
+              </Grid>
+            </Grid>
+            <br />
           </>
-        ) : (
-          ''
         )}
 
-        {this.state.showTextSearchPreferences ? (
+        {this.state.showLabelsSearchPreferences && (
           <>
-            <Form.Check
-              type="checkbox"
-              checked={this.state.showParagraphsMatchingSearch}
-              onChange={this.handleShowParagraphsMatchingSearch}
-              label={
-                <>
-                  <Form.Text className="text-muted" title="Show only matching paragraphs" onClick={this.handleShowParagraphsMatchingSearch}>
-                    Show only matching paragraphs
-                  </Form.Text>
-                </>
+            <Grid container spacing={1}>
+              <Grid item xs={1} sm={1} md={1} ld={1} xl={1}>
+                <LocalOfferOutlinedIcon />
+              </Grid>
+              <Grid item xs={10} sm={11} md={11} ld={11} xl={11}>
+                <Select
+                  value={this.state.selectedOptionLabelSearch}
+                  onChange={this.handleLabelsSearchChange}
+                  isMulti
+                  isSearchable
+                  options={this.props.labelsOptions}
+                  styles={colourStyles}
+                  placeholder={'Filter by labels...'}
+                />
+              </Grid>
+            </Grid>
+            <br />
+          </>
+        )}
+
+        {this.state.showTextSearchPreferences && (
+          <>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  type="checkbox"
+                  color="primary"
+                  checked={this.state.showParagraphsMatchingSearch}
+                  onChange={this.handleShowParagraphsMatchingSearch}
+                />
               }
+              label={<FormHelperText>Show only matching paragraphs</FormHelperText>}
             />
           </>
-        ) : (
-          ''
         )}
       </>
     );

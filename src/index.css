@@ -1,3 +1,16 @@
+/* TODO: Temporary, need to scope this to the component in a sensible way */
+* {
+  font-family: Roboto, sans-serif;
+}
+
+body {
+  margin: 0px;
+  padding: 0;
+  /* -webkit-font-smoothing: antialiased; */
+  /* -moz-osx-font-smoothing: grayscale; */
+}
+
+/* 
 body {
   margin: 0;
   padding: 0;
@@ -6,6 +19,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
@@ -34,6 +48,8 @@ code {
   background-color: #e9ecef !important;
   border-color: #ced4da !important;
 }
+ */
+
 /* .breadcrumb {
   margin-bottom: 1rem!important;
   background-color: transparent!important;

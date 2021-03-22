@@ -1,43 +1,29 @@
-import React, { Component } from 'react';
-import Breadcrumb from 'react-bootstrap/Breadcrumb';
+import React from 'react';
+import Typography from '@material-ui/core/Typography';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 
-class CustomBreadcrumb extends Component {
-  render() {
-    const breadcrumbs = this.props.items.map((item, index) => {
-      if (item.link) {
-        return (
-          <Breadcrumb.Item key={index} href={`#${item.link}`}>
-            {' '}
-            {item.name}
-          </Breadcrumb.Item>
-        );
-      } else {
-        return (
-          <Breadcrumb.Item key={index} active>
-            {item.name}
-          </Breadcrumb.Item>
-        );
-      }
-    });
+import CustomLink from '../CustomLink';
 
-    return (
-      <>
-        <style scoped>
-          {`
-        .breadcrumb{ 
-          background-color: ${this.props.backgroundColor};
-          ${this.props.backgroundColor ? ' margin: 0px' : ''} 
-          }
-        `}
-        </style>
-        <div
-        // className="d-none d-sm-block"
-        >
-          <Breadcrumb>{breadcrumbs}</Breadcrumb>
+function CustomBreadcrumb(props) {
+  const breadcrumbs = props.items.map((item, index) => {
+    if (item.link) {
+      return (
+        <CustomLink to={item.link} key={index}>
+          {item.name}
+        </CustomLink>
+      );
+    } else {
+      return (
+        <div key={index} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Typography key={index} color="textPrimary" noWrap>
+            {item.name}
+          </Typography>
         </div>
-      </>
-    );
-  }
+      );
+    }
+  });
+
+  return <Breadcrumbs aria-label="breadcrumb">{breadcrumbs}</Breadcrumbs>;
 }
 
 export default CustomBreadcrumb;

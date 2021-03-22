@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
+import Typography from '@material-ui/core/Typography';
 
 class TitleHeading extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-
-    };
+    this.state = {};
   }
 
   render() {
     return (
-      <h4>{this.props.title}</h4>
+      <Typography variant="h6" gutterBottom color={'textSecondary'}>
+        {this.props.title}
+      </Typography>
     );
   }
 }

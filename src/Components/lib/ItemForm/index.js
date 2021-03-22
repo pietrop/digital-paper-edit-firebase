@@ -2,9 +2,13 @@
 // https://reactjs.org/docs/forms.html
 
 import React, { Component } from 'react';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import Button from '@material-ui/core/Button';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Input from '@material-ui/core/Input';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Grid from '@material-ui/core/Grid';
+//https://material-ui.com/api/form-control/
 
 class ItemForm extends Component {
   constructor(props) {
@@ -15,12 +19,13 @@ class ItemForm extends Component {
       title: this.props.title,
       description: this.props.description,
       validated: false,
-      id: this.props.id
+      id: this.props.id,
     };
   }
 
   handleSubmit(event) {
     const form = event.currentTarget;
+    console.log('form.checkValidity()', form.checkValidity());
     if (!form.checkValidity()) {
       event.preventDefault();
       event.stopPropagation();
@@ -33,7 +38,7 @@ class ItemForm extends Component {
       const tmpItem = {
         title: this.state.title,
         description: this.state.description,
-        id: this.state.id
+        id: this.state.id,
       };
       this.props.handleSaveForm(tmpItem);
     }
@@ -41,64 +46,59 @@ class ItemForm extends Component {
     //this.setState({ redirect: true, newProjectId: response.projectId });
   }
 
-  handleTitleChange = event => {
+  handleTitleChange = (event) => {
     this.setState({ title: event.target.value });
   };
 
-  handleDescriptionChange = event => {
+  handleDescriptionChange = (event) => {
     this.setState({ description: event.target.value });
   };
 
   render() {
     return (
-
-      <Form
-        noValidate
-        validated={ this.state.validated }
-        onSubmit={ e => this.handleSubmit(e) }
-      >
-        <Form.Group controlId="formBasicEmail">
-          <Form.Label>Title </Form.Label>
-          <Form.Control
-            required
-            type="text"
-            placeholder="Enter a project title"
-            value={ this.state.title }
-            onChange={ this.handleTitleChange }
-          />
-          <Form.Text className="text-muted">
-              Chose a title
-          </Form.Text>
-          <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-          <Form.Control.Feedback type="invalid">
-              Please chose a title
-          </Form.Control.Feedback>
-        </Form.Group>
-
-        <Form.Group controlId="formBasicEmail">
-          <Form.Label>Description </Form.Label>
-          <Form.Control
-            // required
-            // as="textarea" rows="3"
-            type="text"
-            placeholder="Enter a project description"
-            value={ this.state.description }
-            onChange={ this.handleDescriptionChange }
-          />
-          <Form.Text className="text-muted">
-              Chose an optional description
-          </Form.Text>
-          <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-          <Form.Control.Feedback type="invalid">
-              Please chose a description
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Modal.Footer>
-          <Button variant="primary" type="submit">
-            Save
-          </Button>
-        </Modal.Footer>
-      </Form>
+      <>
+        <div style={{ margin: '1em' }}>
+          <form validated={this.state.validated} onSubmit={(e) => this.handleSubmit(e)}>
+            <Grid container direction="column" justify="center" alignItems="stretch">
+              <Grid item xs={12} sm={12} md={12} lg={12}>
+                <FormControl fullWidth={true}>
+                  <InputLabel htmlFor="my-input">Title</InputLabel>
+                  <Input
+                    fullWidth={true}
+                    id="my-input"
+                    aria-describedby="my-helper-text"
+                    type="text"
+                    required
+                    placeholder="Enter a project title"
+                    value={this.state.title}
+                    onChange={this.handleTitleChange}
+                  />
+                  <FormHelperText id="my-helper-text">Chose a title</FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item item xs={12} sm={12} md={12} lg={12}>
+                <FormControl fullWidth={true}>
+                  <InputLabel htmlFor="my-input">Description</InputLabel>
+                  <Input
+                    type="text"
+                    placeholder="Enter a project description"
+                    value={this.state.description}
+                    onChange={this.handleDescriptionChange}
+                    fullWidth="true"
+                  />
+                  <FormHelperText id="my-helper-text">Chose an optional description</FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item item xs={12} sm={12} md={12} lg={12}>
+                <br />
+                <Button variant="contained" color="primary" type="submit">
+                  Save
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
+      </>
     );
   }
 }

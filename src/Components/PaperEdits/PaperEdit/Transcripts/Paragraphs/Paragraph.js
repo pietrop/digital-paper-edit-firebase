@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Grid from '@material-ui/core/Grid';
 import { shortTimecode } from 'slate-transcript-editor';
 import styles from './index.module.css';
 
@@ -11,7 +10,6 @@ import styles from './index.module.css';
  */
 
 class Paragraph extends Component {
-
   render() {
     const { paragraphDisplayPreference } = this.props;
     // const inContextSearch = paragraphDisplayPreference;
@@ -24,8 +22,7 @@ class Paragraph extends Component {
     let paragraphStyle = {};
     if (this.props.showParagraphsMatchingSearch) {
       paragraphStyle = this.props.paragraphDisplayPreference;
-    }
-    else {
+    } else {
       if (!paragraphDisplayPreference.display) {
         delete paragraphDisplayPreference.display;
         // paragraphStyle.borderColor = 'orange';
@@ -37,21 +34,24 @@ class Paragraph extends Component {
     }
 
     return (
-      <Row
-        style={ { ...paragraphStyle } }
-        className="paragraph"
-        data-paragraph-text={ this.props.paragraphTextWithoutPunctuation }
-      >
-        <Col xs={ 12 } sm={ 12 } md={ 3 } lg={ 3 } xl={ 2 }
-          style={ { cursor: 'pointer', width: '100%' } }
-          className={ 'text-truncate' }
-          title={ `${ this.props.speakerName.toUpperCase() } -  ${ shortTimecode(this.props.paragraph[0].start) } | Click on a speaker to jump to the corresponding time in the media.` }>
-          <span
-            className={ [ styles.speaker, styles.unselectable, 'timecode' ].join(' ') }
-            data-start={ this.props.paragraph[0].start }
-            tabIndex="0"
-          >{this.props.speakerName}</span>
-        </Col>
+      <Grid container style={{ ...paragraphStyle }} className="paragraph" data-paragraph-text={this.props.paragraphTextWithoutPunctuation}>
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={3}
+          lg={3}
+          xl={2}
+          style={{ cursor: 'pointer', width: '100%' }}
+          className={'text-truncate'}
+          title={`${this.props.speakerName.toUpperCase()} -  ${shortTimecode(
+            this.props.paragraph[0].start
+          )} | Click on a speaker to jump to the corresponding time in the media.`}
+        >
+          <span className={[styles.speaker, styles.unselectable, 'timecode'].join(' ')} data-start={this.props.paragraph[0].start} tabIndex="0">
+            {this.props.speakerName}
+          </span>
+        </Grid>
         {/* <Col xs={ 4 } sm={ 4 } md={ 2 } lg={ 2 } xl={ 1 }
           style={ { padding: '0em', textAlign: 'center' } }
           className={ styles.unselectable }
@@ -65,10 +65,10 @@ class Paragraph extends Component {
             { shortTimecode(this.props.paragraph[0].start) }
           </span>
         </Col> */}
-        <Col xs={ 12 } sm={ 12 } md={ 9 } lg={ 9 } xl={ 10 }>
+        <Grid item xs={12} sm={12} md={9} lg={9} xl={10}>
           {this.props.wordsElements}
-        </Col>
-      </Row>
+        </Grid>
+      </Grid>
     );
   }
 }

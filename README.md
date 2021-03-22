@@ -42,7 +42,6 @@ Then from the [firebase dashboard](https://console.firebase.google.com/u/0/)
 REACT_APP_NAME=""
 REACT_APP_NODE_ENV="development"
 REACT_APP_AUTH_DOMAIN=
-REACT_APP_DATABASE_URL=
 REACT_APP_PROJECT_ID=digital-paper-edit
 REACT_APP_STORAGE_BUCKET=
 REACT_APP_MESSAGING_SENDER_ID=
@@ -130,7 +129,19 @@ gsutil cors set cors.json gs://dj-con-innovation-dpe-web-poc.appspot.com
 firebase login
 ```
 
+```
+firebase use <firebase-project-name>
+```
+
 ## Usage - development
+
+```
+
+npm install --production=false
+
+```
+
+<!-- https://docs.npmjs.com/cli/v6/commands/npm-install -->
 
 ```console
 npm start

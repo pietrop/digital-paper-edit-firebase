@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import ProgressBar from '../ProgressBar';
+import ProgressBar from './ProgressBar';
 import PropTypes from 'prop-types';
 
-const getPercentage = (currentTime, duration) => currentTime / duration * 100;
+const getPercentage = (currentTime, duration) => (currentTime / duration) * 100;
 
 const VideoContextProgressBar = (props) => {
   const ref = useRef();
 
-  const [ percentage, setPercentage ] = useState(0);
-  const [ videoContext, setVideoContext ] = useState();
-  const [ width, setWidth ] = useState(0);
+  const [percentage, setPercentage] = useState(0);
+  const [videoContext, setVideoContext] = useState();
+  const [width, setWidth] = useState(0);
 
   const handleClick = ({ nativeEvent: { offsetX } }) => {
     videoContext.currentTime = (offsetX / width) * videoContext.duration;
@@ -21,7 +21,7 @@ const VideoContextProgressBar = (props) => {
     if (ref.current) {
       setWidth(ref.current.offsetWidth);
     }
-  }, [ ref ]);
+  }, [ref]);
 
   useEffect(() => {
     const fillerAnimation = () => {
@@ -35,17 +35,17 @@ const VideoContextProgressBar = (props) => {
     if (videoContext) {
       fillerAnimation();
     }
-  }, [ props.videoContext, videoContext ]);
+  }, [props.videoContext, videoContext]);
 
   return (
-    <div ref={ ref } style={ { width:'100%' } }>
-      <ProgressBar onClick={ handleClick } percentage={ percentage } />
+    <div ref={ref} style={{ width: '100%' }}>
+      <ProgressBar onClick={handleClick} percentage={percentage} />
     </div>
   );
 };
 
 VideoContextProgressBar.propTypes = {
-  videoContext: PropTypes.any
+  videoContext: PropTypes.any,
 };
 
 export default VideoContextProgressBar;

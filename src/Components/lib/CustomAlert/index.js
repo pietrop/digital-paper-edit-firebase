@@ -1,34 +1,47 @@
 import React from 'react';
-import Alert from 'react-bootstrap/Alert';
+// https://material-ui.com/components/alert/#description
+import { makeStyles } from '@material-ui/core/styles';
+import { Alert, AlertTitle } from '@material-ui/lab';
 
-// https://react-bootstrap.netlify.com/components/alerts/#dismissing
-class CustomAlert extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      show: true,
-    };
-  }
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+import Collapse from '@material-ui/core/Collapse';
 
-  handleDismiss = () => this.setState({ show: false });
+const useStyles = makeStyles(theme => ({
+  root: {
+    width: '100%',
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
 
-  render() {
-    if (this.state.show) {
-      return (
-        <Alert variant={this.props.variant} onClose={this.handleDismiss} dismissible>
-          {this.props.heading ? <Alert.Heading>{this.props.heading}</Alert.Heading> : ''}
-          {this.props.message}
-          {this.props.children}
+export default function CustomAlert(props) {
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(true);
+  return (
+    <div className={classes.root}>
+      <Collapse in={open}>
+        <Alert
+          severity={props.variant}
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+        >
+          {props.heading ? <AlertTitle>{props.heading}</AlertTitle> : ''}
+          {props.message}
+          {props.children}
         </Alert>
-      );
-    } else {
-      return (
-        <>
-          <br />
-        </>
-      );
-    }
-  }
+      </Collapse>
+    </div>
+  );
 }
-
-export default CustomAlert;

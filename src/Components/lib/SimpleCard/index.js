@@ -1,71 +1,75 @@
-import React, { Component } from 'react';
-import Card from 'react-bootstrap/Card';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import ListGroup from 'react-bootstrap/ListGroup';
-import Button from 'react-bootstrap/Button';
-// import { LinkContainer } from 'react-router-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
+import ListItem from '@material-ui/core/ListItem';
+import Divider from '@material-ui/core/Divider';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from '@material-ui/core/Avatar';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import CustomLink from '../CustomLink';
 
-class SimpleCard extends Component {
-  handleDelete = () => {
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+  indigo: {
+    // TODO: should pull from theme primary, so that if that change this changes as well
+    color: theme.palette.getContrastText(theme.palette.primary.main),
+    backgroundColor: theme.palette.primary.main,
+  },
+}));
+
+const SimpleCard = (props) => {
+  const classes = useStyles();
+  const handleDelete = () => {
     //eslint-disable-next-line
     const confirmationPrompt = confirm("Click OK if you wish to delete, cancel if you don't");
     if (confirmationPrompt === true) {
-      if (this.props.handleDelete) {
-        this.props.handleDelete(this.props.id);
+      if (props.handleDelete) {
+        props.handleDelete(props.id);
       }
     } else {
       alert('All is good, it was not deleted');
     }
   };
 
-  handleEdit = () => {
-    this.props.handleEdit(this.props.id);
+  const handleEdit = () => {
+    props.handleEdit(props.id);
   };
-  showLinkPath = () => {
-    return this.props.showLinkPath(this.props.id);
+  const showLinkPath = () => {
+    return props.showLinkPath(props.id);
   };
 
-  render() {
-    return (
-      <ListGroup.Item>
-        {/* <Card.Body> */}
-        <Row>
-          {/* <LinkContainer to={this.showLinkPath()} style={{ cursor: 'pointer' }}> */}
-          <Col xs={8} sm={10} md={10} ld={10} xl={10}>
-            <Card.Title>
-              {this.props.icon} <a href={`#${this.showLinkPath()}`}>{this.props.title}</a>
-            </Card.Title>
-          </Col>
-          {/* </LinkContainer> */}
-          <Col xs={2} sm={1} md={1} ld={1} xl={1}>
-            <Card.Link>
-              <Button onClick={this.handleEdit} variant="secondary" size="sm">
-                <FontAwesomeIcon icon={faPen} />
-              </Button>
-            </Card.Link>
-          </Col>
-          <Col xs={2} sm={1} md={1} ld={1} xl={1}>
-            <Card.Link>
-              <Button onClick={this.handleDelete} variant="secondary" size="sm">
-                <FontAwesomeIcon icon={faTrash} />
-              </Button>
-            </Card.Link>
-          </Col>
-        </Row>
-        {/* <LinkContainer to={this.showLinkPath()} style={{ cursor: 'pointer' }}> */}
-        <Row>
-          <Col xs={10} sm={11} md={11} ld={11} xl={11}>
-            <Card.Subtitle className="mb-2 text-muted">{this.props.description}</Card.Subtitle>
-          </Col>
-        </Row>
-        {/* </LinkContainer> */}
-        {/* </Card.Body> */}
-      </ListGroup.Item>
-    );
-  }
-}
+  return (
+    <>
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <CustomLink to={showLinkPath()}>
+            <Avatar alt={props.title} className={classes.indigo}>
+              {props.icon}{' '}
+            </Avatar>
+          </CustomLink>
+        </ListItemAvatar>
+
+        <ListItemText primary={<CustomLink to={showLinkPath()}>{props.title}</CustomLink>} secondary={<>{props.description}</>} />
+        <ListItemSecondaryAction>
+          <IconButton size="small" color="primary" onClick={handleEdit}>
+            <EditIcon />
+          </IconButton>
+          <IconButton size="small" color="primary" onClick={handleDelete}>
+            <DeleteOutlinedIcon />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </ListItem>
+      <Divider variant="inset" component="li" />
+    </>
+  );
+};
 
 export default SimpleCard;

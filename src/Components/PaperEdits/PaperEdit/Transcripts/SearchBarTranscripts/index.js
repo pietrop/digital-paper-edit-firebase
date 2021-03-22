@@ -1,18 +1,15 @@
 import React, { Component } from 'react';
-import InputGroup from 'react-bootstrap/InputGroup';
-import FormControl from 'react-bootstrap/FormControl';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import Input from '@material-ui/core/Input';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
+import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
+import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
+import LocalOfferOutlinedIcon from '@material-ui/icons/LocalOfferOutlined';
+import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
+
 import Select from 'react-select';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faAngleLeft,
-  faTag,
-  faUser,
-  faSearch,
-  faFileAlt
-} from '@fortawesome/free-solid-svg-icons';
+
 import colourStyles from '../LabelsList/select-color-styles.js';
 import speakersColorStyles from './select-speakers-color-styles.js';
 
@@ -25,149 +22,129 @@ class SearchBarTranscripts extends Component {
       showTextSearchPreferences: false,
       showSpeakersSearchPreferences: false,
       showLabelsSearchPreferences: false,
-      selectedOptionTranscriptSearch: false
+      selectedOptionTranscriptSearch: false,
     };
   }
 
-  handleSpeakersSearchChange = selectedOptionSpeakerSearch => {
+  handleSpeakersSearchChange = (selectedOptionSpeakerSearch) => {
     this.props.handleSpeakersSearchChange(selectedOptionSpeakerSearch);
   };
 
-   handleLabelsSearchChange = selectedOptionLabelSearch => {
-     this.props.handleLabelsSearchChange(selectedOptionLabelSearch);
-   };
+  handleLabelsSearchChange = (selectedOptionLabelSearch) => {
+    this.props.handleLabelsSearchChange(selectedOptionLabelSearch);
+  };
 
-   handleShowParagraphsMatchingSearch = () => {
-     this.setState((state) => {
-      this.props.handleShowParagraphsMatchingSearch( !state.showParagraphsMatchingSearch);
-       return { showParagraphsMatchingSearch: !state.showParagraphsMatchingSearch };
-     }, () => {
-      
-     });
-   }
+  handleShowParagraphsMatchingSearch = () => {
+    this.setState(
+      (state) => {
+        this.props.handleShowParagraphsMatchingSearch(!state.showParagraphsMatchingSearch);
+        return { showParagraphsMatchingSearch: !state.showParagraphsMatchingSearch };
+      },
+      () => {}
+    );
+  };
 
-   handleTranscriptSearchChange = selectedOptionTranscriptSearch => {
+  handleTranscriptSearchChange = (selectedOptionTranscriptSearch) => {
     this.props.handleTranscriptSearchChange(selectedOptionTranscriptSearch);
     this.setState({ selectedOptionTranscriptSearch });
   };
 
-   /* TODO: move SearchBarTranscripts to a Search Toolbar component? */
-   render() {
-
-     return (
-       <>
-              <Row className="mb-3">
-                 <Col xs={ 1 } sm={ 1 } md={ 1 } ld={ 1 } xl={ 1 }>
-                 <Button 
-                  // block
-                  variant="light"
-                  onClick={this.props.handleShowAdvancedSearchViewSearchingAcrossTranscripts}
-                  title={"close search across transcript in a project"}
-                >
-                  <FontAwesomeIcon 
-                   icon={ faAngleLeft }
-                  />
-                </Button>
-                 </Col>
-                 <Col xs={ 10 } sm={ 11 } md={ 11 } ld={ 11 } xl={ 11 }>
-                 <InputGroup >
-                    {/* Search */}
-                    <FormControl
-                      //  TODO: pass labels, speakers, and paragraph pref
-                      onChange={ (e) => { this.props.handleSearch(e, {
-                        showParagraphsMatchingSearch: this.state.showParagraphsMatchingSearch,
-                        showLabelsSearchPreferences: this.state.showLabelsSearchPreferences,
-                        showSpeakersSearchPreferences: this.state.showSpeakersSearchPreferences,
-                        selectedOptionTranscriptSearch: this.state.selectedOptionTranscriptSearch
-                      });} }
-                      value={ this.props.searchValue }
-                      placeholder="Search text..."
-                      aria-label="search"
-                      aria-describedby="search"
-                    />
-                    <InputGroup.Append>
-                      <InputGroup.Text>
-                        <FontAwesomeIcon icon={ faSearch } />
-                      </InputGroup.Text>
-                    </InputGroup.Append>
-                </InputGroup>
-                {/* <Form.Text className="text-muted">
-                Search Text within a transcript 
-              </Form.Text> */}
-                </Col>
-               </Row>
-               <Row className="mb-3">
-                 <Col xs={ 1 } sm={ 1 } md={ 1 } ld={ 1 } xl={ 1 }>
-                   <InputGroup.Prepend>
-                     <InputGroup.Text>
-                       <FontAwesomeIcon icon={ faFileAlt } />
-                     </InputGroup.Text>
-                   </InputGroup.Prepend>
-                 </Col>
-                 <Col xs={ 10 } sm={ 11 } md={ 11 } ld={ 11 } xl={ 11 }>
-                   <Select
-                     value={ this.state.selectedOptionTranscriptSearch }
-                     onChange={ this.handleTranscriptSearchChange }
-                     isMulti
-                     isSearchable
-                     options={ this.props.transcriptOptions }
-                     styles={ speakersColorStyles }
-                     placeholder={ 'Filter by transcripts...' }
-                   />
-                {/* <Form.Text className="text-muted">
-                Filter by transcripts in the current project
-                </Form.Text> */}
-                 </Col>
-               </Row>
-               <Row className="mb-3">
-                 <Col xs={ 1 } sm={ 1 } md={ 1 } ld={ 1 } xl={ 1 }>
-                   <InputGroup.Prepend>
-                     <InputGroup.Text>
-                       <FontAwesomeIcon icon={ faUser } />
-                     </InputGroup.Text>
-                   </InputGroup.Prepend>
-                 </Col>
-                 <Col xs={ 10 } sm={ 11 } md={ 11 } ld={ 11 } xl={ 11 }>
-                   <Select
-                     value={ this.state.selectedOptionSpeakerSearch }
-                     onChange={ this.handleSpeakersSearchChange }
-                     isMulti
-                     isSearchable
-                     options={ this.props.speakersOptions }
-                     styles={ speakersColorStyles }
-                     placeholder={ 'Filter by speakers...' }
-                   />
-                {/* <Form.Text className="text-muted">
-                  Filter by speaker in the current project
-                </Form.Text> */}
-                 </Col>
-               </Row>
-               <Row className="mb-3">
-                 <Col xs={ 1 } sm={ 1 } md={ 1 } ld={ 1 } xl={ 1 }>
-                   <InputGroup.Prepend>
-                     <InputGroup.Text>
-                       <FontAwesomeIcon icon={ faTag } />
-                     </InputGroup.Text>
-                   </InputGroup.Prepend>
-                 </Col>
-                 <Col xs={ 10 } sm={ 11 } md={ 11 } ld={ 11 } xl={ 11 }>
-                   <Select
-                     value={ this.state.selectedOptionLabelSearch }
-                     onChange={ this.handleLabelsSearchChange }
-                     isMulti
-                     isSearchable
-                     options={ this.props.labelsOptions }
-                     styles={ colourStyles }
-                     placeholder={ 'Filter by labels...' }
-                   />
-                {/* <Form.Text className="text-muted">
-                  Filter by labels in the current project
-                </Form.Text> */}
-                 </Col>
-               </Row>
-       </>
-     );
-   }
+  /* TODO: move SearchBarTranscripts to a Search Toolbar component? */
+  render() {
+    return (
+      <>
+        <Grid container>
+          <Grid item xs={1} sm={1} md={1} ld={1} xl={1}>
+            <Button
+              // block
+              variant="light"
+              onClick={this.props.handleShowAdvancedSearchViewSearchingAcrossTranscripts}
+              title={'close search across transcript in a project'}
+            >
+              <ArrowBackIosOutlinedIcon />
+            </Button>
+          </Grid>
+          <Grid item xs={10} sm={11} md={11} ld={11} xl={11}>
+            <Grid container spacing={1} alignItems="flex-end">
+              <Grid item xs={11} sm={11} md={11} ld={11} xl={11}>
+                <Input
+                  fullWidth={true}
+                  //  TODO: pass labels, speakers, and paragraph pref
+                  onChange={(e) => {
+                    this.props.handleSearch(e, {
+                      showParagraphsMatchingSearch: this.state.showParagraphsMatchingSearch,
+                      showLabelsSearchPreferences: this.state.showLabelsSearchPreferences,
+                      showSpeakersSearchPreferences: this.state.showSpeakersSearchPreferences,
+                      selectedOptionTranscriptSearch: this.state.selectedOptionTranscriptSearch,
+                    });
+                  }}
+                  value={this.props.searchValue}
+                  placeholder="Search text..."
+                  aria-label="search"
+                  aria-describedby="search"
+                />
+              </Grid>
+              <Grid item xs={1} sm={1} md={1} ld={1} xl={1}>
+                <SearchOutlinedIcon />
+              </Grid>
+            </Grid>
+            <br />
+          </Grid>
+        </Grid>
+        <Grid container>
+          <Grid item xs={1} sm={1} md={1} ld={1} xl={1}>
+            <DescriptionOutlinedIcon />
+          </Grid>
+          <Grid item xs={10} sm={11} md={11} ld={11} xl={11}>
+            <Select
+              value={this.state.selectedOptionTranscriptSearch}
+              onChange={this.handleTranscriptSearchChange}
+              isMulti
+              isSearchable
+              options={this.props.transcriptOptions}
+              styles={speakersColorStyles}
+              placeholder={'Choose transcripts to search...'}
+            />
+          </Grid>
+        </Grid>
+        <br />
+        <Grid container>
+          <Grid item xs={1} sm={1} md={1} ld={1} xl={1}>
+            <PersonOutlineOutlinedIcon />
+          </Grid>
+          <Grid item xs={10} sm={11} md={11} ld={11} xl={11}>
+            <Select
+              value={this.state.selectedOptionSpeakerSearch}
+              onChange={this.handleSpeakersSearchChange}
+              isMulti
+              isSearchable
+              options={this.props.speakersOptions}
+              styles={speakersColorStyles}
+              placeholder={'Filter by speakers...'}
+            />
+          </Grid>
+        </Grid>
+        <br />
+        <Grid container>
+          <Grid item xs={1} sm={1} md={1} ld={1} xl={1}>
+            <LocalOfferOutlinedIcon />
+          </Grid>
+          <Grid item xs={10} sm={11} md={11} ld={11} xl={11}>
+            <Select
+              value={this.state.selectedOptionLabelSearch}
+              onChange={this.handleLabelsSearchChange}
+              isMulti
+              isSearchable
+              options={this.props.labelsOptions}
+              styles={colourStyles}
+              placeholder={'Filter by labels...'}
+            />
+          </Grid>
+        </Grid>
+        <br />
+      </>
+    );
+  }
 }
 
 export default SearchBarTranscripts;

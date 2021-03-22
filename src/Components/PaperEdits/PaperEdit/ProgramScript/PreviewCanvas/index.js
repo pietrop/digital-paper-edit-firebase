@@ -6,7 +6,6 @@ import VideoContextControls from './VideoContextControls';
 import Row from 'react-bootstrap/Row';
 
 class PreviewCanvas extends React.PureComponent {
-
   constructor(props) {
     const { playlist = [], width = 640 } = props;
 
@@ -20,10 +19,7 @@ class PreviewCanvas extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.videoContext =
-      this.videoContextRef
-      && this.videoContextRef.current
-      && this.videoContextRef.current.videoContext;
+    this.videoContext = this.videoContextRef && this.videoContextRef.current && this.videoContextRef.current.videoContext;
 
     this.forceUpdate();
   }
@@ -31,42 +27,24 @@ class PreviewCanvas extends React.PureComponent {
   render() {
     return (
       <>
-        <Row
-          className={ 'justify-content-center' }
-          style={ { backgroundColor: 'black' } }
-        >
-          <VideoContextViewer
-            ref={ this.videoContextRef }
-            playlist={ this.playlist }
-            width={ this.width }
-            height={ this.height }
-          />
+        <Row className={'justify-content-center'} style={{ backgroundColor: 'black' }}>
+          <VideoContextViewer ref={this.videoContextRef} playlist={this.playlist} width={this.width} height={this.height} />
         </Row>
-        <Row
-          className={ 'justify-content-center' }
-          style={ { backgroundColor: 'lightgrey' } }
-        >
-          <VideoContextProgressBar
-            width={ this.width }
-            videoContext={ this.videoContext && this.videoContext }
-          />
+        <Row className={'justify-content-center'} style={{ backgroundColor: 'lightgrey' }}>
+          <VideoContextProgressBar width={this.width} videoContext={this.videoContext && this.videoContext} />
         </Row>
         <Row
           // noGutters
           // className={ 'justify-content-center' }
-          style={
-            {
-              marginTop: '0.4em'
-            }
-          }
+          style={{
+            marginTop: '0.4em',
+          }}
         >
-          <VideoContextControls
-            videoContext={ this.videoContext && this.videoContext }
-          />
+          <VideoContextControls videoContext={this.videoContext && this.videoContext} />
         </Row>
       </>
     );
   }
-};
+}
 
 export default PreviewCanvas;

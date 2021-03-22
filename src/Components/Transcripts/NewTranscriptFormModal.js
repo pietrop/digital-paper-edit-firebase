@@ -1,38 +1,30 @@
 import React from 'react';
-import Modal from 'react-bootstrap/Modal';
 import TranscriptForm from './TranscriptForm';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+function NewTranscriptFormModal(props) {
+  const handleClose = () => {
+    props.handleCloseModal();
+  };
 
-class NewTranscriptFormModal extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      title: 'title'
-    };
-  }
-
-  handleClose = () => {
-    this.props.handleCloseModal();
-  }
-
-  render() {
-    return (
-      <Modal show={ this.props.show } onHide={ this.handleClose }>
-        <Modal.Header closeButton>
-          <Modal.Title>{this.props.modalTitle}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+  return (
+    <>
+      <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={props.show} fullWidth={true} maxWidth={'xs'}>
+        <DialogTitle id="simple-dialog-title">{props.modalTitle}</DialogTitle>
+        <DialogContent dividers={'paper'}>
           <TranscriptForm
-            projectId={ this.props.projectId }
-            title={ this.props.title }
-            description={ this.props.description }
-            id={ this.props.id }
-            handleSaveForm={ this.props.handleSaveForm }
-            handleCloseModal={ this.props.handleCloseModal }
+            projectId={props.projectId}
+            title={props.title}
+            description={props.description}
+            id={props.id}
+            handleSaveForm={props.handleSaveForm}
+            handleCloseModal={props.handleCloseModal}
           />
-        </Modal.Body>
-      </Modal>
-    );
-  }
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 export default NewTranscriptFormModal;

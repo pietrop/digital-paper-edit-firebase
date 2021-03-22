@@ -1,25 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import List from '../List';
 import includesText from '../../../Util/includes-text/index.js';
 import SearchBar from '../SearchBar';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-class Page extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showSearchInput: false
-    };
-  }
+const useStyles = makeStyles((theme) => ({
+  // root: {
+  //   backgroundColor: theme.palette.background.paper,
+  //   width: 500,
+  //   position: 'relative',
+  //   minHeight: 200,
+  // },
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
+    zIndex: '1000',
+  },
+  // fabGreen: {
+  //   color: theme.palette.common.white,
+  //   backgroundColor: green[500],
+  //   '&:hover': {
+  //     backgroundColor: green[600],
+  //   },
+  // },
+}));
 
-  handleSearch = searchText => {
-    const results = this.props.items.filter(project => {
-      if (
-        includesText(project.title, searchText) ||
-        includesText(project.description, searchText)
-      ) {
+function Page(props) {
+  const [showSearchInput, setShowSearchInput] = useState(false);
+  const classes = useStyles();
+
+  const handleSearch = (searchText) => {
+    const results = props.items.filter((project) => {
+      if (includesText(project.title, searchText) || includesText(project.description, searchText)) {
         project.display = true;
 
         return project;
@@ -29,51 +46,54 @@ class Page extends React.Component {
         return project;
       }
     });
-    this.props.handleUpdateList(results);
+    props.handleUpdateList(results);
   };
 
-  handleShowSearchBar = () => {
-    this.setState(state => {
-      return { showSearchInput: !state.showSearchInput };
-    });
+  const handleShowSearchBar = () => {
+    setShowSearchInput(!showSearchInput);
+    // this.setState(state => {
+    //   return { showSearchInput: !state.showSearchInput };
+    // });
+  };
+
+  // render() {
+  let searchEl;
+  if (props.items !== null && props.items.length !== 0) {
+    searchEl = <SearchBar handleSearch={handleSearch} />;
   }
 
-  render() {
-
-    let searchEl;
-    if (this.props.items !== null && this.props.items.length !== 0) {
-      searchEl = (<SearchBar
-        handleSearch={ this.handleSearch }
-      />);
-    }
-
-    return (<>
-
-      <Row>
-        <Col sm={ 9 } md={ 9 } ld={ 9 } xl={ 9 }>
+  return (
+    <>
+      <Grid container direction="row" justify="space-between" alignItems="flex-end">
+        <Grid item xs={12} sm={10} md={10} ld={10} xl={10}>
           {searchEl}
-        </Col>
+        </Grid>
 
-        <Col xs={ 12 } sm={ 3 } md={ 3 } ld={ 3 } xl={ 3 }>
-          <Button onClick={ this.props.handleShowCreateNewItemForm } variant="secondary" size="sm" block>
-                New {this.props.model}
+        <Grid item xs={12} sm={2} md={2} ld={2} xl={2}>
+          <Button onClick={props.handleShowCreateNewItemForm} color="primary" block="true" fullWidth={true}>
+            New {props.model}
           </Button>
-        </Col>
-      </Row>
+        </Grid>
 
-      {(this.props.items && this.props.items.length === 0) ? <i>There are no {this.props.model}, create a new one to get started</i> : null}
+        <Fab aria-label={'add'} className={classes.fab} color={'primary'} onClick={props.handleShowCreateNewItemForm}>
+          <AddIcon />
+        </Fab>
+      </Grid>
 
-      {this.props.items ?
+      {props.items && props.items.length === 0 ? <i>There are no {props.model}, create a new one to get started</i> : null}
+
+      {props.items ? (
         <List
-          icon={this.props.icon}
-          items={ this.props.items }
-          handleEdit={ this.props.handleEdit }
-          handleDelete={ this.props.handleDelete }
-          showLinkPath={ this.props.showLinkPath }
-        /> : null}
-
-    </>);
-  }
+          icon={props.icon}
+          items={props.items}
+          handleEdit={props.handleEdit}
+          handleDelete={props.handleDelete}
+          showLinkPath={props.showLinkPath}
+        />
+      ) : null}
+    </>
+  );
+  // }
 }
 
 export default Page;

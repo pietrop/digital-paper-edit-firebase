@@ -1,36 +1,21 @@
 import React from 'react';
-import Modal from 'react-bootstrap/Modal';
 import ItemForm from '../ItemForm';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
 
-class ItemFormModal extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      title: 'title'
-    };
-  }
+function ItemFormModal(props) {
+  const handleClose = () => {
+    props.handleCloseModal();
+  };
 
-  handleClose = () => {
-    this.props.handleCloseModal();
-  }
-
-  render() {
-    return (
-      <Modal show={ this.props.show } onHide={ this.handleClose }>
-        <Modal.Header closeButton>
-          <Modal.Title>{this.props.modalTitle}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ItemForm
-            title={ this.props.title }
-            description={ this.props.description }
-            id={ this.props.id }
-            handleSaveForm={ this.props.handleSaveForm }
-          />
-        </Modal.Body>
-      </Modal>
-    );
-  }
+  return (
+    <>
+      <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={props.show} fullWidth={true} maxWidth={'xs'}>
+        <DialogTitle id="simple-dialog-title">{props.modalTitle}</DialogTitle>
+        <ItemForm title={props.title} description={props.description} id={props.id} handleSaveForm={props.handleSaveForm} />
+      </Dialog>
+    </>
+  );
 }
 
 export default ItemFormModal;

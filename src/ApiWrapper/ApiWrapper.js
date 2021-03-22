@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 // import downloadjs from 'downloadjs';
 import firebase, { db, analytics, storage } from '../Firebase.js';
+import { deserializeTranscript, serializeTranscript } from '@pietrop/serialize-stt-words';
 
 const DEFAULT_LABEL = {
   //TODO: is _id needed, or is it just needed for electron database?
@@ -27,7 +28,6 @@ class ApiWrapper {
   async getAllProjects() {
     const { currentUser } = await firebase.auth();
     const currentUserUid = currentUser.uid;
-    console.log('currentUserUid', currentUserUid, currentUser.email, currentUser.displayName);
     analytics.logEvent('getAllProjects', 'd');
     return new Promise((resolve, reject) => {
       db.collection('projects')
@@ -37,9 +37,9 @@ class ApiWrapper {
         // TODO: also figure out how to extened/modify this, to support multiple users on the same project? eg array instead of string. Also in project create
         // .where('user', '==', currentUser.email)
         .get()
-        .then(querySnapshot => {
+        .then((querySnapshot) => {
           let list = [];
-          querySnapshot.forEach(doc => {
+          querySnapshot.forEach((doc) => {
             const data = doc.data();
             // Temporary way to only show the user their projects
             // TODO: it be better to make this more secure, using where compound query.
@@ -55,7 +55,7 @@ class ApiWrapper {
           resolve(list);
           return list;
         })
-        .catch(err => {
+        .catch((err) => {
           reject(err);
         });
     });
@@ -68,7 +68,7 @@ class ApiWrapper {
       const docRef = db.collection('projects').doc(id);
       docRef
         .get()
-        .then(doc => {
+        .then((doc) => {
           // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/in
           if (doc.exists) {
             // && currentUser.email in doc.data().roles
@@ -83,7 +83,7 @@ class ApiWrapper {
             reject('No such document! getProject 2');
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('Error getting document getProject: 3', error);
           reject('No such document! getProject 4');
         });
@@ -105,7 +105,7 @@ class ApiWrapper {
           created: firebase.firestore.FieldValue.serverTimestamp(),
           updated: firebase.firestore.FieldValue.serverTimestamp(),
         })
-        .then(async docRef => {
+        .then(async (docRef) => {
           console.log('Document written with ID: ', docRef.id);
           const response = {};
           response.status = 'ok';
@@ -120,7 +120,7 @@ class ApiWrapper {
 
           resolve(response);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.error('Error adding document: ', error);
           reject(error);
         });
@@ -135,10 +135,10 @@ class ApiWrapper {
 
       docRef
         .set(tmpData, { merge: true })
-        .then(doc => {
+        .then((doc) => {
           resolve({ status: 'ok', project: data });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error getting document:', error);
           reject('No such document updateProject!');
         });
@@ -155,7 +155,7 @@ class ApiWrapper {
           console.log('Document successfully deleted!');
           resolve({ ok: true });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error removing document: ', error);
           reject(error);
         });
@@ -168,17 +168,14 @@ class ApiWrapper {
   async getTranscripts(projectId) {
     // TODO: handle edge case transcript collection has not been created yet
     return new Promise((resolve, reject) => {
-      const transcriptRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('transcripts');
+      const transcriptRef = db.collection('projects').doc(projectId).collection('transcripts');
 
       transcriptRef
         .get()
-        .then(querySnapshot => {
+        .then((querySnapshot) => {
           if (querySnapshot.docs.length > 0) {
-            const transcripts = querySnapshot.docs.map(doc => {
-              console.log('doc.data()', doc.data(), doc.id);
+            const transcripts = querySnapshot.docs.map((doc) => {
+              // console.log('doc.data()', doc.data(), doc.id);
               const tmpData = doc.data();
               // tmpData.transcript = { paragraphs: tmpData.paragraphs, words: tmpData.words };
               // delete tmpData.paragraphs;
@@ -197,17 +194,18 @@ class ApiWrapper {
             });
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log('Error getting documents: ', error);
           reject(error);
         });
     });
   }
 
-  async createTranscript(projectId, formData, updateProgressValue) {
+  async createTranscript(projectId, formData, data, updateProgressValue) {
     // TODO: send file to google cloud storate
     const title = formData.get('title');
     const description = formData.get('description');
+    const languageCode = formData.get('languageCode');
     const type = formData.get('type');
     const clipName = formData.get('file').name;
 
@@ -233,7 +231,7 @@ class ApiWrapper {
       // Listen for state changes, errors, and completion of the upload.
       uploadTask.on(
         firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
-        function(snapshot) {
+        function (snapshot) {
           // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log('Upload is ' + progress + '% done');
@@ -251,7 +249,7 @@ class ApiWrapper {
               break;
           }
         },
-        function(error) {
+        function (error) {
           // A full list of error codes is available at
           // https://firebase.google.com/docs/storage/web/handle-errors
           switch (error.code) {
@@ -274,7 +272,7 @@ class ApiWrapper {
         },
         () => {
           // Upload completed successfully, now we can get the download URL
-          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
             const newTranscript = {
               projectId,
               title,
@@ -283,6 +281,7 @@ class ApiWrapper {
               clipName,
               storageRefName,
               downloadURL,
+              languageCode,
               display: true,
               // paragraphs: [],
               // words: [],
@@ -295,7 +294,7 @@ class ApiWrapper {
               .doc(projectId)
               .collection('transcripts')
               .add(newTranscript)
-              .then(async docRef => {
+              .then(async (docRef) => {
                 console.log('Document written with ID: ', docRef.id);
                 const response = {};
                 response.status = 'ok';
@@ -324,7 +323,7 @@ class ApiWrapper {
                 //   reject(er);
                 // });
               })
-              .catch(function(error) {
+              .catch(function (error) {
                 console.error('Error adding document: ', error);
                 reject(error);
               });
@@ -349,7 +348,7 @@ class ApiWrapper {
 
       transcriptRef
         .get()
-        .then(async doc => {
+        .then(async (doc) => {
           if (doc.exists) {
             const tmpData = doc.data();
             // In casee the url of the media expires, getting a new getDownloadURL from ref in cloud storage
@@ -360,40 +359,84 @@ class ApiWrapper {
               pathReference = storage.ref(tmpData.audioUrl);
             }
 
-            // Getting collections for words and transcripts
-            const wordsRef = db
+            // Getting collections for words and transcripts and serializing it back into a transcript
+            //  wordStartTimes, wordEndTimes, textList, paragraphStartTimes, paragraphEndTimes, speakersLit;
+            const wordStartTimesRef = db
               .collection('projects')
               .doc(projectId)
               .collection('transcripts')
               .doc(transcriptId)
               .collection('words')
-              .doc('words');
+              .doc('wordStartTimes');
+            const wordStartTimesRefSnaphot = await wordStartTimesRef.get();
+            const wordStartTimes = await wordStartTimesRefSnaphot.data().wordStartTimes;
 
-            const wordRefSnapShot = await wordsRef.get();
-            const words = await wordRefSnapShot.data().words;
-
-            const paragraphsRef = db
+            const wordEndTimesRef = db
               .collection('projects')
               .doc(projectId)
               .collection('transcripts')
               .doc(transcriptId)
-              .collection('paragraphs')
-              .doc('paragraphs');
+              .collection('words')
+              .doc('wordEndTimes');
+            const wordEndTimesRefSnaphot = await wordEndTimesRef.get();
+            const wordEndTimes = await wordEndTimesRefSnaphot.data().wordEndTimes;
 
-            const paragraphsRefSnapShot = await paragraphsRef.get();
-            const paragraphs = await paragraphsRefSnapShot.data().paragraphs;
+            const textListRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('textList');
+            const textListRefSnaphot = await textListRef.get();
+            const textList = await textListRefSnaphot.data().textList;
 
-            const transcript = {
-              paragraphs,
-              words,
-            };
-            console.log('transcript', transcript);
+            const paragraphStartTimesRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('paragraphStartTimes');
+            const paragraphStartTimesRefSnaphot = await paragraphStartTimesRef.get();
+            const paragraphStartTimes = await paragraphStartTimesRefSnaphot.data()
+              .paragraphStartTimes;
+
+            const paragraphEndTimesRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('paragraphEndTimes');
+            const paragraphEndTimesRefSnaphot = await paragraphEndTimesRef.get();
+            const paragraphEndTimes = await paragraphEndTimesRefSnaphot.data().paragraphEndTimes;
+
+            const speakersLitRef = db
+              .collection('projects')
+              .doc(projectId)
+              .collection('transcripts')
+              .doc(transcriptId)
+              .collection('words')
+              .doc('speakersLit');
+            const speakersLitRefSnaphot = await speakersLitRef.get();
+            const speakersLit = await speakersLitRefSnaphot.data().speakersLit;
+
+            const transcript = deserializeTranscript({
+              wordStartTimes: JSON.parse(wordStartTimes),
+              wordEndTimes: JSON.parse(wordEndTimes),
+              textList: JSON.parse(textList),
+              paragraphStartTimes: JSON.parse(paragraphStartTimes),
+              paragraphEndTimes: JSON.parse(paragraphEndTimes),
+              speakersLit: JSON.parse(speakersLit),
+            });
+            // console.log('transcript', transcript);
             // TODO: or could get it from the audio that is sent to STT
             // to ensure HTML5 compatibility, if non HTML5 audio/video is being uploaded as source file
             // const pathReference = storage.ref(tmpData.audioUrl);
             pathReference
               .getDownloadURL()
-              .then(url => {
+              .then((url) => {
                 const tmpResult = {
                   id: doc.id,
                   projectTitle: projectData.title,
@@ -409,13 +452,15 @@ class ApiWrapper {
                   // TODO: add clipName
                   clipName: tmpData.clipName,
                   status: tmpData.status,
+                  sttEngine: tmpData.sttEngine,
+                  languageCode: tmpData.languageCode,
                 };
                 // TODO: also need to get transcript associated with project
                 // TODO: first do the create transcript within a project ApiWrapper
                 // TODO: also need to get paper-edits for project
                 resolve(tmpResult);
               })
-              .catch(function(error) {
+              .catch(function (error) {
                 // Handle any errors
                 console.log('No such document! getTranscript');
                 reject('No such document! getTranscript');
@@ -426,7 +471,7 @@ class ApiWrapper {
             reject('No such document! getTranscript');
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log('Error getting document: getTranscript', error);
           reject('No such document! getTranscript error');
         });
@@ -434,53 +479,195 @@ class ApiWrapper {
   }
 
   async updateTranscript(projectId, transcriptId, queryParamsOptions, data) {
+    console.log('projectId', projectId);
+    console.log('transcriptId', transcriptId);
+    console.log('queryParamsOptions', queryParamsOptions);
+    console.log('data', data);
+    // TODO: there mgiht be a better way to do this.
+    // this being avoiding sending client side info to the
+    const { display, status } = data;
+    delete data.display;
+    delete data.status;
+    // console.log('updateTranscript', projectId, transcriptId, queryParamsOptions, data);
     // const res = await corsFetch(this.transcriptsIdUrl(projectId, transcriptId, queryParamsOptions), 'PUT', data);
+    // if only updating title or descrition
+
     // return res;
-    console.log('queryParamsOptions, data', queryParamsOptions, data);
-    return new Promise((resolve, reject) => {
+    // console.log('queryParamsOptions, data', queryParamsOptions, data);
+    return new Promise(async (resolve, reject) => {
       const docRef = db
         .collection('projects')
         .doc(projectId)
         .collection('transcripts')
         .doc(transcriptId);
 
-      const tmpData = data;
-      const { words, paragraphs } = data;
-      console.log('words', words);
-      console.log('paragraphs', paragraphs);
-      delete tmpData.words;
-      delete tmpData.paragraphs;
-      const updated = firebase.firestore.FieldValue.serverTimestamp();
-      // const { paragraphs, words } = data;
-
-      const wordsRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('transcripts')
-        .doc(transcriptId)
-        .collection('words')
-        .doc('words')
-        .set({ words }, { merge: true });
-
-      const paragraphsRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('transcripts')
-        .doc(transcriptId)
-        .collection('paragraphs')
-        .doc('paragraphs')
-        .set({ paragraphs }, { merge: true });
-
-      docRef
-        .set(data, { merge: true })
-        .then(doc => {
-          // TODO: inconsistencies in the interface, some return ok boolean attribute, others status 'ok' string
-          resolve({ ok: true, status: 'ok', transcript: data });
-        })
-        .catch(error => {
-          console.log('Error getting document:', error);
-          reject('No such document updateTranscript!');
+      if (data.words && data.paragraphs) {
+        const tmpData = data;
+        const { words, paragraphs } = data;
+        const {
+          wordStartTimes,
+          wordEndTimes,
+          textList,
+          paragraphStartTimes,
+          paragraphEndTimes,
+          speakersLit,
+        } = serializeTranscript({
+          words,
+          paragraphs,
         });
+        console.log('words', words);
+        console.log('paragraphs', paragraphs);
+        delete tmpData.words;
+        delete tmpData.paragraphs;
+        const updated = firebase.firestore.FieldValue.serverTimestamp();
+        // const { paragraphs, words } = data;
+
+        await db
+          .collection('projects')
+          .doc(projectId)
+          .collection('transcripts')
+          .doc(transcriptId)
+          .collection('words')
+          .doc('wordStartTimes')
+          .set(
+            {
+              wordStartTimes: JSON.stringify(wordStartTimes),
+            },
+            {
+              merge: true,
+            }
+          );
+
+        await db
+          .collection('projects')
+          .doc(projectId)
+          .collection('transcripts')
+          .doc(transcriptId)
+          .collection('words')
+          .doc('wordEndTimes')
+          .set(
+            {
+              wordEndTimes: JSON.stringify(wordEndTimes),
+            },
+            {
+              merge: true,
+            }
+          );
+
+        await db
+          .collection('projects')
+          .doc(projectId)
+          .collection('transcripts')
+          .doc(transcriptId)
+          .collection('words')
+          .doc('textList')
+          .set(
+            {
+              textList: JSON.stringify(textList),
+            },
+            {
+              merge: true,
+            }
+          );
+
+        await db
+          .collection('projects')
+          .doc(projectId)
+          .collection('transcripts')
+          .doc(transcriptId)
+          .collection('words')
+          .doc('paragraphStartTimes')
+          .set(
+            {
+              paragraphStartTimes: JSON.stringify(paragraphStartTimes),
+            },
+            {
+              merge: true,
+            }
+          );
+
+        await db
+          .collection('projects')
+          .doc(projectId)
+          .collection('transcripts')
+          .doc(transcriptId)
+          .collection('words')
+          .doc('paragraphEndTimes')
+          .set(
+            {
+              paragraphEndTimes: JSON.stringify(paragraphEndTimes),
+            },
+            {
+              merge: true,
+            }
+          );
+
+        await db
+          .collection('projects')
+          .doc(projectId)
+          .collection('transcripts')
+          .doc(transcriptId)
+          .collection('words')
+          .doc('speakersLit')
+          .set(
+            {
+              speakersLit: JSON.stringify(speakersLit),
+            },
+            {
+              merge: true,
+            }
+          );
+
+        // /////
+
+        // const wordsRef = db
+        //   .collection('projects')
+        //   .doc(projectId)
+        //   .collection('transcripts')
+        //   .doc(transcriptId)
+        //     .collection('words')
+        //     .doc('words')
+        //     .set({ words }, { merge: true });
+
+        //   const paragraphsRef = db
+        //     .collection('projects')
+        //     .doc(projectId)
+        //     .collection('transcripts')
+        //     .doc(transcriptId)
+        //     .collection('paragraphs')
+        //     .doc('paragraphs')
+        //     .set({ paragraphs }, { merge: true });
+        // }
+
+        //
+
+        docRef
+          .set(data, { merge: true })
+          .then((doc) => {
+            // TODO: inconsistencies in the interface, some return ok boolean attribute, others status 'ok' string
+            data.status = status;
+            data.display = display;
+            resolve({ ok: true, status: 'ok', transcript: data });
+          })
+          .catch((error) => {
+            console.log('Error getting document:', error);
+            reject('No such document updateTranscript!');
+          });
+        // TODO: if editing transcript, title, description in transcript list view
+      } else {
+        docRef
+          .set(data, { merge: true })
+          .then((doc) => {
+            // TODO: inconsistencies in the interface, some return ok boolean attribute, others status 'ok' string
+            data.status = status;
+            data.display = display;
+            resolve({ ok: true, status: 'ok', transcript: data });
+          })
+          .catch((error) => {
+            console.log('Error getting document:', error);
+            reject('No such document updateTranscript!');
+          });
+      }
     });
   }
 
@@ -495,7 +682,7 @@ class ApiWrapper {
           console.log('Document successfully deleted!');
           resolve({ ok: true });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error removing document: ', error);
           reject(error);
         });
@@ -519,9 +706,9 @@ class ApiWrapper {
 
         annotationsRef
           .get()
-          .then(querySnapshot => {
+          .then((querySnapshot) => {
             if (querySnapshot.docs.length > 0) {
-              const annotations = querySnapshot.docs.map(doc => {
+              const annotations = querySnapshot.docs.map((doc) => {
                 // Add the individual transcript firebase id to the data
                 return {
                   id: doc.id,
@@ -540,7 +727,7 @@ class ApiWrapper {
               });
             }
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log('Error getting documents: ', error);
             reject(error);
           });
@@ -577,7 +764,7 @@ class ApiWrapper {
         .doc(transcriptId)
         .collection('annotations')
         .add(newAnnotation)
-        .then(docRef => {
+        .then((docRef) => {
           const annotationId = docRef.id;
           newAnnotation.id = annotationId;
           //TODO: is _id needed, or is it just needed for electron database?
@@ -585,7 +772,7 @@ class ApiWrapper {
           // this.updateAnnotation(projectId, transcriptId, annotationId, newAnnotation);
           resolve({ ok: true, status: 'ok', annotation: newAnnotation });
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.error('Error adding document: ', error);
           reject(error);
         });
@@ -608,13 +795,13 @@ class ApiWrapper {
 
       docRef
         .set(tmpData, { merge: true })
-        .then(doc => {
+        .then((doc) => {
           // TODO: Is this call to get all labels needed, is it actually used by the client,
           // or can we just return  { ok: true, status: 'ok' }
           // const resp = this.getAllLabels(projectId);
           resolve({ ok: true, status: 'ok', annotation: tmpData });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('Error getting document updateAnnotation:', error);
           reject('No such document! updateAnnotation');
         });
@@ -637,7 +824,7 @@ class ApiWrapper {
           console.log('Document successfully deleted!');
           resolve({ ok: true });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error removing document: ', error);
           reject(error);
         });
@@ -651,18 +838,15 @@ class ApiWrapper {
   // Get All Labels
   async getAllLabels(projectId) {
     return new Promise(async (resolve, reject) => {
-      const labelsRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('labels');
+      const labelsRef = db.collection('projects').doc(projectId).collection('labels');
 
       labelsRef
         // sorting by created date, to ensure'default' label to be first in list
         .orderBy('created', 'asc')
         .get()
-        .then(querySnapshot => {
+        .then((querySnapshot) => {
           if (querySnapshot.docs.length > 0) {
-            const tmpData = querySnapshot.docs.map(doc => {
+            const tmpData = querySnapshot.docs.map((doc) => {
               // Add the individual transcript firebase id to the data
               return {
                 id: doc.id,
@@ -677,7 +861,7 @@ class ApiWrapper {
             // reject('No such document getAllLabels!');
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log('Error getting document getAllLabels:', error);
           reject('No such document! getAllLabels');
         });
@@ -686,15 +870,11 @@ class ApiWrapper {
   // Get Label - not used
   async getLabel(projectId, labelId) {
     return new Promise(async (resolve, reject) => {
-      const labelRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('labels')
-        .doc(labelId);
+      const labelRef = db.collection('projects').doc(projectId).collection('labels').doc(labelId);
 
       labelRef
         .get()
-        .then(doc => {
+        .then((doc) => {
           if (doc.exists) {
             console.log('getLabel Document data:', doc.data());
             const tmpData = doc.data();
@@ -709,7 +889,7 @@ class ApiWrapper {
             reject('No such document! getLabel');
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log('Error getting document getLabel:', error);
           reject('No such document! getLabel');
         });
@@ -730,7 +910,7 @@ class ApiWrapper {
         .doc(projectId)
         .collection('labels')
         .add(newLabel)
-        .then(async docRef => {
+        .then(async (docRef) => {
           const labelId = docRef.id;
           newLabel.id = labelId;
           //TODO: is _id needed, or is it just needed for electron database?
@@ -742,7 +922,7 @@ class ApiWrapper {
           const resp = await this.getAllLabels(projectId);
           resolve(resp);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.error('Error adding document: ', error);
           reject(error);
         });
@@ -751,23 +931,19 @@ class ApiWrapper {
   // Update Label
   async updateLabel(projectId, labelId, data) {
     return new Promise((resolve, reject) => {
-      const docRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('labels')
-        .doc(labelId);
+      const docRef = db.collection('projects').doc(projectId).collection('labels').doc(labelId);
 
       const tmpData = data;
       tmpData.updated = firebase.firestore.FieldValue.serverTimestamp();
       docRef
         .set(tmpData, { merge: true })
-        .then(doc => {
+        .then((doc) => {
           // TODO: Is this call to get all labels needed, is it actually used by the client,
           // or can we just return  { ok: true, status: 'ok' }
           const resp = this.getAllLabels(projectId);
           resolve(resp);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('Error getting document updateLabel:', error);
           reject('No such document updateLabel!');
         });
@@ -788,7 +964,7 @@ class ApiWrapper {
           const result = this.getAllLabels(projectId);
           resolve(result);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error removing document: ', error);
           reject(error);
         });
@@ -803,16 +979,13 @@ class ApiWrapper {
     // return json.paperedits;
     return new Promise((resolve, reject) => {
       // const transcriptRef = db.collection('transcripts');
-      const transcriptRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('paperedits');
+      const transcriptRef = db.collection('projects').doc(projectId).collection('paperedits');
 
       transcriptRef
         .get()
-        .then(querySnapshot => {
+        .then((querySnapshot) => {
           if (querySnapshot.docs.length > 0) {
-            const paperedits = querySnapshot.docs.map(doc => {
+            const paperedits = querySnapshot.docs.map((doc) => {
               // Add the individual transcript firebase id to the data
               return {
                 id: doc.id,
@@ -828,7 +1001,7 @@ class ApiWrapper {
             );
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log('Error getting documents: ', error);
           reject(error);
         });
@@ -850,7 +1023,7 @@ class ApiWrapper {
 
       paperEditRef
         .get()
-        .then(doc => {
+        .then((doc) => {
           if (doc.exists) {
             console.log('getPaperEdit Document data:', doc.data());
             const tmpData = doc.data();
@@ -873,7 +1046,7 @@ class ApiWrapper {
             reject('No such document! getPaperEdit');
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log('Error getting document getPaperEdit: ', error);
           reject('No such document! getPaperEdit');
         });
@@ -899,7 +1072,7 @@ class ApiWrapper {
           // type,
           // clipName,
         })
-        .then(docRef => {
+        .then((docRef) => {
           const response = {
             status: 'ok',
             paperedit: {
@@ -911,7 +1084,7 @@ class ApiWrapper {
 
           resolve(response);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.error('Error adding document: ', error);
           reject(error);
         });
@@ -920,20 +1093,16 @@ class ApiWrapper {
 
   async updatePaperEdit(projectId, id, data) {
     return new Promise((resolve, reject) => {
-      const docRef = db
-        .collection('projects')
-        .doc(projectId)
-        .collection('paperedits')
-        .doc(id);
+      const docRef = db.collection('projects').doc(projectId).collection('paperedits').doc(id);
 
       const tmpData = data;
       tmpData.updated = firebase.firestore.FieldValue.serverTimestamp();
       docRef
         .set(tmpData, { merge: true })
-        .then(doc => {
+        .then((doc) => {
           resolve({ status: 'ok', paperedit: data });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('Error getting document:', error);
           reject('No such document! updatePaperEdit');
         });
@@ -951,7 +1120,7 @@ class ApiWrapper {
           console.log('Document successfully deleted!');
           resolve({ ok: true });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error removing document: ', error);
           reject(error);
         });
@@ -996,7 +1165,7 @@ class ApiWrapper {
     // as separate request
     // TODO: also add annotations for each Transcripts
     const transcriptsJson = await Promise.all(
-      transcriptsResult.transcripts.map(transcript => {
+      transcriptsResult.transcripts.map((transcript) => {
         // const annotations = this.getAllAnnotations(projectId, transcript.id);
         // console.log('transcript.id', transcript.id);
         const transcriptTmp = this.getTranscript(projectId, transcript.id);
@@ -1010,7 +1179,7 @@ class ApiWrapper {
     console.log('transcriptsJson', transcriptsJson);
 
     const annotationsJson = await Promise.all(
-      transcriptsResult.transcripts.map(transcript => {
+      transcriptsResult.transcripts.map((transcript) => {
         const annotations = this.getAllAnnotations(projectId, transcript.id);
 
         return annotations;
@@ -1018,9 +1187,9 @@ class ApiWrapper {
     );
 
     // add annotations to transcript
-    transcriptsJson.forEach(tr => {
+    transcriptsJson.forEach((tr) => {
       // get annotations for transcript
-      const currentAnnotationsSet = annotationsJson.find(a => {
+      const currentAnnotationsSet = annotationsJson.find((a) => {
         return a.transcriptId === tr.id;
       });
       // if there are annotations for this transcript add them to it
@@ -1076,7 +1245,7 @@ class ApiWrapper {
           downloadURI(urlOfRemix, fileName);
           resolve(data);
         })
-        .catch(error => {
+        .catch((error) => {
           reject(error);
         });
     });
@@ -1104,6 +1273,39 @@ class ApiWrapper {
   //       });
   //   });
   // }
+
+  async submitFeedback(data) {
+    console.log('submitFeedback', data);
+    const { currentUser } = await firebase.auth();
+    const currentUserEmail = currentUser.email;
+    // analytics.logEvent('submitFeedback', { email: currentUserEmail, ...data });
+
+    // TODO: refactor to use async/await
+    return new Promise((resolve, reject) => {
+      const created = firebase.firestore.FieldValue.serverTimestamp();
+
+      db.collection('feedback')
+        .add({
+          user: currentUserEmail,
+          ...data,
+          created,
+        })
+        .then(async (docRef) => {
+          console.log('Document written with ID: ', docRef.id);
+          const response = {};
+          response.status = 'ok';
+
+          // create default label for project
+          // await this.createLabel(docRef.id, DEFAULT_LABEL);
+
+          resolve(response);
+        })
+        .catch(function (error) {
+          console.error('Error adding document: ', error);
+          reject(error);
+        });
+    });
+  }
 }
 
 function downloadURI(uri, name) {

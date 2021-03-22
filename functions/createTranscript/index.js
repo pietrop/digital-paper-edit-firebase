@@ -1,3 +1,4 @@
+const functions = require('firebase-functions');
 const speech = require('@google-cloud/speech');
 const { CloudTasksClient } = require('@google-cloud/tasks');
 const gcpToDpe = require('gcp-to-dpe');
@@ -12,6 +13,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
   // access a particular field as you would any JS property
   let storageRef = newValue.storageRefName;
   const downloadURLLink = newValue.downloadURL;
+  const languageCode = newValue.languageCode ? newValue.languageCode : 'en-US';
   // https://firebase.google.com/docs/storage/admin/start
   const storage = admin.storage();
   // https://github.com/firebase/firebase-tools/issues/1573#issuecomment-517000981
@@ -64,12 +66,14 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
       encoding: 'OGG_OPUS',
       // in RecognitionConfig must either be unspecified or match the value in the FLAC header `16000`;
       sampleRateHertz: Number(SAMPLE_RATE_HERTZ).toString(),
-      languageCode: 'en-US',
+      // languageCode: 'en-US',
+      languageCode: languageCode,
       // https://cloud.google.com/speech-to-text/docs/multiple-languages
       // alternativeLanguageCodes: ['es-ES', 'en-US'],
       // https://cloud.google.com/speech-to-text/docs/reference/rest/v1p1beta1/RecognitionConfig
       // https://cloud.google.com/blog/products/gcp/toward-better-phone-call-and-video-transcription-with-new-cloud-speech-to-text
-      model: 'video',
+      // model: 'video',
+      model: languageCode === 'en-US' ? 'video' : 'default',
     },
     audio: {
       uri: `gs://${bucket}/${audioForSttRef}`,
@@ -82,7 +86,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
   // if (metadataRes.duration && metadataRes.duration <= 60) {
   //   const [shortResponse] = await client.recognize(request);
   //   //  const transcription = response.results.map(result => result.alternatives[0].transcript).join('\n');
-  //   //  console.log('Transcription: ', transcription);
+  //   //   functions.logger.log('Transcription: ', transcription);
   //   const transcript = gcpToDpe(shortResponse);
   //   const { paragraphs, words } = transcript;
   //   return change.ref.set(
@@ -100,40 +104,44 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
   // initialApiResponse.name is the operation name/"id"
   // initialApiResponse.done is the status of the operation
   const [operation, initialApiResponse] = await client.longRunningRecognize(request);
-  console.log('initialApiResponse', initialApiResponse.name);
+  functions.logger.log('initialApiResponse', initialApiResponse.name);
 
   const sttOperationName = initialApiResponse.name;
   const sttOperationStatus = initialApiResponse.done;
 
-  // TODO: I don't think the first response will have just have the results as is?
+  // TODO: if initial response has an error here should do
+  // if(initialApiResponse.error){
+  //   // TODDO: save to db update status: 'error' +save erro object
+  //   // see firstore check stt function for actual code
+  // }
+
+  // TODO: Remember to refactor this to serialize the data same as firestoreCheckSTT
+  // OR remove it, so that it always just goes through that one function
+  // OR abstract common part into a helper function and use that
+  //
+  // TODO: But I don't think the first response will have just have the results as is?
   if (sttOperationStatus && initialApiResponse.response && initialApiResponse.response.results) {
     //  const [response] = await operation.promise();
     const transcript = gcpToDpe(initialApiResponse);
     const { paragraphs, words } = transcript;
 
-    change.ref
-      .collection('words')
-      .doc('words')
-      .set(
-        {
-          words,
-        },
-        {
-          merge: true,
-        }
-      );
+    change.ref.collection('words').doc('words').set(
+      {
+        words,
+      },
+      {
+        merge: true,
+      }
+    );
 
-    change.ref
-      .collection('paragraphs')
-      .doc('paragraphs')
-      .set(
-        {
-          paragraphs,
-        },
-        {
-          merge: true,
-        }
-      );
+    change.ref.collection('paragraphs').doc('paragraphs').set(
+      {
+        paragraphs,
+      },
+      {
+        merge: true,
+      }
+    );
 
     return change.ref.set(
       {
@@ -158,7 +166,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
     const queuePath = tasksClient.queuePath(project, location, queue);
 
     const url = `https://${location}-${project}.cloudfunctions.net/firestoreCheckSTT`;
-    console.log('url firestoreCheckSTT', url);
+    functions.logger.log('url firestoreCheckSTT', url);
     const docPath = change.ref.path;
 
     const payload = { sttOperationName, docPath };
@@ -198,7 +206,7 @@ exports.createHandler = async (change, context, admin, AUDIO_EXTENSION, SAMPLE_R
       parent: queuePath,
       task,
     });
-    console.log(`Created task ${response.name}`);
+    functions.logger.log(`Created task ${response.name}`);
     return null;
   }
   // }
