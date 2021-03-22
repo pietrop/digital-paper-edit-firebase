@@ -452,6 +452,7 @@ class ApiWrapper {
                   // TODO: add clipName
                   clipName: tmpData.clipName,
                   status: tmpData.status,
+                  sttEngine: tmpData.sttEngine,
                 };
                 // TODO: also need to get transcript associated with project
                 // TODO: first do the create transcript within a project ApiWrapper
@@ -1271,6 +1272,39 @@ class ApiWrapper {
   //       });
   //   });
   // }
+
+  async submitFeedback(data) {
+    console.log('submitFeedback', data);
+    const { currentUser } = await firebase.auth();
+    const currentUserEmail = currentUser.email;
+    // analytics.logEvent('submitFeedback', { email: currentUserEmail, ...data });
+
+    // TODO: refactor to use async/await
+    return new Promise((resolve, reject) => {
+      const created = firebase.firestore.FieldValue.serverTimestamp();
+
+      db.collection('feedback')
+        .add({
+          user: currentUserEmail,
+          ...data,
+          created,
+        })
+        .then(async (docRef) => {
+          console.log('Document written with ID: ', docRef.id);
+          const response = {};
+          response.status = 'ok';
+
+          // create default label for project
+          // await this.createLabel(docRef.id, DEFAULT_LABEL);
+
+          resolve(response);
+        })
+        .catch(function (error) {
+          console.error('Error adding document: ', error);
+          reject(error);
+        });
+    });
+  }
 }
 
 function downloadURI(uri, name) {
