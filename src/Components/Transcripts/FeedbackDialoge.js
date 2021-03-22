@@ -25,6 +25,7 @@ function FeedbackDialoge({
   slackName,
   slackUrl,
   sttEngine,
+  languagecode,
 }) {
   const [sttRating, setSttRating] = useState(null);
   const [sttFeeback, setSttFeedback] = useState('');
@@ -44,6 +45,7 @@ function FeedbackDialoge({
       projectId,
       sttEngine,
       appVersion,
+      languagecode,
     };
     if (sttRating && toolRating) {
       console.log('send', overallRating);
@@ -112,7 +114,7 @@ function FeedbackDialoge({
             }}
             placeholder="Optional feedback on the quality of the automated transcription"
           />
-          <p> How would you rate the WSJ Newsroom Transcript editor experience?</p>
+          <p> How would you rate the Transcript editor experience?</p>
           <Rating
             name="simple-controlled-tool"
             value={toolRating}
@@ -127,7 +129,7 @@ function FeedbackDialoge({
           />
           <br />
           <TextField
-            label="Optional feedback on The WSJ Newsroom Transcription tool"
+            label="Optional feedback on The Transcription tool"
             fullWidth
             multiline
             rows={2}
@@ -138,7 +140,7 @@ function FeedbackDialoge({
             onChange={(e) => {
               setToollFeedback(e.target.value);
             }}
-            placeholder="Optional feedback on The WSJ Newsroom Transcription tool"
+            placeholder="Optional feedback on The Transcription tool"
           />
           {slackUrl && (
             <p>

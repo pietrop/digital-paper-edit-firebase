@@ -453,6 +453,7 @@ class ApiWrapper {
                   clipName: tmpData.clipName,
                   status: tmpData.status,
                   sttEngine: tmpData.sttEngine,
+                  languageCode: tmpData.languageCode,
                 };
                 // TODO: also need to get transcript associated with project
                 // TODO: first do the create transcript within a project ApiWrapper

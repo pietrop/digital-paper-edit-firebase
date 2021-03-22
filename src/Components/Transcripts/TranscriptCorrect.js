@@ -33,6 +33,7 @@ function TranscriptCorrect(props) {
   const [clipName, setClipName] = useState(null);
   const [redirect, setRedirect] = useState(false);
   const [sttEngine, setSttEngine] = useState(null);
+  const [languagecode, setLanguageCode] = useState(null);
 
   useEffect(() => {
     try {
@@ -46,6 +47,7 @@ function TranscriptCorrect(props) {
           setUrl(json.url);
           setClipName(json.clipName);
           setSttEngine(json.sttEngine);
+          setLanguageCode(json.languageCode);
         });
     } catch (e) {
       console.error(e);
@@ -182,6 +184,7 @@ function TranscriptCorrect(props) {
           // slackName={slackName}
           // slackUrl={slackUrl}
           sttEngine={sttEngine}
+          languagecode={languagecode}
         />
 
         {/* {savedNotification} */}
