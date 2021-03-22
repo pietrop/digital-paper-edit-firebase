@@ -13,6 +13,7 @@ import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import FeedbackDialoge from './FeedbackDialoge';
 
 // const TranscriptEditor = React.lazy(() => import('slate-transcript-editor'));
 import TranscriptEditor from 'slate-transcript-editor';
@@ -31,6 +32,7 @@ function TranscriptCorrect(props) {
   const [savedNotification, setSavedNotification] = useState(null);
   const [clipName, setClipName] = useState(null);
   const [redirect, setRedirect] = useState(false);
+  const [sttEngine, setSttEngine] = useState(null);
 
   useEffect(() => {
     try {
@@ -43,6 +45,7 @@ function TranscriptCorrect(props) {
           setTranscriptJson(json.transcript);
           setUrl(json.url);
           setClipName(json.clipName);
+          setSttEngine(json.sttEngine);
         });
     } catch (e) {
       console.error(e);
@@ -168,6 +171,19 @@ function TranscriptCorrect(props) {
             />
           </Col>
         </Row>
+
+        <FeedbackDialoge
+          // isOpen={isFeedbackDialogeOpen}
+          // setIsFeedbackDialogeOpen={setIsFeedbackDialogeOpen}
+          // api={api}
+          // analytics={analytics}
+          projectId={projectId}
+          transcriptId={transcriptId}
+          // slackName={slackName}
+          // slackUrl={slackUrl}
+          sttEngine={sttEngine}
+        />
+
         {/* {savedNotification} */}
         {transcriptJson !== null && (
           <Suspense
