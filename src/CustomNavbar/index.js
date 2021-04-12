@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -12,6 +12,7 @@ import MovieCreationOutlinedIcon from '@material-ui/icons/MovieCreationOutlined'
 import GraphicEqOutlinedIcon from '@material-ui/icons/GraphicEqOutlined';
 import LocalMoviesOutlinedIcon from '@material-ui/icons/LocalMoviesOutlined';
 import MovieFilterOutlinedIcon from '@material-ui/icons/MovieFilterOutlined';
+import Switch from '@material-ui/core/Switch';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CustomNavbar(props) {
   const { firebase } = props;
+
   const classes = useStyles();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,6 +87,7 @@ function CustomNavbar(props) {
           ) : (
             <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
           )}
+          {props.children}
         </Toolbar>
       </AppBar>
 
