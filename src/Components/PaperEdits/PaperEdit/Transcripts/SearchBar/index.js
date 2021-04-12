@@ -12,6 +12,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from 'react-select';
 import colourStyles from '../LabelsList/select-color-styles.js';
 import speakersColorStyles from './select-speakers-color-styles.js';
+import { withTheme } from '@material-ui/styles';
 
 class SearchBar extends Component {
   constructor(props) {
@@ -23,6 +24,7 @@ class SearchBar extends Component {
       showSpeakersSearchPreferences: false,
       showLabelsSearchPreferences: false,
     };
+    const { theme } = props;
   }
 
   handleSpeakersSearchChange = (selectedOptionSpeakerSearch) => {

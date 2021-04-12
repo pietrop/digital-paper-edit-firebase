@@ -6,18 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Skeleton from '@material-ui/lab/Skeleton';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
-import { Switch as MaterialUiSwitch } from '@material-ui/core';
-import {
-  orange,
-  lightBlue,
-  deepOrange,
-  deepPurple,
-  blue,
-  indigo,
-  green,
-  purple,
-  red,
-} from '@material-ui/core/colors';
+import { blue, red } from '@material-ui/core/colors';
 
 import CustomNavbar from './CustomNavbar';
 import firebase from './Firebase.js';
@@ -38,8 +27,10 @@ import Project from './Components/Projects/Project.js';
 import TranscriptCorrect from './Components/Transcripts/TranscriptCorrect.js';
 import PaperEdit from './Components/PaperEdits/PaperEdit';
 
-const navyBlue = '#023E8A';
-const darkRedColor = '#b2102f';
+const lightModePrimary = blue['900'];
+const lightModeSecondary = red['900'];
+const darkModePrimary = blue['400'];
+const darkModeSecondary = red['700'];
 
 const demoWarningMessage = (
   <>
@@ -63,8 +54,8 @@ function App(props) {
   const initialDarkModeState = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const [darkState, setDarkState] = useState(initialDarkModeState);
   const palletType = darkState ? 'dark' : 'light';
-  const mainPrimaryColor = darkState ? '#00A4E4' : navyBlue;
-  const mainSecondaryColor = darkState ? '#00A4E4' : darkRedColor;
+  const mainPrimaryColor = darkState ? darkModePrimary : lightModePrimary;
+  const mainSecondaryColor = darkState ? darkModeSecondary : lightModeSecondary;
 
   const darkTheme = createMuiTheme({
     palette: {
@@ -131,8 +122,10 @@ function App(props) {
         {envWarning}
         {offlineWarning}
         <CustomNavbar firebase={firebase} handleUserChange={handleUserChange}>
-          <MaterialUiSwitch checked={darkState} onChange={handleThemeChange} />
-          {darkState ? <Brightness5Icon /> : <Brightness4Icon />}
+          <span style={{ cursor: 'pointer' }} onClick={handleThemeChange}>
+            {' '}
+            {darkState ? <Brightness5Icon /> : <Brightness4Icon />}
+          </span>
         </CustomNavbar>
 
         {user ? (
