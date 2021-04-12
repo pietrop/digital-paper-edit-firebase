@@ -23,6 +23,11 @@ import CustomNavbar from './CustomNavbar';
 import firebase from './Firebase.js';
 import useOnlineStatus from './Components/lib/useOnlineStatus';
 
+import Brightness3Icon from '@material-ui/icons/Brightness3';
+import Brightness4Icon from '@material-ui/icons/Brightness4';
+import Brightness5Icon from '@material-ui/icons/Brightness5';
+import WbSunnyIcon from '@material-ui/icons/WbSunny';
+
 // const Projects = lazy(() => import('./Components/Projects/index.js'));
 // const Project = lazy(() => import('./Components/Projects/Project.js'));
 // const TranscriptCorrect = lazy(() => import('./Components/Transcripts/TranscriptCorrect.js'));
@@ -127,6 +132,7 @@ function App(props) {
         {offlineWarning}
         <CustomNavbar firebase={firebase} handleUserChange={handleUserChange}>
           <MaterialUiSwitch checked={darkState} onChange={handleThemeChange} />
+          {darkState ? <Brightness5Icon /> : <Brightness4Icon />}
         </CustomNavbar>
 
         {user ? (
