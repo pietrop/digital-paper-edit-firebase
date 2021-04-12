@@ -58,8 +58,8 @@ function App(props) {
   const initialDarkModeState = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const [darkState, setDarkState] = useState(initialDarkModeState);
   const palletType = darkState ? 'dark' : 'light';
-  const mainPrimaryColor = darkState ? orange[500] : navyBlue;
-  const mainSecondaryColor = darkState ? deepOrange[900] : darkRedColor;
+  const mainPrimaryColor = darkState ? '#00A4E4' : navyBlue;
+  const mainSecondaryColor = darkState ? '#00A4E4' : darkRedColor;
 
   const darkTheme = createMuiTheme({
     palette: {
