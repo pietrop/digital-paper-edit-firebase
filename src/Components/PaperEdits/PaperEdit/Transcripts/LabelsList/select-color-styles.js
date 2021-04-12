@@ -2,12 +2,13 @@
 // https://react-select.com/styles
 // import chroma from 'chroma-js';
 
+const customBabckgroundColor = 'white';
 const colourStyles = {
-  control: styles => ({ ...styles, backgroundColor: 'white' }),
+  control: (styles) => ({ ...styles, backgroundColor: customBabckgroundColor }),
   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
     // const color = chroma(data.color);
 
-    const tmpBackgroundColor = null;// 'black;
+    const tmpBackgroundColor = customBabckgroundColor; //null; //
     // if (isDisabled) {
     //   tmpBackgroundColor = null;
     // }
@@ -31,11 +32,12 @@ const colourStyles = {
     return {
       ...styles,
       backgroundColor: tmpBackgroundColor,
+      color: 'black',
       borderLeft: '1.5em solid',
       borderColor: tmpColor,
       marginBottom: '0.4em',
       // color: tmpColor,
-      cursor: isDisabled ? 'not-allowed' : 'default'
+      cursor: isDisabled ? 'not-allowed' : 'default',
     };
   },
   //   return {
@@ -69,7 +71,7 @@ const colourStyles = {
     return {
       ...styles,
       // backgroundColor: color.alpha(0.1).css()
-      backgroundColor: 'white',
+      backgroundColor: customBabckgroundColor,
       border: '0.05em solid',
       borderLeft: '1.2em solid',
       borderColor: data.color,
@@ -86,7 +88,7 @@ const colourStyles = {
     //   backgroundColor: data.color,
     //   color: 'white'
     // }
-  })
+  }),
 };
 
 export default colourStyles;

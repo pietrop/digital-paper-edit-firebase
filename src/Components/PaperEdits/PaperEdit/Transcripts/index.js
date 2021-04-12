@@ -358,10 +358,10 @@ class Transcripts extends Component {
             {/* This is to style of the Paragraph component programmatically */}
             {`${
               this.state.sentenceToSearchCSS
-            } { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
+            } { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black; color: ${'black'};  }`}
             {`${
               this.state.sentenceToSearchCSSInHighlights
-            } { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
+            } { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black; color: ${'black'};  }`}
           </style>
           <Grid container disableGutters={true}>
             <Grid

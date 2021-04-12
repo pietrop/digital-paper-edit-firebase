@@ -2,32 +2,31 @@
 // https://react-select.com/styles
 
 const speakersColorStyles = {
-  control: styles => ({ ...styles, backgroundColor: 'white' }),
+  control: (styles) => ({ ...styles, backgroundColor: 'white' }),
   option: (styles) => {
-
-    const tmpBackgroundColor = null;
+    const tmpBackgroundColor = 'white'; // null;
 
     return {
       ...styles,
+      color: 'black',
       backgroundColor: tmpBackgroundColor,
-      cursor:'default'
+      cursor: 'default',
     };
   },
 
   multiValue: (styles) => {
-
     return {
       ...styles,
       backgroundColor: 'white',
-      border: '0.05em solid grey'
+      border: '0.05em solid grey',
     };
   },
   multiValueLabel: (styles) => ({
-    ...styles
+    ...styles,
   }),
   multiValueRemove: (styles) => ({
-    ...styles
-  })
+    ...styles,
+  }),
 };
 
 export default speakersColorStyles;
