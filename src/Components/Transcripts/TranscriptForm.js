@@ -17,6 +17,7 @@ import whichJsEnv from '../../Util/which-js-env';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
 import languages from './languages';
 import getMediaType from '../../Util/get-media-type';
+import selectTranscriptLanguageColor from './select-transcript-language-color';
 
 const LANGUAGE_US_ENGLISH_INDEX = 25;
 const LANGUAGE_CODE_US_ENGLISH = 'en-US';
@@ -87,22 +88,25 @@ class TranscriptForm extends Component {
 
   // This is used in Aobe CEP Panel integration only
   handleAdobeCepSetFilePath = () => {
-    window.__adobe_cep__.evalScript(`$._PPP.get_current_project_panel_selection_absolute_path()`, (response) => {
-      console.log('handleAdobeCepSetFilePath');
-      if (response !== '') {
-        console.log('handleAdobeCepSetFilePath', response);
-        //  const newFilePath = response;
-        //  fileName = path.basename(newFilePath);
-        // TODO: add some visual quee that this worked (eg alert box at top? or file name/path somewhere)
-        this.setState({
-          title: path.basename(response),
-          adobeCepFilePath: response,
-        });
-      } else {
-        // TODO: review logic for edge case
-        alert('select a clip');
+    window.__adobe_cep__.evalScript(
+      `$._PPP.get_current_project_panel_selection_absolute_path()`,
+      (response) => {
+        console.log('handleAdobeCepSetFilePath');
+        if (response !== '') {
+          console.log('handleAdobeCepSetFilePath', response);
+          //  const newFilePath = response;
+          //  fileName = path.basename(newFilePath);
+          // TODO: add some visual quee that this worked (eg alert box at top? or file name/path somewhere)
+          this.setState({
+            title: path.basename(response),
+            adobeCepFilePath: response,
+          });
+        } else {
+          // TODO: review logic for edge case
+          alert('select a clip');
+        }
       }
-    });
+    );
   };
   updateProgressValue = (value) => {
     this.setState({
@@ -210,7 +214,12 @@ class TranscriptForm extends Component {
     }
     // TODO: do you need a try catch?
     try {
-      ApiWrapper.createTranscript(this.state.projectId, this.state.formData, {}, this.updateProgressValue)
+      ApiWrapper.createTranscript(
+        this.state.projectId,
+        this.state.formData,
+        {},
+        this.updateProgressValue
+      )
         .then((response) => {
           console.log('ApiWrapper.createTranscript-response ', response);
           // show message or redirect
@@ -276,15 +285,22 @@ class TranscriptForm extends Component {
                     Pick a file
                   </Button>
                   <InputLabel className="text-muted">
-                    Select an audio or video file to transcribe. Click on a file in the Adobe Premiere project browser window, and the click{' '}
-                    <code>pick a file</code> to select a file to transcribe. Then click <code>save</code> when you are ready to start the
-                    transcriptiion.
+                    Select an audio or video file to transcribe. Click on a file in the Adobe
+                    Premiere project browser window, and the click <code>pick a file</code> to
+                    select a file to transcribe. Then click <code>save</code> when you are ready to
+                    start the transcriptiion.
                   </InputLabel>
                 </>
               ) : (
                 <FormControl controlId="formTranscriptMediaFile" fullWidth={true}>
                   <InputLabel>File </InputLabel>
-                  <Input required type="file" label="Upload" accept="audio/*,video/*,.mxf, audio/x-m4a" onChange={this.handleFileUpload} />
+                  <Input
+                    required
+                    type="file"
+                    label="Upload"
+                    accept="audio/*,video/*,.mxf, audio/x-m4a"
+                    onChange={this.handleFileUpload}
+                  />
                   <FormHelperText className="text-muted">
                     Select an audio or video file to transcribe. <br />
                     For video files, there's a limit to <code>2Gig</code> in file size
@@ -302,16 +318,29 @@ class TranscriptForm extends Component {
                   <br />
                   <InputLabel>Audio Preview </InputLabel>
                   <Chip label={this.state.audioPreviewProgressValueAsTime} />
-                  <Chip avatar={<Avatar>%</Avatar>} label={parseInt(this.state.audioPreviewProgressValue)} />
+                  <Chip
+                    avatar={<Avatar>%</Avatar>}
+                    label={parseInt(this.state.audioPreviewProgressValue)}
+                  />
                   <FormControl controlId="formTranscriptDescription" fullWidth={true}>
                     <br />
-                    <LinearProgress variant="determinate" fullWidth={true} value={this.state.audioPreviewProgressValue} />
+                    <LinearProgress
+                      variant="determinate"
+                      fullWidth={true}
+                      value={this.state.audioPreviewProgressValue}
+                    />
                     <br />
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={12}>
                   <FormControl controlId="formTranscriptTitle" fullWidth={true}>
-                    {this.state.audioPreviewSrc ? <audio src={this.state.audioPreviewSrc} controls style={{ width: '100%' }}></audio> : null}
+                    {this.state.audioPreviewSrc ? (
+                      <audio
+                        src={this.state.audioPreviewSrc}
+                        controls
+                        style={{ width: '100%' }}
+                      ></audio>
+                    ) : null}
                   </FormControl>
                 </Grid>
               </>
@@ -328,7 +357,9 @@ class TranscriptForm extends Component {
                   value={this.state.title}
                   onChange={this.handleTitleChange}
                 />
-                <FormHelperText className="text-muted">Chose a title for your Transcript</FormHelperText>
+                <FormHelperText className="text-muted">
+                  Chose a title for your Transcript
+                </FormHelperText>
                 {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
                 {/* <Form.Control.Feedback type="invalid">Please chose a title for your transcript</Form.Control.Feedback> */}
               </FormControl>
@@ -344,7 +375,9 @@ class TranscriptForm extends Component {
                   value={this.state.description}
                   onChange={this.handleDescriptionChange}
                 />
-                <FormHelperText className="text-muted">Chose an optional description for your Transcript</FormHelperText>
+                <FormHelperText className="text-muted">
+                  Chose an optional description for your Transcript
+                </FormHelperText>
                 {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
                 {/* <Form.Control.Feedback type="invalid">Please chose a description for your transcript</Form.Control.Feedback> */}
               </FormControl>
@@ -358,10 +391,12 @@ class TranscriptForm extends Component {
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={12}>
                   <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
+                    <br />
                     <Select
                       onChange={this.handleLanguageChange}
                       options={languagesOptions}
                       defaultValue={languagesOptions[DEFAULT_LANGUAGE_OPTION_INDEX]}
+                      styles={selectTranscriptLanguageColor}
                     />
                   </FormControl>
                 </Grid>
@@ -372,7 +407,11 @@ class TranscriptForm extends Component {
                 <>
                   <FormControl controlId="formTranscriptDescription" fullWidth={true}>
                     <br />
-                    <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
+                    <LinearProgress
+                      variant="determinate"
+                      fullWidth={true}
+                      value={this.state.progressValue}
+                    />
                     <br />
                   </FormControl>
                 </>
@@ -381,7 +420,12 @@ class TranscriptForm extends Component {
 
             <Grid item xs={12} sm={12} md={12} lg={12}>
               <br />
-              <Button variant="contained" color="primary" type="submit" disabled={this.state.uploading}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={this.state.uploading}
+              >
                 Save
               </Button>
             </Grid>
