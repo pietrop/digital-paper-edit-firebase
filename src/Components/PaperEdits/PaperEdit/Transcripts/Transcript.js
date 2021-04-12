@@ -37,7 +37,12 @@ class Transcript extends Component {
   }
 
   componentDidMount = () => {
-    console.log('Transcript componentDidMount getAllAnnotations', this.props.projectId, 'this.props.transcriptId', this.props.transcriptId);
+    console.log(
+      'Transcript componentDidMount getAllAnnotations',
+      this.props.projectId,
+      'this.props.transcriptId',
+      this.props.transcriptId
+    );
     ApiWrapper.getAllAnnotations(this.props.projectId, this.props.transcriptId).then((json) => {
       // console.log(' ApiWrapper.getAllAnnotations', json);
       this.setState({
@@ -175,7 +180,11 @@ class Transcript extends Component {
       selection.note = '';
       const newAnnotation = selection;
       console.log('newAnnotation', newAnnotation);
-      ApiWrapper.createAnnotation(this.props.projectId, this.props.transcriptId, newAnnotation).then((json) => {
+      ApiWrapper.createAnnotation(
+        this.props.projectId,
+        this.props.transcriptId,
+        newAnnotation
+      ).then((json) => {
         const newAnnotationFromServer = json.annotation;
         console.log('newAnnotationFromServer', newAnnotationFromServer);
         // console.log('handleCreateAnnotation', newAnnotation);
@@ -201,9 +210,11 @@ class Transcript extends Component {
     });
 
     const deepCloneOfNestedObjectNewAnnotationsSet = JSON.parse(JSON.stringify(newAnnotationsSet));
-    ApiWrapper.deleteAnnotation(this.props.projectId, this.props.transcriptId, annotationId).then((json) => {
-      this.setState({ annotations: deepCloneOfNestedObjectNewAnnotationsSet });
-    });
+    ApiWrapper.deleteAnnotation(this.props.projectId, this.props.transcriptId, annotationId).then(
+      (json) => {
+        this.setState({ annotations: deepCloneOfNestedObjectNewAnnotationsSet });
+      }
+    );
   };
 
   // TODO: add server side via ApiWrapper
@@ -216,7 +227,12 @@ class Transcript extends Component {
     const newNote = prompt('Edit the text note of the annotation', newAnnotationToEdit.note);
     if (newNote) {
       newAnnotationToEdit.note = newNote;
-      ApiWrapper.updateAnnotation(this.state.projectId, this.props.transcriptId, annotationId, newAnnotationToEdit).then((json) => {
+      ApiWrapper.updateAnnotation(
+        this.state.projectId,
+        this.props.transcriptId,
+        annotationId,
+        newAnnotationToEdit
+      ).then((json) => {
         const newAnnotation = json.annotation;
         // updating annotations client side by removing updating one
         // and re-adding to array
@@ -260,15 +276,22 @@ class Transcript extends Component {
     const time = Math.round(currentWordTime * 4.0) / 4.0;
     const highlights = (
       <style scoped>
-        {`span.words[data-prev-times~="${Math.floor(time)}"][data-transcript-id="${this.props.transcriptId}"] { color: ${unplayedColor} }`}
+        {`span.words[data-prev-times~="${Math.floor(time)}"][data-transcript-id="${
+          this.props.transcriptId
+        }"] { color: ${unplayedColor} }`}
       </style>
     );
     return (
       <>
         <style scoped>
           {/* This is to style of the Paragraph component programmatically */}
-          {`${this.state.sentenceToSearchCSS} { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
-          {`${this.state.sentenceToSearchCSSInHighlights} { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
+          {`${
+            this.state.sentenceToSearchCSS
+          } { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black; color: ${'black'}; }`}
+
+          {`${
+            this.state.sentenceToSearchCSSInHighlights
+          } { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black; color: ${'black'};  }`}
         </style>
         <Card
           style={
@@ -302,7 +325,10 @@ class Transcript extends Component {
           <CardContent style={{ paddingBottom: '0.5em', paddingTop: '0.5em' }}>
             <Grid container>
               <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                <SplitButton handleCreateAnnotation={this.handleCreateAnnotation} options={this.state.labelsOptions}>
+                <SplitButton
+                  handleCreateAnnotation={this.handleCreateAnnotation}
+                  options={this.state.labelsOptions}
+                >
                   <LabelsList
                     isLabelsListOpen={this.state.isLabelsListOpen}
                     labelsOptions={this.state.labelsOptions && this.state.labelsOptions}
@@ -352,7 +378,11 @@ class Transcript extends Component {
           <CardContent style={{ paddingBottom: '0px', paddingTop: '0px' }}>
             <SearchBar
               labelsOptions={this.state.labelsOptions}
-              speakersOptions={this.props.transcript ? makeListOfUniqueSpeakers(this.props.transcript.paragraphs) : null}
+              speakersOptions={
+                this.props.transcript
+                  ? makeListOfUniqueSpeakers(this.props.transcript.paragraphs)
+                  : null
+              }
               handleSearch={this.handleSearch}
               handleLabelsSearchChange={this.handleLabelsSearchChange}
               handleSpeakersSearchChange={this.handleSpeakersSearchChange}
@@ -407,8 +437,14 @@ class Transcript extends Component {
                   transcriptJson={this.props.transcript}
                   searchString={this.state.searchString ? this.state.searchString : ''}
                   showParagraphsMatchingSearch={this.state.showParagraphsMatchingSearch}
-                  selectedOptionLabelSearch={this.state.selectedOptionLabelSearch ? this.state.selectedOptionLabelSearch : []}
-                  selectedOptionSpeakerSearch={this.state.selectedOptionSpeakerSearch ? this.state.selectedOptionSpeakerSearch : []}
+                  selectedOptionLabelSearch={
+                    this.state.selectedOptionLabelSearch ? this.state.selectedOptionLabelSearch : []
+                  }
+                  selectedOptionSpeakerSearch={
+                    this.state.selectedOptionSpeakerSearch
+                      ? this.state.selectedOptionSpeakerSearch
+                      : []
+                  }
                   transcriptId={this.props.transcriptId}
                   handleTimecodeClick={this.handleTimecodeClick}
                   handleWordClick={this.handleWordClick}

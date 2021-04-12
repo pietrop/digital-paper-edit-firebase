@@ -1,14 +1,18 @@
 // helper function for adding custom stylings to speakers in react-select component in search bar
 // https://react-select.com/styles
 
-const speakersColorStyles = {
-  control: (styles) => ({ ...styles, backgroundColor: 'white' }),
-  option: (styles) => {
-    const tmpBackgroundColor = 'white'; // null;
+const tmpBackgroundColor = 'white';
+const tmpColor = 'black';
 
+const selectTranscriptLanguageColor = {
+  control: (styles) => ({
+    ...styles,
+    backgroundColor: tmpBackgroundColor,
+  }),
+  option: (styles) => {
     return {
       ...styles,
-      color: 'black',
+      color: tmpColor,
       backgroundColor: tmpBackgroundColor,
       cursor: 'default',
     };
@@ -17,7 +21,7 @@ const speakersColorStyles = {
   multiValue: (styles) => {
     return {
       ...styles,
-      backgroundColor: 'white',
+      backgroundColor: tmpBackgroundColor,
       border: '0.05em solid grey',
     };
   },
@@ -29,4 +33,4 @@ const speakersColorStyles = {
   }),
 };
 
-export default speakersColorStyles;
+export default selectTranscriptLanguageColor;

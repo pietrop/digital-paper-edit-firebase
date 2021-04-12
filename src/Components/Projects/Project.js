@@ -15,7 +15,13 @@ function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
   return (
-    <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
       {value === index && (
         <Box p={3}>
           <Typography>{children}</Typography>
@@ -41,7 +47,7 @@ function a11yProps(index) {
 const useStyles = makeStyles((theme) => ({
   root: {
     // flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
+    // backgroundColor: theme.palette.background.paper,
   },
 }));
 
@@ -92,7 +98,14 @@ function Project(props) {
         </Grid>
         {/* <div className={classes.root}> */}
         {/* <Paper position="static" square> */}
-        <Tabs centered indicatorColor="primary" textColor="primary" value={value} onChange={handleChange} aria-label="simple tabs example">
+        <Tabs
+          centered
+          indicatorColor="primary"
+          textColor="primary"
+          value={value}
+          onChange={handleChange}
+          aria-label="simple tabs example"
+        >
           <Tab label="Transcripts" {...a11yProps(0)} />
           <Tab label="Paper Edits" {...a11yProps(1)} />
         </Tabs>

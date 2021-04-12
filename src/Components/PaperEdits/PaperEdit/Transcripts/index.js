@@ -26,7 +26,13 @@ function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
   return (
-    <div role="tabpanel" hidden={value !== index} id={`vertical-tabpanel-${index}`} aria-labelledby={`vertical-tab-${index}`} {...other}>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`vertical-tabpanel-${index}`}
+      aria-labelledby={`vertical-tab-${index}`}
+      {...other}
+    >
       {value === index && (
         <Box p={3}>
           <Typography>{children}</Typography>
@@ -52,7 +58,7 @@ function a11yProps(index) {
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
+    // backgroundColor: theme.palette.background.paper,
     display: 'flex',
     height: 224,
   },
@@ -212,7 +218,12 @@ class Transcripts extends Component {
           label={
             <>
               {transcript.status === 'in-progress' ? <QueryBuilderIcon /> : ''}
-              {(transcript.status !== 'done' && transcript.status !== 'in-progress') || transcript.status === 'error' ? <WarningIcon /> : ''}
+              {(transcript.status !== 'done' && transcript.status !== 'in-progress') ||
+              transcript.status === 'error' ? (
+                <WarningIcon />
+              ) : (
+                ''
+              )}
               {`  ${transcript.transcriptTitle}`}
             </>
           }
@@ -250,7 +261,10 @@ class Transcripts extends Component {
         return { value: 'test', label: 'test' };
       }
     });
-    const transcriptsUniqueListOfSpeakers = transcriptsUniqueListOfSpeakers2D.reduce(function (prev, curr) {
+    const transcriptsUniqueListOfSpeakers = transcriptsUniqueListOfSpeakers2D.reduce(function (
+      prev,
+      curr
+    ) {
       return prev.concat(curr);
     });
     // remove duplicates
@@ -258,7 +272,9 @@ class Transcripts extends Component {
       //  https://stackoverflow.com/questions/2218999/remove-duplicates-from-an-array-of-objects-in-javascript
       return Array.from(new Set(array.map(JSON.stringify))).map(JSON.parse);
     }
-    const transcriptsUniqueListOfSpeakersNoDuplicates = removeDuplicates(transcriptsUniqueListOfSpeakers);
+    const transcriptsUniqueListOfSpeakersNoDuplicates = removeDuplicates(
+      transcriptsUniqueListOfSpeakers
+    );
 
     /* TODO: Will this work? */
     const searchBarTranscriptsElement = (
@@ -273,7 +289,9 @@ class Transcripts extends Component {
         transcriptOptions={transcriptsOptions}
         handleTranscriptSearchChange={this.handleTranscriptSearchChange}
         handleFilterResults={this.handleFilterResults}
-        handleShowAdvancedSearchViewSearchingAcrossTranscripts={this.handleShowAdvancedSearchViewSearchingAcrossTranscripts}
+        handleShowAdvancedSearchViewSearchingAcrossTranscripts={
+          this.handleShowAdvancedSearchViewSearchingAcrossTranscripts
+        }
       />
     );
 
@@ -307,8 +325,12 @@ class Transcripts extends Component {
             transcriptJson={transcript.transcript}
             searchString={this.state.searchString ? this.state.searchString : ''}
             showParagraphsMatchingSearch={this.state.showParagraphsMatchingSearch}
-            selectedOptionLabelSearch={this.state.selectedOptionLabelSearch ? this.state.selectedOptionLabelSearch : []}
-            selectedOptionSpeakerSearch={this.state.selectedOptionSpeakerSearch ? this.state.selectedOptionSpeakerSearch : []}
+            selectedOptionLabelSearch={
+              this.state.selectedOptionLabelSearch ? this.state.selectedOptionLabelSearch : []
+            }
+            selectedOptionSpeakerSearch={
+              this.state.selectedOptionSpeakerSearch ? this.state.selectedOptionSpeakerSearch : []
+            }
             transcriptId={transcript.id}
             handleTimecodeClick={this.handleTimecodeClick}
             // TODO: these attributes below have not been implemented - low priority
@@ -334,11 +356,19 @@ class Transcripts extends Component {
         <Container disableGutters={true}>
           <style scoped>
             {/* This is to style of the Paragraph component programmatically */}
-            {`${this.state.sentenceToSearchCSS} { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
-            {`${this.state.sentenceToSearchCSSInHighlights} { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black }`}
+            {`${
+              this.state.sentenceToSearchCSS
+            } { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black; color: ${'black'};  }`}
+            {`${
+              this.state.sentenceToSearchCSSInHighlights
+            } { background-color: ${'yellow'}; text-shadow: 0 0 0.01px black; color: ${'black'};  }`}
           </style>
           <Grid container disableGutters={true}>
-            <Grid item xs={12} sm={!this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? 4 : 0}>
+            <Grid
+              item
+              xs={12}
+              sm={!this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? 4 : 0}
+            >
               {!this.state.showAdvancedSearchViewSearchingAcrossTranscripts ? (
                 <>
                   <Button

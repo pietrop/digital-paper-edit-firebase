@@ -19,6 +19,7 @@ import CustomAlert from '../lib/CustomAlert/index.js';
 import NoNeedToConvertNotice from '../lib/NoNeedToConvertNotice/index.js';
 import whichJsEnv from '../../Util/which-js-env';
 import languages from './languages';
+import selectTranscriptLanguageColor from './select-transcript-language-color';
 
 const LANGUAGE_US_ENGLISH_INDEX = 25;
 const LANGUAGE_CODE_US_ENGLISH = 'en-US';
@@ -66,22 +67,25 @@ class BatchTranscriptForm extends Component {
 
   // This is used in Aobe CEP Panel integration only
   handleAdobeCepSetFilePath = () => {
-    window.__adobe_cep__.evalScript(`$._PPP.get_current_project_panel_selection_absolute_path()`, (response) => {
-      console.log('handleAdobeCepSetFilePath');
-      if (response !== '') {
-        console.log('handleAdobeCepSetFilePath', response);
-        //  const newFilePath = response;
-        //  fileName = path.basename(newFilePath);
-        // TODO: add some visual quee that this worked (eg alert box at top? or file name/path somewhere)
-        this.setState({
-          title: path.basename(response),
-          adobeCepFilePath: response,
-        });
-      } else {
-        // TODO: review logic for edge case
-        alert('select a clip');
+    window.__adobe_cep__.evalScript(
+      `$._PPP.get_current_project_panel_selection_absolute_path()`,
+      (response) => {
+        console.log('handleAdobeCepSetFilePath');
+        if (response !== '') {
+          console.log('handleAdobeCepSetFilePath', response);
+          //  const newFilePath = response;
+          //  fileName = path.basename(newFilePath);
+          // TODO: add some visual quee that this worked (eg alert box at top? or file name/path somewhere)
+          this.setState({
+            title: path.basename(response),
+            adobeCepFilePath: response,
+          });
+        } else {
+          // TODO: review logic for edge case
+          alert('select a clip');
+        }
       }
-    });
+    );
   };
   // https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
   handleFileUpload = (e) => {
@@ -167,7 +171,9 @@ class BatchTranscriptForm extends Component {
                     dismissable={true}
                     variant={'danger'}
                     heading={'Error could not contact the server'}
-                    message={<p>There was an error trying to create this transcript on the server</p>}
+                    message={
+                      <p>There was an error trying to create this transcript on the server</p>
+                    }
                   />
                 ),
               });
@@ -197,7 +203,12 @@ class BatchTranscriptForm extends Component {
         };
 
         try {
-          ApiWrapper.createTranscript(this.state.projectId, individualFileFormData, data, this.updateProgressValue)
+          ApiWrapper.createTranscript(
+            this.state.projectId,
+            individualFileFormData,
+            data,
+            this.updateProgressValue
+          )
             .then((response) => {
               console.log('ApiWrapper.createTranscript-response ', response);
               // show message or redirect
@@ -220,7 +231,9 @@ class BatchTranscriptForm extends Component {
                     dismissable={true}
                     variant={'danger'}
                     heading={'Error could not contact the server'}
-                    message={<p>There was an error trying to create this transcript on the server</p>}
+                    message={
+                      <p>There was an error trying to create this transcript on the server</p>
+                    }
                   />
                 ),
               });
@@ -271,15 +284,21 @@ class BatchTranscriptForm extends Component {
                   inputProps={{ multiple: true, accept: 'audio/*,video/*,.mxf' }}
                   onChange={this.handleFileUpload}
                 />
-                <FormHelperText className="text-muted">Select multiple audio or video file to transcribe.</FormHelperText>
-                <br />
                 <FormHelperText className="text-muted">
-                  This allows you to batch transcribe multiple files, the transcript name will default to the clip name.
+                  Select multiple audio or video file to transcribe.
                 </FormHelperText>
-                <FormHelperText className="text-muted">You can change the default transcript name after you've clicked save.</FormHelperText>
                 <br />
                 <FormHelperText className="text-muted">
-                  Use command <code>⌘</code> + click or shift <code>⇧</code> + click to select multiple files.
+                  This allows you to batch transcribe multiple files, the transcript name will
+                  default to the clip name.
+                </FormHelperText>
+                <FormHelperText className="text-muted">
+                  You can change the default transcript name after you've clicked save.
+                </FormHelperText>
+                <br />
+                <FormHelperText className="text-muted">
+                  Use command <code>⌘</code> + click or shift <code>⇧</code> + click to select
+                  multiple files.
                 </FormHelperText>
                 {/* <Form.Control.Feedback>Looks good!</Form.Control.Feedback> */}
                 {/* <Form.Control.Feedback type="invalid">Please chose a audio or video file to transcribe</Form.Control.Feedback> */}
@@ -294,10 +313,12 @@ class BatchTranscriptForm extends Component {
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={12}>
                   <FormControl controlId="exampleForm.SelectCustomSizeSm" fullWidth={true}>
+                    <br />
                     <Select
                       onChange={this.handleLanguageChange}
                       options={languagesOptions}
                       defaultValue={languagesOptions[DEFAULT_LANGUAGE_OPTION_INDEX]}
+                      styles={selectTranscriptLanguageColor}
                     />
                   </FormControl>
                 </Grid>
@@ -307,7 +328,11 @@ class BatchTranscriptForm extends Component {
               {this.state.progressValue !== 0 && (
                 <>
                   <br />
-                  <LinearProgress variant="determinate" fullWidth={true} value={this.state.progressValue} />
+                  <LinearProgress
+                    variant="determinate"
+                    fullWidth={true}
+                    value={this.state.progressValue}
+                  />
                   <br />
                 </>
               )}

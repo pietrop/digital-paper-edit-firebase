@@ -57,7 +57,14 @@ const LabelModal = ({ color, label, description, labelId, onLabelSaved, openBtn 
             <SettingsOutlinedIcon />
             Label
           </Typography>
-          <LabelForm onLabelSaved={onLabelSaved} label={label} description={description} color={color} labelId={labelId} handleClose={handleClose} />
+          <LabelForm
+            onLabelSaved={onLabelSaved}
+            label={label}
+            description={description}
+            color={color}
+            labelId={labelId}
+            handleClose={handleClose}
+          />
         </div>
       </Modal>
     </>
